@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:fanmi/config/tim_config.dart';
+import 'package:fanmi/enums/is_applicant_enum.dart';
+import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
@@ -74,7 +78,7 @@ class _MainPageState extends State<MainPage> {
               list.forEach((element) {
                 print("已读回执${element.userID} ${element.timestamp}");
                 Provider.of<MessageListModel>(context, listen: false)
-                    .updateC2CMessageByUserId(element.userID);
+                    .updateReadReceiptByUserId(element.userID);
               });
             },
             //发送消息进度监听
@@ -95,7 +99,26 @@ class _MainPageState extends State<MainPage> {
             //接受到新消息
             onRecvNewMessage: (data) {
               try {
-                String key=data.userID!;
+                String key = data.userID!;
+                //接收到好友申请消息，需要把消息里带过来的 名字/头像/是申请者/申请的名片id & type 更新好友信息
+                if (data.customElem != null &&
+                    data.customElem!.desc ==
+                        MessageTypeEnum.APPLICATION.toString()) {
+                  Map<String, String> customDataMap =
+                      json.decode(data.customElem!.data!);
+                  TencentImSDKPlugin.v2TIMManager
+                      .getFriendshipManager()
+                      .setFriendInfo(
+                    friendRemark: customDataMap['name'],
+                    userID: data.userID!,
+                    friendCustomInfo: {
+                      "avatar_url": customDataMap['avatar_url']!,
+                      "is_applicant": IsApplicantEnum.YES.toString(),
+                      "applied_card_id": customDataMap['applied_card_id']!,
+                      "applied_card_type": customDataMap['applied_card_type']!,
+                    },
+                  );
+                }
                 Provider.of<MessageListModel>(context, listen: false)
                     .addOneMessageIfNotExits(key, data);
               } catch (err) {

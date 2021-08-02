@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>fanmi_app_v2</string>
+	<string>凡觅</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -41,5 +41,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>本地保存图片服务需要访问您的图片库</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>上传图片服务需要访问您的图片库</string>
 </dict>
 </plist>

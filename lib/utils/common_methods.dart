@@ -1,5 +1,3 @@
-
-
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/storage_manager.dart';
 import 'package:fanmi/view_models/card_list_model.dart';

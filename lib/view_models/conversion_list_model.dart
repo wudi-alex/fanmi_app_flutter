@@ -16,23 +16,25 @@ import 'package:tuple/tuple.dart';
 class ConversionListModel extends ChangeNotifier {
   String nextSeq = '0';
 
-  Map<String, V2TimConversation> _conversionMap = {};
-  Map<String, V2TimUserFullInfo> _userInfoMap = {};
-  Map<String, V2TimFriendInfo> _friendInfoMap = {};
+  Map<String, V2TimConversation> conversionMap = {};
+  Map<String, V2TimUserFullInfo> userInfoMap = {};
+  Map<String, V2TimFriendInfo> friendInfoMap = {};
+
+  get pullCnt => 100;
 
   get conversionPageList {
     List<Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>> res =
         [];
-    _conversionMap.forEach((userId, conversionInfo) {
+    conversionMap.forEach((userId, conversionInfo) {
       List list = [];
       list.add(conversionInfo);
-      if (_userInfoMap.containsKey(userId)) {
-        list.add(_userInfoMap[userId]);
+      if (userInfoMap.containsKey(userId)) {
+        list.add(userInfoMap[userId]);
       } else {
         list.add(null);
       }
-      if (_friendInfoMap.containsKey(userId)) {
-        list.add(_friendInfoMap[userId]);
+      if (friendInfoMap.containsKey(userId)) {
+        list.add(friendInfoMap[userId]);
       } else {
         list.add(null);
       }
@@ -47,13 +49,14 @@ class ConversionListModel extends ChangeNotifier {
     var userList = await pullConversionData(nextSeq);
     await pullFriendInfoData(userList);
     await pullUserInfoData(userList);
+    return userList.length > pullCnt;
   }
 
   Future<List<String>> pullConversionData(String nextSeq) async {
     V2TimValueCallback<V2TimConversationResult> response =
         await TencentImSDKPlugin.v2TIMManager
             .getConversationManager()
-            .getConversationList(nextSeq: nextSeq, count: 100);
+            .getConversationList(nextSeq: nextSeq, count: pullCnt);
     if (response.code == 0) {
       List<V2TimConversation?> res = response.data!.conversationList!;
       nextSeq = response.data!.nextSeq!;
@@ -105,7 +108,7 @@ class ConversionListModel extends ChangeNotifier {
     newList.forEach((element) {
       newMap[element!.userID!] = element;
     });
-    updateMap(newMap: newMap, originalMap: _conversionMap, isDelete: isDelete);
+    updateMap(newMap: newMap, originalMap: conversionMap, isDelete: isDelete);
   }
 
   updateFriendInfoMap(List<V2TimFriendInfo> newList, {bool isDelete = false}) {
@@ -113,7 +116,7 @@ class ConversionListModel extends ChangeNotifier {
     newList.forEach((element) {
       newMap[element.userID] = element;
     });
-    updateMap(newMap: newMap, originalMap: _friendInfoMap, isDelete: isDelete);
+    updateMap(newMap: newMap, originalMap: friendInfoMap, isDelete: isDelete);
   }
 
   updateUserInfoMap(List<V2TimUserFullInfo> newList, {bool isDelete = false}) {
@@ -121,27 +124,28 @@ class ConversionListModel extends ChangeNotifier {
     newList.forEach((element) {
       newMap[element.userID!] = element;
     });
-    updateMap(newMap: newMap, originalMap: _userInfoMap, isDelete: isDelete);
+    updateMap(newMap: newMap, originalMap: userInfoMap, isDelete: isDelete);
   }
 
   clear() {
-    _conversionMap = {};
-    _userInfoMap = {};
-    _friendInfoMap = {};
+    conversionMap = {};
+    userInfoMap = {};
+    friendInfoMap = {};
     notifyListeners();
   }
 
   //删除对话。若对方为申请状态is_applicant=1，则等同于拒绝，删除好友
   Future<bool> deleteConversion(String userId) async {
     try {
-      var conversionId = _conversionMap[userId]!.conversationID;
+      var conversionId = conversionMap[userId]!.conversationID;
       V2TimCallback delConRes = await TencentImSDKPlugin.v2TIMManager
           .getConversationManager()
           .deleteConversation(
             conversationID: conversionId,
           );
       bool delFriendResCode = true;
-      if (_friendInfoMap[userId]!.friendCustomInfo!["is_applicant"] == null) {
+      if (friendInfoMap[userId]!.friendCustomInfo!["is_applicant"] ==
+          IsApplicantEnum.YES.toString()) {
         V2TimValueCallback<List<V2TimFriendOperationResult>> res =
             await TencentImSDKPlugin.v2TIMManager
                 .getFriendshipManager()
