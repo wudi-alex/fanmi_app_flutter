@@ -30,7 +30,6 @@ class _ConversionListPageState extends State<ConversionListPage> {
   Widget build(BuildContext context) {
     ConversionListModel conversionListModel =
         Provider.of<ConversionListModel>(context);
-    conversionListModel.pullData();
     var conversionList = conversionListModel.conversionPageList;
     return Scaffold(
       appBar: TitleAppBar(

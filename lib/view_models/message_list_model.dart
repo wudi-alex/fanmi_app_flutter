@@ -1,10 +1,11 @@
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class MessageListModel extends ChangeNotifier {
-  Map<String, List<V2TimMessage>> messageMap = new Map();
+  Map<String, List<V2TimMessage>> messageMap = Map();
 
   get pullCnt => 20;
 
@@ -16,7 +17,7 @@ class MessageListModel extends ChangeNotifier {
     if (res.code == 0) {
       updateMessage(userId, res.data!);
       notifyListeners();
-      return res.data!.length>pullCnt;
+      return res.data!.length > pullCnt;
     } else {
       SmartDialog.showToast("获取历史消息失败");
       return false;

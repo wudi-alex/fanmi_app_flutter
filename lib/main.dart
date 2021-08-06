@@ -1,80 +1,108 @@
+import 'package:fanmi/config/qq_config.dart';
+import 'package:fanmi/pages/splash_page.dart';
+import 'package:fanmi/utils/storage_manager.dart';
+import 'package:fanmi/view_models/card_list_model.dart';
+import 'package:fanmi/view_models/conversion_list_model.dart';
+import 'package:fanmi/view_models/message_list_model.dart';
+import 'package:fanmi/view_models/user_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_kit/tencent_kit.dart';
 
-import 'config/storage_manager.dart';
+import 'config/app_router.dart';
 
 void main() async {
-  /// 确保初始化
+  Provider.debugCheckInvalidValueType = null;
   WidgetsFlutterBinding.ensureInitialized();
-
-  /// 配置初始化
+  Tencent.instance.registerApp(appId: QQConfig.appId);
   await StorageManager.init();
-
-  Tencent.instance.registerApp(appId: "1111833337");
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
-    runApp(MyApp());
+    runApp(FanmiApp());
   });
+  configLoading();
 }
 
-class MyApp extends StatelessWidget {
+class FanmiApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  _FanmiAppState createState() => _FanmiAppState();
+}
+
+class _FanmiAppState extends State<FanmiApp> {
+  @override
+  void initState() {
+    super.initState();
   }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (BuildContext context) => UserModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => CardListModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => ConversionListModel(),
+        ),
+        ChangeNotifierProvider(
+          create: (BuildContext context) => MessageListModel(),
+        ),
+      ],
+      child: ScreenUtilInit(
+        designSize: Size(375, 667),
+        builder: () => RefreshConfiguration(
+          hideFooterWhenNotFull: true,
+          child: MaterialApp(
+            onGenerateRoute: AppRouter.generateRoute,
+            debugShowCheckedModeBanner: false,
+            builder: (BuildContext context, Widget? child) {
+              return GestureDetector(
+                child: FlutterSmartDialog(child: child),
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus &&
+                      currentFocus.focusedChild != null) {
+                    FocusManager.instance.primaryFocus!.unfocus();
+                  }
+                },
+              );
+            },
+            home: SplashPage(),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.doubleBounce
+    ..loadingStyle = EasyLoadingStyle.light
+    ..fontSize=15.0
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.blue
+    ..backgroundColor = Colors.white
+    ..indicatorColor = Colors.blue
+    ..textColor = Colors.black
+    ..maskColor = Colors.grey.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = true;
 }

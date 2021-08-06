@@ -45,6 +45,10 @@ class ConversionListModel extends ChangeNotifier {
     return res;
   }
 
+  init() {
+    pullData();
+  }
+
   pullData() async {
     var userList = await pullConversionData(nextSeq);
     await pullFriendInfoData(userList);

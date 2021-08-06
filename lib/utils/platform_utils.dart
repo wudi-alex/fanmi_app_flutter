@@ -10,7 +10,6 @@ export 'dart:io';
 const bool inProduction = const bool.fromEnvironment("dart.vm.product");
 
 class PlatformUtils {
-
   static Future<PackageInfo> getAppPackageInfo() {
     return PackageInfo.fromPlatform();
   }
@@ -19,19 +18,22 @@ class PlatformUtils {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.version;
   }
+
   static Future<String> getBuildNum() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.buildNumber;
   }
 
-  static Future getDeviceInfo() async {
+  static getDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
-      return await deviceInfo.androidInfo;
+      var res = await deviceInfo.androidInfo;
+      return res.model;
     } else if (Platform.isIOS) {
-      return await deviceInfo.iosInfo;
+      var res = await deviceInfo.iosInfo;
+      return res.utsname.machine;
     } else {
-      return null;
+      return "";
     }
   }
 }

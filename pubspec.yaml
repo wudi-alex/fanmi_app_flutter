@@ -57,6 +57,7 @@ dependencies:
   # 微信登录
   fluwx: ^3.4.3
   image: ^3.0.2
+  # qq登录
   tencent_kit: ^2.1.0
   # 极光推送
   jpush_flutter: ^2.1.2
@@ -68,6 +69,8 @@ dependencies:
   tencent_im_sdk_plugin: ^3.3.0
   # 元组类
   tuple: ^2.0.0
+  # 加载组件
+  flutter_easyloading: ^3.0.0
 
 dev_dependencies:
   flutter_test:

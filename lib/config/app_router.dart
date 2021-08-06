@@ -1,4 +1,4 @@
-import 'package:fanmi/pages/message_page/message_list_page.dart';
+import 'package:fanmi/pages/message_list_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:page_transition/page_transition.dart';
 
