@@ -8,9 +8,10 @@ class CardTypeEnum {
   final String info;
   final int value;
   final String coverUrl;
+  final String hint;
 
   const CardTypeEnum(this.desc, this.svgPath, this.color, this.info, this.value,
-      this.backgroundPath, this.coverUrl);
+      this.backgroundPath, this.coverUrl, this.hint);
 
   static const CardTypeEnum LOVE = CardTypeEnum(
     "恋爱",
@@ -20,6 +21,7 @@ class CardTypeEnum {
     1,
     "assets/images/love_background.png",
     "https://cdn.fanminet.com/love_cover.png",
+    "你可以在这里介绍自己，和描述你的恋爱理想型哦～",
   );
 
   static const CardTypeEnum FRIEND = CardTypeEnum(
@@ -30,6 +32,7 @@ class CardTypeEnum {
     2,
     "assets/images/friend_background.png",
     "https://cdn.fanminet.com/friend_cover.png",
+    "你可以在这里介绍自己，和描述你的交友期望哦～"
   );
 
   static const CardTypeEnum SKILL = CardTypeEnum(
@@ -40,6 +43,7 @@ class CardTypeEnum {
     3,
     "assets/images/skill_background.png",
     "https://cdn.fanminet.com/skill_cover.png",
+    "你可以在这里介绍自己的专业背景或技能，以便同行交流或者帮助需要你的人～",
   );
 
   static const CardTypeEnum HELP = CardTypeEnum(
@@ -50,6 +54,7 @@ class CardTypeEnum {
     4,
     "assets/images/help_background.png",
     "https://cdn.fanminet.com/help_cover.png",
+    "你可以在这里描述你遇到的问题～",
   );
 
   static const CardTypeEnum GROUP = CardTypeEnum(
@@ -60,10 +65,11 @@ class CardTypeEnum {
     5,
     "assets/images/group_background.png",
     "https://cdn.fanminet.com/group_cover.png",
+    "你可以在这里介绍群信息，以方便招揽群友哦～"
   );
 
   static const CardTypeEnum ALL =
-      CardTypeEnum("不限", "assets/svg/rainbow.svg", Colors.cyan, "", 0, "", "");
+      CardTypeEnum("不限", "assets/svg/rainbow.svg", Colors.cyan, "", 0, "", "","");
 
   static CardTypeEnum getCardType(int value) {
     switch (value) {

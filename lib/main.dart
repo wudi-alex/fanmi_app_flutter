@@ -14,6 +14,7 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_kit/tencent_kit.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'config/app_router.dart';
 
@@ -70,7 +71,14 @@ class _FanmiAppState extends State<FanmiApp> {
           child: MaterialApp(
             onGenerateRoute: AppRouter.generateRoute,
             debugShowCheckedModeBanner: false,
-            builder: (BuildContext context, Widget? child) {
+            localizationsDelegates: const <LocalizationsDelegate<dynamic>>[
+              GlobalWidgetsLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            builder: EasyLoading.init(
+                builder: (BuildContext context, Widget? child) {
+              EasyLoading.init();
               return GestureDetector(
                 child: FlutterSmartDialog(child: child),
                 onTap: () {
@@ -81,7 +89,7 @@ class _FanmiAppState extends State<FanmiApp> {
                   }
                 },
               );
-            },
+            }),
             home: SplashPage(),
           ),
         ),
@@ -95,7 +103,7 @@ void configLoading() {
     ..displayDuration = const Duration(milliseconds: 2000)
     ..indicatorType = EasyLoadingIndicatorType.doubleBounce
     ..loadingStyle = EasyLoadingStyle.light
-    ..fontSize=15.0
+    ..fontSize = 15.0
     ..indicatorSize = 45.0
     ..radius = 10.0
     ..progressColor = Colors.blue

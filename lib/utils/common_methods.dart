@@ -23,12 +23,13 @@ logout(BuildContext context) async {
 }
 
 initData(BuildContext context) async {
+  Provider.of<ConversionListModel>(context, listen: false).init();
+  var sig = await Provider.of<UserModel>(context, listen: false).init();
+  Provider.of<CardListModel>(context, listen: false).init();
+
   ///tim登录
   await TencentImSDKPlugin.v2TIMManager.login(
-    userID: StorageManager.uid,
-    userSig: StorageManager.getTimUserSig(),
+    userID: StorageManager.uid.toString(),
+    userSig: sig,
   );
-  Provider.of<ConversionListModel>(context, listen: false).init();
-  Provider.of<UserModel>(context, listen: false).init();
-  Provider.of<CardListModel>(context, listen: false).init();
 }

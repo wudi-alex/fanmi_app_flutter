@@ -11,21 +11,25 @@ class UserModel extends ChangeNotifier {
   V2TimUserFullInfo userTimInfo = V2TimUserFullInfo();
   UserInfoEntity userInfo = UserInfoEntity();
 
-  init() async {
+  Future<String> init() async {
     try {
       var uid = StorageManager.uid;
-      var resp = await UserService.getUserInfo(uid: uid);
+      var resp = await UserService.getUserInfo();
       UserInfoEntity userInfo =
-          userInfoEntityFromJson(UserInfoEntity(), resp.data);
+          userInfoEntityFromJson(UserInfoEntity(), resp.data['user']!);
       setUserInfo(userInfo);
-      StorageManager.saveUserInfo(userInfo);
+      StorageManager.setUserInfo(userInfo);
+      //更新im签名
+      StorageManager.setTimUserSig(resp.data['tim_sig']);
       V2TimValueCallback<List<V2TimUserFullInfo>> infos =
           await TencentImSDKPlugin.v2TIMManager.getUsersInfo(userIDList: [uid]);
       if (infos.code == 0) {
         setUserTimInfo(infos.data![0]);
       }
+      return resp.data['tim_sig'];
     } catch (e, s) {
       setUserInfo(StorageManager.getUserInfo());
+      return StorageManager.getTimUserSig();
     }
   }
 
@@ -40,8 +44,8 @@ class UserModel extends ChangeNotifier {
   }
 
   clear() {
-    V2TimUserFullInfo userTimInfo = V2TimUserFullInfo();
-    UserInfoEntity userInfo = UserInfoEntity();
+    userTimInfo = V2TimUserFullInfo();
+    userInfo = UserInfoEntity();
     notifyListeners();
   }
 }

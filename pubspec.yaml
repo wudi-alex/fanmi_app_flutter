@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.2
   # 设备信息
@@ -38,8 +40,9 @@ dependencies:
   # 展开文字
   expandable_text: ^2.2.0
   # 图片选择器
-  image_picker: ^0.8.0+3
-  multi_image_picker2: ^5.0.2
+#  image_picker: ^0.8.0+3
+#  multi_image_picker2: ^5.0.2
+  wechat_assets_picker: ^6.0.2
   # 滑动组件
   extended_sliver: ^2.0.0
   # 页面切换动画
@@ -71,6 +74,11 @@ dependencies:
   tuple: ^2.0.0
   # 加载组件
   flutter_easyloading: ^3.0.0
+  # 弹跳特效
+  flutter_bounce: ^1.1.0
+  modal_bottom_sheet: ^2.0.0
+  #对话框
+  adaptive_dialog: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -82,3 +90,12 @@ flutter:
   assets:
     - assets/svg/
     - assets/images/
+    - assets/city.json
+
+  fonts:
+    - family: iconfont
+      fonts:
+        - asset: assets/fonts/page_font.ttf
+    - family: Hippo
+      fonts:
+        - asset: assets/fonts/Hippo.ttf

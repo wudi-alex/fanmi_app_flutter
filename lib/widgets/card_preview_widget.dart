@@ -42,34 +42,38 @@ class CardPreviewWidget extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(ratioWrap(20.r))),
           ),
           elevation: 1.0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              cardHead(context),
-              Container(
-                padding: EdgeInsets.fromLTRB(0, ratioWrap(10.r), 0, 0),
-                child: Text(
-                  data.desc!,
-                  maxLines: 5,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                      fontSize: ratioWrap(16.sp),
-                      fontWeight: FontWeight.normal),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+                ratioWrap(10.r), ratioWrap(10.r), ratioWrap(10.r), ratioWrap(10.r)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                cardHead(context),
+                Container(
+                  padding: EdgeInsets.fromLTRB(0, ratioWrap(10.r), 0, 0),
+                  child: Text(
+                    data.desc!,
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: ratioWrap(16.sp),
+                        fontWeight: FontWeight.normal),
+                  ),
                 ),
-              ),
-              data.album != null && data.album!.length > 0
-                  ? Padding(
-                      padding: EdgeInsets.only(top: ratioWrap(10.r)),
-                      child: Album(
-                        imgUrlOrigin: data.album,
-                        onePicDivide: 1 / ratio,
-                        twoPicDivide: 2 / ratio,
-                        threePicDivide: 3 / ratio,
-                      ),
-                    )
-                  : SizedBox.shrink(),
-            ],
+                data.album != null && data.album!.length > 0
+                    ? Padding(
+                        padding: EdgeInsets.only(top: ratioWrap(10.r)),
+                        child: Album(
+                          imgUrlOrigin: data.album,
+                          onePicDivide: 1 / ratio,
+                          twoPicDivide: 2 / ratio,
+                          threePicDivide: 3 / ratio,
+                        ),
+                      )
+                    : SizedBox.shrink(),
+              ],
+            ),
           ),
         ),
       ),
@@ -83,8 +87,8 @@ class CardPreviewWidget extends StatelessWidget {
             CommonImage.avatar(
               imgUrl: data.avatarUrl!,
               callback: callback,
-              radius: ratioWrap(43.r),
-              height: ratioWrap(5.r),
+              radius: ratioWrap(5.r),
+              height: ratioWrap(43.r),
             ),
             SizedBox(
               width: ratioWrap(5.r),

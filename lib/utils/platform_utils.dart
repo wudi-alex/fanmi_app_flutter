@@ -24,7 +24,7 @@ class PlatformUtils {
     return packageInfo.buildNumber;
   }
 
-  static getDeviceInfo() async {
+  static Future<String> getDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       var res = await deviceInfo.androidInfo;

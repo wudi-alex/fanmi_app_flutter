@@ -6,5 +6,5 @@ class SearchGenderFilterEnum {
 class SearchRankTypeEnum {
   static const int DEFAULT = 0;
   static const int SAME_CITY_PREFER = 1;
-  static const int ONLINE_PREFER = 1;
+  static const int ONLINE_PREFER = 2;
 }

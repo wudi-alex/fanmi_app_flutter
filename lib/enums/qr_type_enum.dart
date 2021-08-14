@@ -1,6 +1,6 @@
 class QrTypeEnum {
-  static const int WEIXIN = 0;
-  static const int QQ = 1;
-  static const int WEIXIN_GROUP = 2;
-  static const int QQ_GROUP = 3;
+  static const String WEIXIN = "微信";
+  static const String QQ = "QQ";
+  static const String WEIXIN_GROUP = "微信群";
+  static const String QQ_GROUP = "QQ群";
 }

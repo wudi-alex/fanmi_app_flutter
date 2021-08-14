@@ -14,7 +14,6 @@ import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 

@@ -58,22 +58,10 @@ class _SplashPageState extends State<SplashPage> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Center(
-          child: Column(
-            children: [
-              Image.asset(
-                "assets/images/logo_trans_blue.png",
-                width: 200.r,
-                height: 200.r,
-              ),
-              SizedBox(
-                height: 20.r,
-              ),
-              Image.asset(
-                "assets/images/fanmi_font.png",
-                width: 200.r,
-                height: 120.r,
-              ),
-            ],
+          child: Image.asset(
+            "assets/images/logo_trans_blue.png",
+            width: 200.r,
+            height: 200.r,
           ),
         ),
       ),
