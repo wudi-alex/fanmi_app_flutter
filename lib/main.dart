@@ -101,7 +101,7 @@ class _FanmiAppState extends State<FanmiApp> {
 void configLoading() {
   EasyLoading.instance
     ..displayDuration = const Duration(milliseconds: 2000)
-    ..indicatorType = EasyLoadingIndicatorType.doubleBounce
+    ..indicatorType = EasyLoadingIndicatorType.circle
     ..loadingStyle = EasyLoadingStyle.light
     ..fontSize = 15.0
     ..indicatorSize = 45.0

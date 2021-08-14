@@ -139,7 +139,7 @@ class AppRouter {
         var args = settings.arguments as List;
         return PageTransition(
             child: TextEditPage(
-              initText: args[0] as String,
+              initText: args[0] as String?,
               appbarName: args[1] as String,
               maxLength: args[2] as int,
             ),
@@ -149,7 +149,7 @@ class AppRouter {
         var args = settings.arguments as List;
         return PageTransition(
             child: LongTextEditPage(
-              initText: args[0] as String,
+              initText: args[0] as String?,
               appbarName: args[1] as String,
               maxLength: args[2] as int,
             ),

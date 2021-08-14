@@ -1,3 +1,5 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/config/text_constants.dart';
@@ -5,15 +7,18 @@ import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_status_enum.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
+import 'package:fanmi/generated/json/card_info_entity_helper.dart';
+import 'package:fanmi/net/card_service.dart';
+import 'package:fanmi/net/status_code.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
 import 'package:fanmi/view_models/image_picker_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
-import 'package:fanmi/widgets/common_image.dart';
 import 'package:fanmi/widgets/image_picker.dart';
 import 'package:fanmi/widgets/provider_widget.dart';
-import 'package:fanmi/widgets/svg_icon.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -49,7 +54,9 @@ class _CardEditPageState extends State<CardEditPage> {
     cardListModel = Provider.of<CardListModel>(context, listen: false);
     userModel = Provider.of<UserModel>(context, listen: false);
     if (cardListModel.cardMap.containsKey(cardType.value)) {
-      card = cardListModel.cardMap[cardType.value]!;
+      var cardOrigin = cardListModel.cardMap[cardType.value]!;
+      card = cardInfoEntityFromJson(
+          CardInfoEntity(), cardInfoEntityToJson(cardOrigin));
     } else {
       card = CardInfoEntity();
       card.avatarUrl = userModel.userInfo.avatarUrl!;
@@ -61,6 +68,13 @@ class _CardEditPageState extends State<CardEditPage> {
         card.qqQrUrl = userModel.userInfo.qqQrUrl;
       }
     }
+    avatarModel =
+        ImagePickerModel(maxAssetsCount: 1, imgUrls: [card.avatarUrl!]);
+    coverModel = ImagePickerModel(maxAssetsCount: 1, imgUrls: [card.coverUrl!]);
+    albumModel = ImagePickerModel(
+      maxAssetsCount: 9,
+      imgUrls: card.album != null ? card.album!.split(",") : [],
+    );
   }
 
   @override
@@ -73,14 +87,6 @@ class _CardEditPageState extends State<CardEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    avatarModel =
-        ImagePickerModel(maxAssetsCount: 1, imgUrls: [card.avatarUrl!]);
-    coverModel = ImagePickerModel(maxAssetsCount: 1, imgUrls: [card.coverUrl!]);
-    albumModel = ImagePickerModel(
-      maxAssetsCount: 9,
-      imgUrls: card.album != null ? card.album!.split(",") : [],
-    );
-
     return Scaffold(
       appBar: appBar(),
       body: SingleChildScrollView(
@@ -91,22 +97,6 @@ class _CardEditPageState extends State<CardEditPage> {
           children: [
             header(),
             subtitleText("自我描述:"),
-            // Padding(
-            //   padding: EdgeInsets.only(left: 12.r, right: 12.r, top: 10.r),
-            //   child: bounceButton(
-            //       Text(
-            //         card.selfDesc ?? '尚未填写',
-            //         style: TextStyle(
-            //             fontSize: 17.sp,
-            //             fontWeight: FontWeight.w500,
-            //             color:
-            //                 card.selfDesc != null ? Colors.black : Colors.grey),
-            //       ), () async {
-            //     var res = await Navigator.of(context).pushNamed(
-            //         AppRouter.LongTextEditPageRoute,
-            //         arguments: [card.selfDesc??"", "自我描述", 1000]) as String;
-            //   }),
-            // ),
             descWidget(),
             subtitleText("相册:"),
             Padding(
@@ -187,13 +177,48 @@ class _CardEditPageState extends State<CardEditPage> {
       leading: IconButton(
         color: Colors.black,
         icon: Icon(Icons.arrow_back_ios),
-        onPressed: () {
-          Navigator.of(context).pop();
+        onPressed: () async {
+          if (isCreateMode) {
+            if (card.selfDesc != null || card.album != null) {
+              final res = await showOkCancelAlertDialog(
+                context: context,
+                title: "创建名片",
+                message: "是否创建该名片？取消后系统将临时保存草稿",
+                okLabel: "创建",
+                cancelLabel: "取消",
+              );
+              if (res == OkCancelResult.ok) {
+                await setCardInfo();
+              } else {
+                cardListModel.cardMap[cardType.value] = card;
+                Navigator.of(context).pop();
+              }
+            } else {
+              Navigator.of(context).pop();
+            }
+          } else if (!card.equal(cardListModel.cardMap[cardType.value]!)) {
+            final res = await showOkCancelAlertDialog(
+              context: context,
+              title: "保存编辑",
+              message: "是否取消这次编辑？取消后系统不会保存修改的内容",
+              okLabel: "保存",
+              cancelLabel: "取消",
+            );
+            if (res == OkCancelResult.ok) {
+              await setCardInfo();
+            } else {
+              Navigator.of(context).pop();
+            }
+          } else {
+            Navigator.of(context).pop();
+          }
         },
       ),
       actions: [
         TextButton(
-          onPressed: () {},
+          onPressed: () async {
+            await setCardInfo();
+          },
           child: Text(
             "$actionDesc完成",
             style: TextStyle(fontSize: 17.sp, color: Colors.blue),
@@ -234,7 +259,12 @@ class _CardEditPageState extends State<CardEditPage> {
                   ), () async {
                 var res = await Navigator.of(context).pushNamed(
                     AppRouter.TextEditPageRoute,
-                    arguments: [card.sign!, "名片签名", 20]) as String;
+                    arguments: [card.sign!, "名片签名", 20]) as String?;
+                if (res != null) {
+                  setState(() {
+                    card.sign = res;
+                  });
+                }
               }),
             ),
           ],
@@ -255,7 +285,12 @@ class _CardEditPageState extends State<CardEditPage> {
                     ), () async {
                   var res = await Navigator.of(context).pushNamed(
                       AppRouter.TextEditPageRoute,
-                      arguments: [card.name!, "名片昵称", 20]) as String;
+                      arguments: [card.name!, "名片昵称", 20]) as String?;
+                  if (res != null) {
+                    setState(() {
+                      card.name = res;
+                    });
+                  }
                 }),
                 SizedBox(
                   width: 17.r,
@@ -346,9 +381,22 @@ class _CardEditPageState extends State<CardEditPage> {
     return Container(
       padding: EdgeInsets.all(8.0.r),
       child: GestureDetector(
-        onTap: () {
-          Navigator.of(context).pushNamed(AppRouter.QrUploadPageRoute,
-              arguments: [qrType, qrUrl]);
+        onTap: () async {
+          final res = await Navigator.of(context).pushNamed(
+              AppRouter.QrUploadPageRoute,
+              arguments: [qrType, qrUrl]) as String?;
+          if (res != null) {
+            if (qrType == QrTypeEnum.WEIXIN_GROUP ||
+                qrType == QrTypeEnum.WEIXIN) {
+              setState(() {
+                card.wxQrUrl = res;
+              });
+            } else {
+              setState(() {
+                card.qqQrUrl = res;
+              });
+            }
+          }
         },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(5.0.r),
@@ -359,7 +407,10 @@ class _CardEditPageState extends State<CardEditPage> {
               children: [
                 Positioned.fill(
                     child: qrUrl != null
-                        ? Image.network(qrUrl)
+                        ? Image.network(
+                            qrUrl,
+                            fit: BoxFit.cover,
+                          )
                         : Container(
                             color: ColorConstants.mi_color,
                           )),
@@ -383,22 +434,73 @@ class _CardEditPageState extends State<CardEditPage> {
   //描述组件
   Widget descWidget() {
     var isFilled = card.selfDesc != null;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 10.r),
-      margin: EdgeInsets.symmetric(horizontal: 10.r, vertical: 10.r),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(
-          Radius.circular(10.r),
+    return Bounce(
+      duration: Duration(milliseconds: 100),
+      onPressed: () {
+        final res = Navigator.of(context).pushNamed(
+            AppRouter.LongTextEditPageRoute,
+            arguments: [card.selfDesc, "自我描述", 1000]) as String?;
+        if (res != null) {
+          setState(() {
+            card.selfDesc = res;
+          });
+        }
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.r, vertical: 10.r),
+        margin: EdgeInsets.symmetric(horizontal: 10.r, vertical: 10.r),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(10.r),
+          ),
+          color: Colors.transparent,
+          border: Border.all(width: 2.r, color: Colors.blue),
         ),
-        color: Colors.transparent,
-        border: Border.all(width: 2.r, color: Colors.blue),
-      ),
-      constraints: BoxConstraints(minHeight: 150.r),
-      width: MediaQuery.of(context).size.width,
-      child: Text(
-        isFilled ? card.selfDesc! : cardType.hint,
-        style: TextStyle(color: isFilled ? Colors.black : Colors.grey, fontSize: 16.sp),
+        constraints: BoxConstraints(minHeight: 150.r),
+        width: MediaQuery.of(context).size.width,
+        child: Text(
+          isFilled ? card.selfDesc! : cardType.hint,
+          style: TextStyle(
+              color: isFilled ? Colors.black : Colors.grey, fontSize: 16.sp),
+        ),
       ),
     );
+  }
+
+  //修改后保存名片
+  setCardInfo() async {
+    EasyLoading.show(status: "保存中");
+    try {
+      var isImgSuccess = true;
+      var imgRes = await Future.wait([
+        avatarModel.uploadImgList(),
+        coverModel.uploadImgList(),
+        albumModel.uploadImgList()
+      ]);
+      for (bool e in imgRes) {
+        isImgSuccess = isImgSuccess && e;
+      }
+      if (isImgSuccess) {
+        card.avatarUrl = avatarModel.imgUrls[0];
+        card.coverUrl = coverModel.imgUrls[0];
+        card.album = albumModel.imgUrls.join(";");
+        card.updateTime = DateTime.now().toString();
+        var resp = await CardService.setCardInfo(
+            cardId: card.id,
+            cardType: cardType.value,
+            cardDict: cardInfoEntityToJson(card));
+        if (resp.statusCode == StatusCode.SUCCESS) {
+          EasyLoading.showSuccess("$actionDesc成功");
+          cardListModel.cardMap[cardType.value] = card;
+          StorageManager.setCardListInfo(cardListModel.cardList);
+          Navigator.of(context).pop();
+        }
+      }
+    } catch (e, s) {
+      e as DioError;
+      EasyLoading.showError(e.error.message);
+    } finally {
+      EasyLoading.dismiss();
+    }
   }
 }

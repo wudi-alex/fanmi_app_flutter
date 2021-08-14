@@ -10,19 +10,19 @@ class CommonService {
       {required String qrUrl, required String qrType}) async {
     var resp = await http.post('/common/upload_contact_qr',
         data: {'qr_url': qrUrl, 'qr_type': qrType});
-    return resp.data;
+    return resp;
   }
 
   static Future verifyImg({required int uid, required String imgUrl}) async {
     var resp = await http
         .post('/common/verify_img', data: {'uid': uid, 'img_url': imgUrl});
-    return resp.data;
+    return resp;
   }
 
   static Future getTimSig({required int uid}) async {
     var resp = await http.post('/common/verify_img', data: {
       'uid': uid,
     });
-    return resp.data;
+    return resp;
   }
 }

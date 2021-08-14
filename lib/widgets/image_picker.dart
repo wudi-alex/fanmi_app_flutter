@@ -45,6 +45,7 @@ class AlbumPicker extends StatelessWidget {
       padding: EdgeInsets.all(5.r),
       child: _selectedAssetWidget(img, () {
         model.removeUrl(index: index);
+
       }),
     );
   }

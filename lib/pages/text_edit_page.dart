@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class TextEditPage extends StatefulWidget {
-  final String initText;
+  final String? initText;
   final String appbarName;
   final int maxLength;
 
@@ -26,7 +26,7 @@ class _TextEditPageState extends State<TextEditPage> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.initText;
+    _controller.text = widget.initText??"";
   }
 
   @override
@@ -104,7 +104,7 @@ class _TextEditPageState extends State<TextEditPage> {
                 focusNode: _focusNode,
                 maxLines: 1,
                 textInputAction: TextInputAction.done,
-                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w400),
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   isCollapsed: true,

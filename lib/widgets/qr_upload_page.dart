@@ -80,7 +80,7 @@ class QrUploadPage extends StatelessWidget {
         leading: BackButton(
           color: Colors.black,
           onPressed: () {
-            Navigator.of(context).pop(model1.qrUrl);
+            Navigator.of(context).pop();
           },
         ),
         actions: [
@@ -90,14 +90,13 @@ class QrUploadPage extends StatelessWidget {
                 EasyLoading.show(status: "二维码上传中");
                 var isSuccess = await model2.uploadImgList();
                 if (isSuccess) {
-                  model1.setQrUrl(model2.imgUrls[0]);
-                  var canUp = await model1.uploadQr();
+                  var canUp = await model1.uploadQr(model2.imgUrls[0]);
                   if (canUp) {
                     EasyLoading.showSuccess("上传成功");
                     EasyLoading.dismiss();
                     Navigator.of(context).pop(model1.qrUrl);
                   } else {
-                    EasyLoading.showSuccess("请上传正确的$qrType二维码");
+                    EasyLoading.showError("请上传正确的$qrType二维码");
                   }
                 } else {
                   EasyLoading.showError("上传失败，请稍后再试");

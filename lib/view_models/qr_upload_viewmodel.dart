@@ -15,15 +15,16 @@ class QrUploadViewModel extends ViewStateModel {
     }
   }
 
-  Future<bool> uploadQr() async {
-    if (qrUrl == null) {
-      return true;
-    }
+  Future<bool> uploadQr(String toUpQr) async {
     try {
       var resp =
-          await CommonService.upLoadContactQr(qrUrl: qrUrl!, qrType: qrType);
-      return resp.statusCode == StatusCode.SUCCESS;
+          await CommonService.upLoadContactQr(qrUrl: toUpQr, qrType: qrType);
+      if(resp.statusCode == StatusCode.SUCCESS){
+        setQrUrl(toUpQr);
+      }
+      return true;
     } catch (e, s) {
+      print(e);
       e as DioError;
       SmartDialog.showToast(e.error.message);
       return false;

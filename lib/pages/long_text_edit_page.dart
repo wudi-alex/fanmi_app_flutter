@@ -4,13 +4,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class LongTextEditPage extends StatefulWidget {
-  final String initText;
+  final String? initText;
   final String appbarName;
   final int maxLength;
 
   const LongTextEditPage(
       {Key? key,
-      required this.initText,
+      this.initText,
       required this.appbarName,
       required this.maxLength})
       : super(key: key);
@@ -26,7 +26,7 @@ class _LongTextEditPageState extends State<LongTextEditPage> {
   @override
   void initState() {
     super.initState();
-    _controller.text = widget.initText;
+    _controller.text = widget.initText??"";
   }
 
   @override
@@ -40,11 +40,13 @@ class _LongTextEditPageState extends State<LongTextEditPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar(),
-      body: Container(
-        child: Column(
-          children: [
-            longTextField(),
-          ],
+      body: SingleChildScrollView(
+        child: Container(
+          child: Column(
+            children: [
+              longTextField(),
+            ],
+          ),
         ),
       ),
     );
@@ -89,7 +91,7 @@ class _LongTextEditPageState extends State<LongTextEditPage> {
 
   Widget longTextField() => Container(
         color: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 12.r),
+        padding: EdgeInsets.symmetric(vertical: 15.r),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -97,14 +99,14 @@ class _LongTextEditPageState extends State<LongTextEditPage> {
               width: 20.r,
             ),
             Container(
-              constraints: BoxConstraints(maxWidth: 300.r),
+              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width-30.r),
               child: TextField(
                 maxLength: widget.maxLength,
                 controller: _controller,
                 focusNode: _focusNode,
-                maxLines: 15,
-                minLines: 8,
-                textInputAction: TextInputAction.done,
+                maxLines: 40,
+                minLines: 15,
+                textInputAction: TextInputAction.newline,
                 style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w400),
                 decoration: InputDecoration(
                   border: InputBorder.none,

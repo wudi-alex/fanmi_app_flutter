@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 class CardListModel extends ChangeNotifier {
   Map<int, CardInfoEntity> cardMap = Map();
 
-  get cardList => cardMap.values;
+  get cardList => cardMap.values.toList();
 
   init() async {
     List<CardInfoEntity> list = [];
