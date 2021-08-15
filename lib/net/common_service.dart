@@ -1,3 +1,5 @@
+import 'package:fanmi/utils/storage_manager.dart';
+
 import 'http_client.dart';
 
 class CommonService {
@@ -13,9 +15,9 @@ class CommonService {
     return resp;
   }
 
-  static Future verifyImg({required int uid, required String imgUrl}) async {
+  static Future verifyImg({required String imgUrl}) async {
     var resp = await http
-        .post('/common/verify_img', data: {'uid': uid, 'img_url': imgUrl});
+        .post('/common/verify_img', data: {'uid': StorageManager.uid, 'img_url': imgUrl});
     return resp;
   }
 

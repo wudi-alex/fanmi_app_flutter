@@ -1,11 +1,14 @@
 import 'package:fanmi/config/hippo_icon.dart';
+import 'package:fanmi/enums/qr_type_enum.dart';
 import 'package:fanmi/widgets/album.dart';
 import 'package:fanmi/view_models/card_info_view_model.dart';
+import 'package:fanmi/widgets/common_image.dart';
 import 'package:fanmi/widgets/provider_widget.dart';
 import 'package:fanmi/widgets/view_state_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 
 import 'custom_card_bar.dart';
 
@@ -34,8 +37,6 @@ class CardInfoPage extends StatelessWidget {
           body: CustomCardBar(
             data: model.cardInfoEntity,
             body: SingleChildScrollView(
-              controller: ScrollController(),
-              physics: NeverScrollableScrollPhysics(),
               child: Container(
                 margin: EdgeInsets.all(10.r),
                 child: Column(
@@ -73,18 +74,38 @@ class CardInfoPage extends StatelessWidget {
                                 left: 2.r, right: 27.r, bottom: 20.r, top: 5.r),
                           )
                         : SizedBox.shrink(),
-                    subtitleText("It's me:"),
+                    subtitleText("自我描述:"),
                     contentText(model.cardInfoEntity.selfDesc!),
                     model.cardInfoEntity.album != null &&
                             model.cardInfoEntity.album != ""
-                        ? subtitleText("Album:")
+                        ? subtitleText("相册:")
                         : SizedBox.shrink(),
                     Container(
-                      margin: EdgeInsets.fromLTRB(17.r, 13.r, 17.r, 0.r),
+                      margin: EdgeInsets.fromLTRB(17.r, 13.r, 17.r, 13.r),
                       child: Album(
                         imgUrlOrigin: model.cardInfoEntity.album,
                       ),
                     ),
+                    model.cardInfoEntity.isExposureContact == 1
+                        ? subtitleText("二维码:")
+                        : SizedBox.shrink(),
+                    model.cardInfoEntity.isExposureContact == 1
+                        ? Padding(
+                          padding: EdgeInsets.fromLTRB(9.r, 0.r, 17.r, 0.r),
+                          child: Row(
+                              children: [
+                                model.cardInfoEntity.wxQrUrl != null
+                                    ? qrWidget(model.cardInfoEntity.wxQrUrl!,
+                                        QrTypeEnum.WEIXIN)
+                                    : SizedBox.shrink(),
+                                model.cardInfoEntity.qqQrUrl != null
+                                    ? qrWidget(model.cardInfoEntity.qqQrUrl!,
+                                        QrTypeEnum.QQ)
+                                    : SizedBox.shrink(),
+                              ],
+                            ),
+                        )
+                        : SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -107,7 +128,7 @@ class CardInfoPage extends StatelessWidget {
           content,
           style: TextStyle(
               color: Colors.black,
-              fontSize: 18.sp,
+              fontSize: 17.sp,
               fontWeight: FontWeight.w400),
         ),
       );
@@ -150,4 +171,47 @@ class CardInfoPage extends StatelessWidget {
           ],
         ),
       );
+
+  Widget qrWidget(String qrUrl, String qrType) {
+    var width = 150.r;
+    var height = 200.r;
+    var iconSize = 50.r;
+    late String svgPath;
+    if (qrType == QrTypeEnum.WEIXIN_GROUP || qrType == QrTypeEnum.WEIXIN) {
+      svgPath = "assets/svg/weixin_border.svg";
+    } else {
+      svgPath = "assets/svg/qq_border.svg";
+    }
+    return Container(
+      padding: EdgeInsets.all(8.0.r),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(5.0.r),
+        child: Container(
+          width: width,
+          height: height,
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: CommonImage(
+                  imgUrl: qrUrl,
+                  height: height,
+                  width: width,
+                  radius: 0,
+                ),
+              ),
+              Positioned(
+                left: (width - iconSize) / 2,
+                top: (height - iconSize) / 2,
+                child: SvgPicture.asset(
+                  svgPath,
+                  width: iconSize,
+                  height: iconSize,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

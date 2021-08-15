@@ -2,6 +2,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
+import 'package:fanmi/config/hippo_icon.dart';
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_status_enum.dart';
@@ -19,10 +20,12 @@ import 'package:fanmi/widgets/provider_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bounce/flutter_bounce.dart';
+import 'package:qiniu_flutter_sdk/qiniu_flutter_sdk.dart';
 
 class CardEditPage extends StatefulWidget {
   final CardTypeEnum cardType;
@@ -73,7 +76,9 @@ class _CardEditPageState extends State<CardEditPage> {
     coverModel = ImagePickerModel(maxAssetsCount: 1, imgUrls: [card.coverUrl!]);
     albumModel = ImagePickerModel(
       maxAssetsCount: 9,
-      imgUrls: card.album != null ? card.album!.split(",") : [],
+      imgUrls: card.album != null && card.album!.isNotEmpty
+          ? card.album!.split(";")
+          : [],
     );
   }
 
@@ -96,6 +101,29 @@ class _CardEditPageState extends State<CardEditPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             header(),
+            card.isExposureData == 1
+                ? Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        cardData(
+                            iconData: Icons.remove_red_eye_outlined,
+                            num: (card.exposureNum ?? 0).toInt().toString()),
+                        cardData(
+                            iconData: Icons.search,
+                            num: (card.searchNum ?? 0).toInt().toString()),
+                        cardData(
+                            iconData: HippoIcon.operation,
+                            num: (card.clickNum ?? 0).toInt().toString()),
+                        cardData(
+                            iconData: Icons.star_border_outlined,
+                            num: (card.cardFavorNum ?? 0).toInt().toString()),
+                      ],
+                    ),
+                    padding: EdgeInsets.only(
+                        left: 2.r, right: 27.r, bottom: 10.r, top: 20.r),
+                  )
+                : SizedBox.shrink(),
             subtitleText("自我描述:"),
             descWidget(),
             subtitleText("相册:"),
@@ -103,10 +131,7 @@ class _CardEditPageState extends State<CardEditPage> {
               padding: EdgeInsets.only(left: 8.r, right: 8.r, top: 10.r),
               child: ProviderWidget(
                   autoDispose: false,
-                  model: ImagePickerModel(
-                    maxAssetsCount: 9,
-                    imgUrls: card.album != null ? card.album!.split(",") : [],
-                  ),
+                  model: albumModel,
                   builder: (context, ImagePickerModel model, child) {
                     return AlbumPicker();
                   }),
@@ -157,8 +182,9 @@ class _CardEditPageState extends State<CardEditPage> {
               });
             }),
             SizedBox(
-              height: 10.r,
+              height: 20.r,
             ),
+            deleteWidget()
           ],
         ),
       ),
@@ -200,7 +226,7 @@ class _CardEditPageState extends State<CardEditPage> {
             final res = await showOkCancelAlertDialog(
               context: context,
               title: "保存编辑",
-              message: "是否取消这次编辑？取消后系统不会保存修改的内容",
+              message: "是否保存这次编辑？取消后系统不会保存修改的内容",
               okLabel: "保存",
               cancelLabel: "取消",
             );
@@ -241,7 +267,7 @@ class _CardEditPageState extends State<CardEditPage> {
               autoDispose: false,
               builder: (context, model, child) => ImagePicker(
                 icon: Icons.camera_alt_outlined,
-                height: 270.r,
+                height: 275.r,
                 width: MediaQuery.of(context).size.width,
                 rectRadius: 0.r,
                 iconSize: 60.r,
@@ -436,8 +462,8 @@ class _CardEditPageState extends State<CardEditPage> {
     var isFilled = card.selfDesc != null;
     return Bounce(
       duration: Duration(milliseconds: 100),
-      onPressed: () {
-        final res = Navigator.of(context).pushNamed(
+      onPressed: () async {
+        final res = await Navigator.of(context).pushNamed(
             AppRouter.LongTextEditPageRoute,
             arguments: [card.selfDesc, "自我描述", 1000]) as String?;
         if (res != null) {
@@ -469,6 +495,13 @@ class _CardEditPageState extends State<CardEditPage> {
 
   //修改后保存名片
   setCardInfo() async {
+    if (card.selfDesc == null || card.selfDesc!.isEmpty) {
+      SmartDialog.showToast("自我描述那里还没有写哦～");
+      return;
+    } else if (card.wxQrUrl == null && card.qqQrUrl == null) {
+      SmartDialog.showToast("不要忘了上传二维码哦～");
+      return;
+    }
     EasyLoading.show(status: "保存中");
     try {
       var isImgSuccess = true;
@@ -484,23 +517,103 @@ class _CardEditPageState extends State<CardEditPage> {
         card.avatarUrl = avatarModel.imgUrls[0];
         card.coverUrl = coverModel.imgUrls[0];
         card.album = albumModel.imgUrls.join(";");
-        card.updateTime = DateTime.now().toString();
+        if (card.createTime != null) {
+          card.updateTime = DateTime.now().toString();
+        }
         var resp = await CardService.setCardInfo(
             cardId: card.id,
             cardType: cardType.value,
             cardDict: cardInfoEntityToJson(card));
         if (resp.statusCode == StatusCode.SUCCESS) {
           EasyLoading.showSuccess("$actionDesc成功");
+          if (isCreateMode) {
+            card.id = resp.data['card_id'];
+          }
           cardListModel.cardMap[cardType.value] = card;
           StorageManager.setCardListInfo(cardListModel.cardList);
           Navigator.of(context).pop();
         }
       }
     } catch (e, s) {
-      e as DioError;
-      EasyLoading.showError(e.error.message);
+      if (e is DioError) {
+        EasyLoading.showError(e.error.message);
+      } else if (e is StorageError) {
+        EasyLoading.showError("上传图片失败");
+      } else {
+        EasyLoading.showError("保存名片失败");
+      }
     } finally {
       EasyLoading.dismiss();
     }
   }
+
+  //删除名片组件
+  Widget deleteWidget() {
+    if (isCreateMode) {
+      return SizedBox.shrink();
+    } else {
+      return GestureDetector(
+        child: Container(
+          color: Colors.red,
+          padding: EdgeInsets.symmetric(vertical: 10.r),
+          child: Center(
+            child: Text(
+              "删除名片",
+              style: TextStyle(
+                  fontSize: 18.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+        onTap: () async {
+          final res = await showOkCancelAlertDialog(
+            context: context,
+            title: "删除名片",
+            message: "是否删除该名片？删除后需重新创建该名片",
+            okLabel: "删除",
+            cancelLabel: "取消",
+          );
+          if (res == OkCancelResult.ok) {
+            EasyLoading.show(status: "删除中");
+            try {
+              var resp = await CardService.deleteCard(cardId: card.id!);
+              if (resp.statusCode == StatusCode.SUCCESS) {
+                cardListModel.cardMap.remove(cardType.value);
+                StorageManager.setCardListInfo(cardListModel.cardList);
+                EasyLoading.showSuccess("删除成功");
+                Navigator.of(context).pop();
+              }
+            } catch (e, s) {
+              EasyLoading.showError("删除失败");
+            } finally {
+              EasyLoading.dismiss();
+            }
+          }
+        },
+      );
+    }
+  }
+
+  //名片数据
+  Widget cardData({required IconData iconData, required String num}) =>
+      Container(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              iconData,
+              color: Colors.grey,
+              size: 24.r,
+            ),
+            SizedBox(
+              width: 2.r,
+            ),
+            Text(
+              num,
+              style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+      );
 }

@@ -1,4 +1,5 @@
 import 'package:fanmi/net/common_service.dart';
+import 'package:fanmi/net/status_code.dart';
 import 'package:fanmi/view_models/view_state_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +39,9 @@ class ImagePickerModel extends ViewStateModel {
   }
 
   Future uploadImgList() async {
-    var isSuccess = true;
-    var res = await Future.wait(
+   await Future.wait(
         List.generate(assets.length, (index) => upLoadImg(assets[index])));
-    for (bool e in res) {
-      isSuccess = isSuccess && e;
-    }
-    return isSuccess;
+   return true;
   }
 
   void removeAsset({required int index}) {
@@ -61,53 +58,21 @@ class ImagePickerModel extends ViewStateModel {
     if (asset == null) {
       return true;
     }
-
     var tokenMap = await CommonService.getQiniuToken();
     var key = tokenMap["key"];
     String urlHead = tokenMap["url_head"];
     PutController putController = PutController();
     var file = await asset.originFile;
-    try {
-      var resp = await storage.putFile(file!, tokenMap["token"],
-          options: PutOptions(controller: putController, key: key));
-      print("上传成功，resp:${resp.key}");
-      if (isOnePic) {
-        imgUrls.clear();
-      }
-      imgUrls.add(urlHead + resp.key!);
-      return true;
-    } catch (error) {
-      if (error is StorageError) {
-        switch (error.type) {
-          case StorageErrorType.CONNECT_TIMEOUT:
-            print('发生错误: 连接超时');
-            break;
-          case StorageErrorType.SEND_TIMEOUT:
-            print('发生错误: 发送数据超时');
-            break;
-          case StorageErrorType.RECEIVE_TIMEOUT:
-            print('发生错误: 响应数据超时');
-            break;
-          case StorageErrorType.RESPONSE:
-            print('发生错误: ${error.message}');
-            break;
-          case StorageErrorType.CANCEL:
-            print('发生错误: 请求取消');
-            break;
-          case StorageErrorType.UNKNOWN:
-            print('发生错误: 未知错误');
-            break;
-          case StorageErrorType.NO_AVAILABLE_HOST:
-            print('发生错误: 无可用 Host');
-            break;
-          case StorageErrorType.IN_PROGRESS:
-            print('发生错误: 已在队列中');
-            break;
-        }
-      } else {
-        print('发生错误: ${error.toString()}');
-      }
-      return false;
+    var resp = await storage.putFile(file!, tokenMap["token"],
+        options: PutOptions(controller: putController, key: key));
+    print("上传成功，resp:${resp.key}");
+    if (isOnePic) {
+      imgUrls.clear();
+    }
+    var imgUrl = urlHead + resp.key!;
+    var verifyResp = await CommonService.verifyImg(imgUrl: imgUrl);
+    if (verifyResp.statusCode == StatusCode.SUCCESS) {
+      imgUrls.add(imgUrl);
     }
   }
 }

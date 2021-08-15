@@ -90,7 +90,7 @@ class _MainPageState extends State<MainPage> {
               BottomNavigationBarItem(icon: Icon(Icons.home), label: '主页'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.web_outlined), label: '名片'),
-              BottomNavigationBarItem(icon: Icon(Icons.email), label: '邮箱'),
+              BottomNavigationBarItem(icon: Icon(Icons.email), label: '消息'),
               BottomNavigationBarItem(
                   icon: Icon(Icons.account_circle), label: '我的'),
             ],
