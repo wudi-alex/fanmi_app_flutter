@@ -76,6 +76,7 @@ class _FanmiAppState extends State<FanmiApp> {
               GlobalMaterialLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
+            locale: Locale('zh', 'CH'),
             builder: EasyLoading.init(
                 builder: (BuildContext context, Widget? child) {
               EasyLoading.init();

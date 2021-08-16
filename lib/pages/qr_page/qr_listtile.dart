@@ -1,6 +1,8 @@
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/net/http_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -61,13 +63,23 @@ class _QrListTileState extends State<QrListTile> {
           var res = await Navigator.of(context).pushNamed(
               AppRouter.QrUploadPageRoute,
               arguments: [widget.qrType, qrUrl]) as String?;
-          widget.callBack(res).then((v) {
-            setState(() {
-              qrUrl = res;
+          if (res != null) {
+            EasyLoading.show(status: "保存二维码中");
+            widget.callBack(res).then((v) {
+              setState(() {
+                qrUrl = res;
+              });
+              EasyLoading.showSuccess("修改成功");
+            }).onError((error, stackTrace) {
+              if (error is DioError) {
+                EasyLoading.showError(error.error.message);
+              } else {
+                EasyLoading.showError("修改二维码失败");
+              }
+            }).whenComplete(() {
+              EasyLoading.dismiss();
             });
-          }).onError((error, stackTrace) {
-            SmartDialog.showToast("修改${widget.qrType}资料失败，请检查网络或稍后重试");
-          });
+          }
         },
       ),
     );

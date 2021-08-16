@@ -479,7 +479,7 @@ class WelcomeGuidePage4 extends StatelessWidget {
         // globalModel.systemDataList.add(firstSystemMail);
         // globalModel.saveSystemMailList();
         // globalModel.setSystemMailRead(1);
-        var userModel = Provider.of<UserModel>(context);
+        var userModel = Provider.of<UserModel>(context, listen: false);
         UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
             .then((v) {
           StorageManager.setUserInfo(userModel.userInfo);

@@ -6,10 +6,14 @@ import 'package:fanmi/pages/login_page.dart';
 import 'package:fanmi/pages/long_text_edit_page.dart';
 import 'package:fanmi/pages/main_page.dart';
 import 'package:fanmi/pages/message_list_page.dart';
+import 'package:fanmi/pages/mine_page/mine_about_page.dart';
+import 'package:fanmi/pages/mine_page/mine_contact_page.dart';
+import 'package:fanmi/pages/mine_page/mine_mail_pwd_page.dart';
 import 'package:fanmi/pages/policy_page.dart';
 import 'package:fanmi/pages/search_page/search_page.dart';
 import 'package:fanmi/pages/text_edit_page.dart';
-import 'package:fanmi/widgets/qr_upload_page.dart';
+import 'package:fanmi/pages/qr_page/qr_upload_page.dart';
+import 'package:fanmi/widgets/web_view_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:page_transition/page_transition.dart';
 
@@ -80,6 +84,11 @@ class AppRouter {
       case PolicyPageRoute:
         return PageTransition(
             child: PolicyPage(),
+            type: PageTransitionType.fade,
+            settings: settings);
+      case CityGuidePageRoute:
+        return PageTransition(
+            child: CityGuidePage(),
             type: PageTransitionType.fade,
             settings: settings);
       case GenderGuidePageRoute:
@@ -170,6 +179,48 @@ class AppRouter {
               qrType: (settings.arguments as List)[0] as String,
               qrUrl: (settings.arguments as List)[1] as String?,
             ),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+
+      case MineContactPageRoute:
+        return PageTransition(
+            child: MineContactPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+
+      case MineMailPasswordPageRoute:
+        return PageTransition(
+            child: MineMailPasswordPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+
+      case MineUserPolicyPageRoute:
+        return PageTransition(
+            child: WebViewPage(
+              title: '用户协议',
+              url: "https://fanminet.com/user_license_agreement",
+            ),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MinePrivacyPolicyPageRoute:
+        return PageTransition(
+            child: WebViewPage(
+              title: '隐私协议',
+              url: "https://fanminet.com/privacy_policy",
+            ),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineContactUsPageRoute:
+        return PageTransition(
+            child: WebViewPage(
+              title: '联系我们',
+              url: "https://fanminet.com/contact_us",
+            ),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineAboutPageRoute:
+        return PageTransition(
+            child: MineAboutPage(),
             type: PageTransitionType.rightToLeft,
             settings: settings);
     }

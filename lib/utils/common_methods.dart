@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
@@ -5,6 +6,7 @@ import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
@@ -32,4 +34,12 @@ initData(BuildContext context) async {
     userID: StorageManager.uid.toString(),
     userSig: sig,
   );
+}
+
+catchError(Object? error, String errorMsg) {
+  if (error is DioError) {
+    EasyLoading.showError(error.error.message);
+  } else {
+    EasyLoading.showError(errorMsg);
+  }
 }

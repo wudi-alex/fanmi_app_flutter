@@ -138,26 +138,26 @@ class _CityPickerViewState extends State<CityPickerView> {
             TextButton(
               child: Text(
                 '取消',
-                style: TextStyle(fontSize: 18.sp, color: Colors.black, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.w400),
               ),
               onPressed: () {
                 Navigator.pop(context);
               },
             ),
-            TextButton(
-              child: Text(
-                '清空',
-                style: TextStyle(fontSize: 18.sp, color: Colors.grey,  fontWeight: FontWeight.w500),
-              ),
-              onPressed: () {
-                widget.onResult(CityResult());
-                Navigator.pop(context);
-              },
-            ),
+            // TextButton(
+            //   child: Text(
+            //     '清空',
+            //     style: TextStyle(fontSize: 16.sp, color: Colors.grey,  fontWeight: FontWeight.w400),
+            //   ),
+            //   onPressed: () {
+            //     widget.onResult(CityResult());
+            //     Navigator.pop(context);
+            //   },
+            // ),
             TextButton(
               child: Text(
                 '确定',
-                style: TextStyle(fontSize: 18.sp, color: Colors.blue,  fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 16.sp, color: Colors.blue,  fontWeight: FontWeight.w400),
               ),
               onPressed: () {
                 if (widget.onResult != null) {
@@ -203,7 +203,7 @@ class _CityPickerViewState extends State<CityPickerView> {
           return Center(
             child: Text(
               item['label'],
-              style: TextStyle(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.w500),
+              style: TextStyle(color: Colors.black87, fontSize: 17.sp, fontWeight: FontWeight.w400),
               maxLines: 1,
             ),
           );
@@ -234,7 +234,7 @@ class _CityPickerViewState extends State<CityPickerView> {
                 return Center(
                   child: Text(
                     item['label'],
-                    style: TextStyle(color: Colors.black87, fontSize: 18.sp, fontWeight: FontWeight.w500),
+                    style: TextStyle(color: Colors.black87, fontSize: 17.sp, fontWeight: FontWeight.w400),
                     maxLines: 1,
                   ),
                 );

@@ -7,7 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'card_list_page/card_list_page.dart';
 import 'conservation_list_page.dart';
-import 'mine_page.dart';
+import 'mine_page/mine_page.dart';
 
 List<Widget> pages = <Widget>[
   SearchPage(),

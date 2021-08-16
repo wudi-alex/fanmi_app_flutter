@@ -20,4 +20,10 @@ class UserService {
         data: {"uid": StorageManager.uid, "user_dict": userDict});
     return resp;
   }
+
+  static Future getMineBoardData() async {
+    var resp = await http
+        .post('/user/get_mine_board_data', data: {"uid": StorageManager.uid});
+    return resp;
+  }
 }

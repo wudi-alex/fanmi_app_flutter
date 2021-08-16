@@ -14,7 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import 'common_image.dart';
+import '../../widgets/common_image.dart';
 
 class QrUploadPage extends StatelessWidget {
   final String qrType;

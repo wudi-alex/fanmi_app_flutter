@@ -79,6 +79,8 @@ dependencies:
   modal_bottom_sheet: ^2.0.0
   #对话框
   adaptive_dialog: ^1.1.0
+  #日期选择框
+  flutter_datetime_picker: ^1.5.1
 
 dev_dependencies:
   flutter_test:

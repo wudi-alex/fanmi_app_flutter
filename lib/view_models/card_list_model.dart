@@ -27,21 +27,5 @@ class CardListModel extends ChangeNotifier {
     });
   }
 
-  //todo：
-  setCard(int type) async {
-    var card = cardMap[type]!;
-    try {
-      await CardService.setCardInfo(
-          cardId: card.id,
-          cardType: card.type!,
-          cardDict: cardInfoEntityToJson(card));
-    } catch (e, s) {
-
-    }
-    notifyListeners();
-  }
-
-  clear() {
-
-  }
+  clear() {}
 }

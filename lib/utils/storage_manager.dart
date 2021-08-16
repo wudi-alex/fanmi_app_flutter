@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:fanmi/entity/card_info_entity.dart';
+import 'package:fanmi/entity/mine_board_entity.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
 import 'package:fanmi/generated/json/card_info_entity_helper.dart';
+import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fanmi/generated/json/user_info_entity_helper.dart';
 
@@ -14,6 +16,7 @@ class StorageManager {
   static const userKey = 'userKey';
   static const cardListKey = 'cardListKey';
   static const timUserSigKey = 'timUserSigKey';
+  static const boardDataKey = 'boardDataKey';
 
   static get isLogin => sp.getInt(uidKey) != null;
 
@@ -27,7 +30,7 @@ class StorageManager {
     await sp.setInt(uidKey, uid);
   }
 
-  static getUserInfo() {
+  static UserInfoEntity getUserInfo() {
     UserInfoEntity userInfoEntity = userInfoEntityFromJson(
         UserInfoEntity(), json.decode(sp.getString(userKey)!));
     return userInfoEntity;
@@ -38,7 +41,7 @@ class StorageManager {
         userKey, json.encode(userInfoEntityToJson(userInfoEntity)));
   }
 
-  static getTimUserSig() {
+  static String getTimUserSig() {
     return sp.getString(timUserSigKey)!;
   }
 
@@ -46,11 +49,12 @@ class StorageManager {
     await sp.setString(timUserSigKey, sig);
   }
 
-  static getCardListInfo() {
+  static List<CardInfoEntity> getCardListInfo() {
     var cardStringList = sp.getStringList(cardListKey) ?? [];
     return cardStringList
         .map((cardString) =>
-            cardInfoEntityFromJson(CardInfoEntity(), json.decode(cardString)))
+            cardInfoEntityFromJson(CardInfoEntity(), json.decode(cardString))
+                as CardInfoEntity)
         .toList();
   }
 
@@ -60,6 +64,16 @@ class StorageManager {
         cardList
             .map((card) => json.encode(cardInfoEntityToJson(card)))
             .toList());
+  }
+
+  static MineBoardEntity getBoardData() {
+    var boardDataStr = sp.getString(boardDataKey)!;
+    return mineBoardEntityFromJson(
+        MineBoardEntity(), json.decode(boardDataStr));
+  }
+
+  static setBoardData(MineBoardEntity data) async {
+    await sp.setString(boardDataKey, json.encode(mineBoardEntityToJson(data)));
   }
 
   static clear() {

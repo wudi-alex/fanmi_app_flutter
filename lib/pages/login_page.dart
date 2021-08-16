@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isQQInstalled = false;
   late WeChatAuthResponse weixinAuthResponse;
   TencentLoginResp? _qqLoginResp;
+  late UserModel userModel;
 
   @override
   void initState() {
@@ -186,6 +187,8 @@ class _LoginPageState extends State<LoginPage> {
       });
     });
 
+    userModel = Provider.of<UserModel>(context, listen: false);
+
     if (!mounted) return;
   }
 
@@ -194,12 +197,12 @@ class _LoginPageState extends State<LoginPage> {
     UserInfoEntity userInfo =
         userInfoEntityFromJson(UserInfoEntity(), resp.data["user_info"]);
     StorageManager.setUid(userInfo.uid!);
-    StorageManager.setUserInfo(userInfo);
     //更新im签名
     StorageManager.setTimUserSig(resp.data['tim_sig']);
     EasyLoading.showSuccess("登录成功");
     EasyLoading.dismiss();
     if (isNew == 1) {
+      userModel.setUserInfo(userInfo);
       Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
     } else {
       initData(context);
