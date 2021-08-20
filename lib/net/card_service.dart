@@ -5,11 +5,6 @@ import 'package:flutter/material.dart';
 import 'http_client.dart';
 
 class CardService {
-  static Future getCardPreview({required int cardId}) async {
-    var resp =
-        await http.post('/card/get_card_preview', data: {"card_id": cardId});
-    return resp;
-  }
 
   static Future getCardInfo({required int cardId}) async {
     var resp = await http.post('/card/get_card_info',

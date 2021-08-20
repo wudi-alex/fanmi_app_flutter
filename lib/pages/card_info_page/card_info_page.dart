@@ -1,3 +1,4 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/hippo_icon.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
 import 'package:fanmi/widgets/album.dart';
@@ -9,6 +10,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 import 'custom_card_bar.dart';
 
@@ -91,8 +95,8 @@ class CardInfoPage extends StatelessWidget {
                         : SizedBox.shrink(),
                     model.cardInfoEntity.isExposureContact == 1
                         ? Padding(
-                          padding: EdgeInsets.fromLTRB(9.r, 0.r, 17.r, 0.r),
-                          child: Row(
+                            padding: EdgeInsets.fromLTRB(9.r, 0.r, 17.r, 0.r),
+                            child: Row(
                               children: [
                                 model.cardInfoEntity.wxQrUrl != null
                                     ? qrWidget(model.cardInfoEntity.wxQrUrl!,
@@ -104,13 +108,14 @@ class CardInfoPage extends StatelessWidget {
                                     : SizedBox.shrink(),
                               ],
                             ),
-                        )
+                          )
                         : SizedBox.shrink(),
                   ],
                 ),
               ),
             ),
           ),
+          bottomNavigationBar: recognizeButton(context, model),
         );
       },
     );
@@ -214,4 +219,48 @@ class CardInfoPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget recognizeButton(BuildContext context, CardInfoViewModel model) =>
+      InkWell(
+        onTap: () async {
+          // if (isLogined) {
+          //   if (StorageManager.userEntity.uid ==
+          //       model.cardDetailEntity.cardUid) {
+          //     SmartDialog.showToast("我想和自己交个朋友～");
+          //     return;
+          //   }
+          //   Navigator.of(context).pushNamed(AppRouter.RecognizePageRoute,
+          //       arguments: [model.cardDetailEntity, gender, birthDate, city]);
+          // } else {
+          //   Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+          // }
+          List<String>? msg = await showTextInputDialog(
+            context: context,
+            textFields: [DialogTextField()],
+          );
+          if (msg != null) {
+            V2TimValueCallback<V2TimMessage> res =
+                await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
+              text: msg[0],
+              userID: model.cardInfoEntity.uid.toString(),
+            );
+          }
+        },
+        child: Container(
+          height: 40.r,
+          width: 90.r,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(13.r)),
+              color: Colors.blue),
+          child: Center(
+            child: Text(
+              '想认识',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+      );
 }

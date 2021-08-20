@@ -1,26 +1,31 @@
-import 'package:fanmi/utils/storage_manager.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:fanmi/config/page_size_config.dart';
+import 'package:fanmi/view_models/view_state_model.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
-class MessageListModel extends ChangeNotifier {
+class MessageListModel extends ViewStateModel {
   Map<String, List<V2TimMessage>> messageMap = Map();
 
-  get pullCnt => 20;
+  get pullCnt => PageSizeConfig.MESSAGE_PAGE_SIZE;
 
-  Future<bool> pullHistoryMessage(String userId, String? lastMsgID) async {
-    var res = await TencentImSDKPlugin.v2TIMManager
-        .getMessageManager()
-        .getC2CHistoryMessageList(
-            userID: userId, count: pullCnt, lastMsgID: lastMsgID);
-    if (res.code == 0) {
-      updateMessage(userId, res.data!);
-      notifyListeners();
-      return res.data!.length > pullCnt;
-    } else {
-      SmartDialog.showToast("获取历史消息失败");
-      return false;
+  initData(String userId) async {
+    setBusy();
+    await pullHistoryMessage(userId);
+    setIdle();
+  }
+
+  pullHistoryMessage(String userId) async {
+    if (!messageMap.containsKey(userId)) {
+      for (int i = 0; i < 3; i++) {
+        var lastMsgID = i > 0 ? messageMap[userId]!.last.msgID : null;
+        var res = await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .getC2CHistoryMessageList(
+                userID: userId, count: pullCnt, lastMsgID: lastMsgID);
+
+        updateMessage(userId, res.data!);
+      }
     }
   }
 
@@ -60,8 +65,8 @@ class MessageListModel extends ChangeNotifier {
       messageList.add(message);
       messageMap[key] = messageList;
     }
-    messageMap[key]!
-        .sort((left, right) => left.timestamp!.compareTo(right.timestamp!));
+    // messageMap[key]!
+    //     .sort((left, right) => right.timestamp!.compareTo(left.timestamp!));
     print("======1111111>>2222${key} ${message.status} ${message.progress}");
     notifyListeners();
   }

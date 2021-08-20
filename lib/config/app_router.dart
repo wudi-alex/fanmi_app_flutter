@@ -1,6 +1,7 @@
 import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/pages/card_edit_page.dart';
 import 'package:fanmi/pages/card_info_page/card_info_page.dart';
+import 'package:fanmi/pages/card_list_page/card_list_page.dart';
 import 'package:fanmi/pages/guide_page.dart';
 import 'package:fanmi/pages/login_page.dart';
 import 'package:fanmi/pages/long_text_edit_page.dart';
@@ -66,6 +67,7 @@ class AppRouter {
 
   static const String TextEditPageRoute = '/text_edit_page_route';
   static const String LongTextEditPageRoute = '/long_text_edit_page_route';
+  static const String CardListPageRoute = '/card_list_page_route';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -221,6 +223,11 @@ class AppRouter {
       case MineAboutPageRoute:
         return PageTransition(
             child: MineAboutPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case CardListPageRoute:
+        return PageTransition(
+            child: CardListPage(),
             type: PageTransitionType.rightToLeft,
             settings: settings);
     }

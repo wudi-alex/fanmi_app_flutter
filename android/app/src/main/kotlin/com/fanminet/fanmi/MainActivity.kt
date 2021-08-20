@@ -1,4 +1,4 @@
-package com.fanminet.fanmi_app_v2
+package com.fanminet.fanmi
 
 import io.flutter.embedding.android.FlutterActivity
 

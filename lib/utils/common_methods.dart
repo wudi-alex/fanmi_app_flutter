@@ -25,15 +25,16 @@ logout(BuildContext context) async {
 }
 
 initData(BuildContext context) async {
-  Provider.of<ConversionListModel>(context, listen: false).init();
   var sig = await Provider.of<UserModel>(context, listen: false).init();
   Provider.of<CardListModel>(context, listen: false).init();
 
   ///tim登录
-  await TencentImSDKPlugin.v2TIMManager.login(
+  TencentImSDKPlugin.v2TIMManager.login(
     userID: StorageManager.uid.toString(),
     userSig: sig,
-  );
+  ).then((v) {
+    Provider.of<ConversionListModel>(context, listen: false).init();
+  });
 }
 
 catchError(Object? error, String errorMsg) {
@@ -42,4 +43,13 @@ catchError(Object? error, String errorMsg) {
   } else {
     EasyLoading.showError(errorMsg);
   }
+}
+
+//设置已读
+setRead(String userId) async {
+  await TencentImSDKPlugin.v2TIMManager
+      .getMessageManager()
+      .markC2CMessageAsRead(
+        userID: userId,
+      );
 }

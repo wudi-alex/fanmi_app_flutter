@@ -43,7 +43,7 @@ class CommonImage extends StatefulWidget {
   CommonImage.photo(
       {this.imgUrl, this.callback, required this.width, required this.height})
       : this.radius = 5.r,
-        this.defaultUrl = AssetConstants.loading_failure,
+        this.defaultUrl = AssetConstants.loading,
         this.errorImageUrl = AssetConstants.loading_failure,
         this.placeHolderUrl = AssetConstants.loading;
 

@@ -24,11 +24,11 @@ class UserModel extends ChangeNotifier {
       StorageManager.setUserInfo(userInfo);
       //更新im签名
       StorageManager.setTimUserSig(resp.data['tim_sig']);
-      V2TimValueCallback<List<V2TimUserFullInfo>> infos =
-          await TencentImSDKPlugin.v2TIMManager.getUsersInfo(userIDList: [uid.toString()]);
-      if (infos.code == 0) {
-        setUserTimInfo(infos.data![0]);
-      }
+      // V2TimValueCallback<List<V2TimUserFullInfo>> infos =
+      //     await TencentImSDKPlugin.v2TIMManager.getUsersInfo(userIDList: [uid.toString()]);
+      // if (infos.code == 0) {
+      //   setUserTimInfo(infos.data![0]);
+      // }
       //更新面板数据
       var boardResp = await UserService.getMineBoardData();
       setMineBoard(mineBoardEntityFromJson(MineBoardEntity(), boardResp.data));
@@ -40,14 +40,30 @@ class UserModel extends ChangeNotifier {
     }
   }
 
-  setUserTimInfo(V2TimUserFullInfo newTimInfo) {
-    userTimInfo = newTimInfo;
+  setUserTimInfo(V2TimUserFullInfo newInfo) async {
+    userTimInfo = newInfo;
     notifyListeners();
   }
 
-  setUserInfo(UserInfoEntity newInfo) {
+  setUserInfo(UserInfoEntity newInfo) async {
     userInfo = newInfo;
     StorageManager.setUserInfo(newInfo);
+    //更新timinfo
+    userTimInfo = V2TimUserFullInfo.fromJson({
+      "userId": newInfo.uid.toString(),
+      "nickName": newInfo.name,
+      "faceUrl": newInfo.avatarUrl,
+      "gender": newInfo.gender,
+      "customInfo": {
+        'Tag_Profile_Custom_City': newInfo.city,
+        "Tag_Profile_Custom_Birth": newInfo.birthDate,
+        "Tag_Profile_Custom_LLT": newInfo.lastLoginTime,
+        "Tag_Profile_Custom_Status": newInfo.userStatus.toString(),
+      },
+    });
+    await TencentImSDKPlugin.v2TIMManager.setSelfInfo(
+      userFullInfo: userTimInfo,
+    );
     notifyListeners();
   }
 

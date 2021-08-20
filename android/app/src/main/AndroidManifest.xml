@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fanminet.fanmi_app_v2">
+    package="com.fanminet.fanmi">
    <application
-        android:label="fanmi_app_v2"
+        android:label="fanmi"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

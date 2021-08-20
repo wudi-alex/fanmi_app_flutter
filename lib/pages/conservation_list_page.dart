@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
+import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/time_utils.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
+import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,6 +32,7 @@ class _ConversionListPageState extends State<ConversionListPage> {
   Widget build(BuildContext context) {
     ConversionListModel conversionListModel =
         Provider.of<ConversionListModel>(context);
+    MessageListModel msgModel = Provider.of<MessageListModel>(context);
     var conversionList = conversionListModel.conversionPageList;
     return Scaffold(
       appBar: TitleAppBar(
@@ -93,8 +96,10 @@ class _ConversionListPageState extends State<ConversionListPage> {
                     .toString();
             return GestureDetector(
               onTap: () {
+                String userId = conversion.userID!;
+                msgModel.initData(userId);
                 Navigator.of(context).pushNamed(AppRouter.MessageListPageRoute,
-                    arguments: conversion.userID!);
+                    arguments: userId);
               },
               child: conversionItemWidget(
                   unReadCnt: unReadCnt,
@@ -136,8 +141,8 @@ class _ConversionListPageState extends State<ConversionListPage> {
             : CommonImage.avatar(
                 imgUrl: avatarUrl,
                 callback: () {},
-                height: 5.r,
-                radius: 43.r,
+                height: 43.r,
+                radius: 5.r,
               ),
         title: Text(
           name,

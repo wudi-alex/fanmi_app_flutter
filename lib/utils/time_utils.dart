@@ -1,14 +1,15 @@
 String messageItemTime(int msgTimestamp) {
-  var date = DateTime.fromMillisecondsSinceEpoch(msgTimestamp*1000);
+  var date = DateTime.fromMillisecondsSinceEpoch(msgTimestamp * 1000);
   var now = DateTime.now();
+  var minute = date.minute < 10 ? "0${date.minute}" : date.minute.toString();
   if (date.year == now.year && date.month == now.month && date.day == now.day) {
     return date.hour <= 12
-        ? "上午${date.hour}:${date.minute}"
-        : "下午${date.hour - 12}:${date.minute}";
+        ? "上午${date.hour}:$minute"
+        : "下午${date.hour - 12}:$minute";
   }
   return date.hour <= 12
-      ? "${date.year}年${date.month}月${date.day}日 上午${date.hour}:${date.minute}"
-      : "${date.year}年${date.month}月${date.day}日 下午${date.hour - 12}:${date.minute}";
+      ? "${date.year}年${date.month}月${date.day}日 上午${date.hour}:$minute"
+      : "${date.year}年${date.month}月${date.day}日 下午${date.hour - 12}:$minute";
 }
 
 String customTime(String inputDate) {

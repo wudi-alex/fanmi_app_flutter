@@ -1,5 +1,6 @@
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
+import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/pages/search_page/search_board.dart';
 import 'package:fanmi/pages/search_page/search_tab.dart';
 import 'package:fanmi/utils/storage_manager.dart';
@@ -36,9 +37,6 @@ class _SearchPageState extends State<SearchPage>
             body = ViewStateErrorWidget(
                 error: model.viewStateError!, onPressed: model.initData);
           } else if (model.isEmpty) {
-            // body = CustomEmptyWidget(
-            //   img: "assets/images/no_card_background.png",
-            // );
             body = SingleChildScrollView(
               child: ViewStateEmptyWidget(
                   image: Padding(
@@ -82,9 +80,15 @@ class _SearchPageState extends State<SearchPage>
                     return CardPreviewWidget(
                       data: item,
                       callback: () {
-                        Navigator.of(context).pushNamed(
-                            AppRouter.CardInfoPageRoute,
-                            arguments: item.id);
+                        if (item.uid == StorageManager.uid) {
+                          Navigator.of(context).pushNamed(
+                              AppRouter.CardEditPageRoute,
+                              arguments: CardTypeEnum.getCardType(item.type!));
+                        } else {
+                          Navigator.of(context).pushNamed(
+                              AppRouter.CardInfoPageRoute,
+                              arguments: item.id);
+                        }
                       },
                     );
                   }),
@@ -123,19 +127,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-        designSize: Size(375, 667),
-        builder: () => RefreshConfiguration(
-              hideFooterWhenNotFull: true, //列表数据不满一页,不触发加载更多
-              child: MaterialApp(
-                onGenerateRoute: AppRouter.generateRoute,
-                debugShowCheckedModeBanner: false,
-                home: Scaffold(
-                  body: Center(
-                    child: Container(child: SearchPage()),
-                  ),
-                  resizeToAvoidBottomInset: false,
-                ),
-              ),
-            ));
+      designSize: Size(375, 667),
+      builder: () => RefreshConfiguration(
+        hideFooterWhenNotFull: true, //列表数据不满一页,不触发加载更多
+        child: MaterialApp(
+          onGenerateRoute: AppRouter.generateRoute,
+          debugShowCheckedModeBanner: false,
+          home: Scaffold(
+            body: Center(
+              child: Container(child: SearchPage()),
+            ),
+            resizeToAvoidBottomInset: false,
+          ),
+        ),
+      ),
+    );
   }
 }

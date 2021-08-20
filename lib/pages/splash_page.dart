@@ -92,95 +92,101 @@ class _SplashPageState extends State<SplashPage> {
 
     //高级消息监听
     timManager.getMessageManager().addAdvancedMsgListener(
-      listener: V2TimAdvancedMsgListener(
-        //已读回执监听
-        onRecvC2CReadReceipt: (data) {
-          print('收到了新消息 已读回执');
-          List<V2TimMessageReceipt> list = data;
-          list.forEach((element) {
-            print("已读回执${element.userID} ${element.timestamp}");
-            Provider.of<MessageListModel>(context, listen: false)
-                .updateReadReceiptByUserId(element.userID);
-          });
-        },
-        //发送消息进度监听
-        onSendMessageProgress: (message, progress) {
-          //消息进度
-          String key = message.userID!;
-          try {
-            Provider.of<MessageListModel>(
-              context,
-              listen: false,
-            ).addOneMessageIfNotExits(key, message);
-          } catch (err) {
-            print("error $err");
-          }
-          print(
-              "消息发送进度 $progress ${message.timestamp} ${message.msgID} ${message.timestamp} ${message.status}");
-        },
-        //接受到新消息
-        onRecvNewMessage: (data) {
-          try {
-            String key = data.userID!;
-            //接收到好友申请消息，需要把消息里带过来的 名字/头像/是申请者/申请的名片id & type 更新好友信息
-            if (data.customElem != null &&
-                data.customElem!.desc ==
-                    MessageTypeEnum.APPLICATION.toString()) {
-              Map<String, String> customDataMap =
-              json.decode(data.customElem!.data!);
-              TencentImSDKPlugin.v2TIMManager
-                  .getFriendshipManager()
-                  .setFriendInfo(
-                friendRemark: customDataMap['name'],
-                userID: data.userID!,
-                friendCustomInfo: {
-                  "avatar_url": customDataMap['avatar_url']!,
-                  "is_applicant": IsApplicantEnum.YES.toString(),
-                  "applied_card_id": customDataMap['applied_card_id']!,
-                  "applied_card_type": customDataMap['applied_card_type']!,
-                },
-              );
-            }
-            Provider.of<MessageListModel>(context, listen: false)
-                .addOneMessageIfNotExits(key, data);
-          } catch (err) {
-            print(err);
-          }
-        },
-      ),
-    );
+          listener: V2TimAdvancedMsgListener(
+            //已读回执监听
+            onRecvC2CReadReceipt: (data) {
+              print('收到了新消息 已读回执');
+              List<V2TimMessageReceipt> list = data;
+              list.forEach((element) {
+                print("已读回执${element.userID} ${element.timestamp}");
+                Provider.of<MessageListModel>(context, listen: false)
+                    .updateReadReceiptByUserId(element.userID);
+              });
+            },
+            //发送消息进度监听
+            onSendMessageProgress: (message, progress) {
+              //消息进度
+              String key = message.userID!;
+              try {
+                Provider.of<MessageListModel>(
+                  context,
+                  listen: false,
+                ).addOneMessageIfNotExits(key, message);
+              } catch (err) {
+                print("error $err");
+              }
+              print(
+                  "消息发送进度 $progress ${message.timestamp} ${message.msgID} ${message.timestamp} ${message.status}");
+            },
+            //接受到新消息
+            onRecvNewMessage: (data) {
+              try {
+                String key = data.userID!;
+                //接收到好友申请消息，需要把消息里带过来的 名字/头像/是申请者/申请的名片id & type 更新好友信息
+                if (data.customElem != null &&
+                    data.customElem!.desc ==
+                        MessageTypeEnum.APPLICATION.toString()) {
+                  Map<String, String> customDataMap =
+                      json.decode(data.customElem!.data!);
+                  TencentImSDKPlugin.v2TIMManager
+                      .getFriendshipManager()
+                      .setFriendInfo(
+                    friendRemark: customDataMap['name'],
+                    userID: data.userID!,
+                    friendCustomInfo: {
+                      "avatar_url": customDataMap['avatar_url']!,
+                      "is_applicant": IsApplicantEnum.YES.toString(),
+                      "applied_card_id": customDataMap['applied_card_id']!,
+                      "applied_card_type": customDataMap['applied_card_type']!,
+                    },
+                  );
+                }
+                Provider.of<MessageListModel>(context, listen: false)
+                    .addOneMessageIfNotExits(key, data);
+              } catch (err) {
+                print(err);
+              }
+            },
+          ),
+        );
+
     //关系链监听
     timManager.getFriendshipManager().setFriendListener(
-      listener: V2TimFriendshipListener(
-          onFriendListAdded: (data) {
-            Provider.of<ConversionListModel>(context, listen: false)
-                .updateFriendInfoMap(data);
-          },
-          onFriendListDeleted: (data) {
-            Provider.of<ConversionListModel>(context, listen: false)
-                .updateFriendInfoMap(
-                data.map((v) => V2TimFriendInfo(userID: v)).toList(),
-                isDelete: true);
-          },
-          onFriendInfoChanged: (data) {
-            Provider.of<ConversionListModel>(context, listen: false)
-                .updateFriendInfoMap(data);
-          },
-          onBlackListAdd: (data) {}),
-    );
+          listener: V2TimFriendshipListener(
+              onFriendListAdded: (data) {
+                Provider.of<ConversionListModel>(context, listen: false)
+                    .updateFriendInfoMap(data);
+              },
+              onFriendListDeleted: (data) {
+                Provider.of<ConversionListModel>(context, listen: false)
+                    .updateFriendInfoMap(
+                        data.map((v) => V2TimFriendInfo(userID: v)).toList(),
+                        isDelete: true);
+              },
+              onFriendInfoChanged: (data) {
+                Provider.of<ConversionListModel>(context, listen: false)
+                    .updateFriendInfoMap(data);
+              },
+              onBlackListAdd: (data) {}),
+        );
+
     //会话监听
     timManager.getConversationManager().setConversationListener(
-      listener: V2TimConversationListener(
-        onNewConversation: (data) {
-          Provider.of<ConversionListModel>(context, listen: false)
-              .updateConversionInfoMap(data);
-        },
-        onConversationChanged: (data) {
-          Provider.of<ConversionListModel>(context, listen: false)
-              .updateConversionInfoMap(data);
-        },
-      ),
-    );
+          listener: V2TimConversationListener(
+            onNewConversation: (data) {
+              Provider.of<ConversionListModel>(context, listen: false)
+                  .updateConversionInfoMap(data);
+            },
+            onConversationChanged: (data) {
+              Provider.of<ConversionListModel>(context, listen: false)
+                  .updateConversionInfoMap(data);
+              Provider.of<MessageListModel>(
+                context,
+                listen: false,
+              ).addOneMessageIfNotExits(data[0].userID!, data[0].lastMessage!);
+            },
+          ),
+        );
   }
 
   startTime() async {
