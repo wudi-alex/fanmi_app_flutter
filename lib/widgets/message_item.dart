@@ -94,6 +94,7 @@ class MessageItem extends StatelessWidget {
 
   Widget msgWrapper(Widget content, double maxWidth) => Row(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: EdgeInsets.symmetric(

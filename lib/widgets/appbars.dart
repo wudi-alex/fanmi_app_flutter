@@ -51,3 +51,35 @@ class SubtitleAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => AppBar().preferredSize;
 }
+
+class PopUpAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final List<Widget>? actions;
+
+  const PopUpAppBar({Key? key, required this.title, this.actions})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      elevation: 0.5,
+      backgroundColor: Colors.white,
+      title: Text(title,
+          style: TextStyle(
+              color: Colors.black,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w500)),
+      leading: IconButton(
+        color: Colors.black,
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      actions: actions,
+    );
+  }
+
+  @override
+  Size get preferredSize => AppBar().preferredSize;
+}

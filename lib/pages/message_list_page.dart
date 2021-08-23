@@ -21,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
-import 'package:tencent_im_sdk_plugin/enum/offlinePushInfo.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
@@ -43,6 +42,10 @@ class _MessageListPageState extends State<MessageListPage> {
   TextEditingController _controller = TextEditingController();
   ScrollController scrollController = ScrollController();
 
+  late UserModel userModel;
+  late MessageListModel messageModel;
+  late CardListModel cardListModel;
+
   @override
   void initState() {
     super.initState();
@@ -53,17 +56,19 @@ class _MessageListPageState extends State<MessageListPage> {
     super.dispose();
     _focusNode.dispose();
     _controller.dispose();
+    messageModel.nowTalkingUserId = "";
   }
 
   @override
   Widget build(BuildContext context) {
-    setRead(userId);
-    UserModel userModel = Provider.of<UserModel>(context);
+    checkFriend(userId: userId);
+
+    userModel = Provider.of<UserModel>(context);
     ConversionListModel conversionListModel =
         Provider.of<ConversionListModel>(context);
-
-    MessageListModel model = Provider.of<MessageListModel>(context);
-    CardListModel cardListModel = Provider.of<CardListModel>(context);
+    messageModel = Provider.of<MessageListModel>(context);
+    messageModel.nowTalkingUserId = userId;
+    cardListModel = Provider.of<CardListModel>(context);
     var cardList = cardListModel.cardList as List<CardInfoEntity>;
 
     var selfUserInfo = userModel.userTimInfo;
@@ -81,10 +86,11 @@ class _MessageListPageState extends State<MessageListPage> {
     int userStatus = UserStatusEnum.USER_STATUS_NORMAL;
 
     Widget body;
-    if (model.isBusy) {
+    if (messageModel.isBusy) {
       body = ViewStateBusyWidget();
     } else {
-      var messageList = (model.messageMap[userId] ?? []).reversed.toList();
+      var messageList =
+          (messageModel.messageMap[userId] ?? []).reversed.toList();
       Widget idleBody = ListView.builder(
         reverse: true,
         shrinkWrap: true,
@@ -118,19 +124,24 @@ class _MessageListPageState extends State<MessageListPage> {
                 msgTimestamp: msgTimeStamp,
               );
             case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-              Map<String, Object> customDataMap = Map<String, Object>.from(
-                  json.decode(timMsg.customElem!.data!));
-              int cardId = customDataMap["card_id"]! as int;
-              int cardType = customDataMap["card_type"]! as int;
-              return MessageItem(
-                messageType: MessageTypeEnum.CARD,
-                avatarUrl: avatarUrl,
-                isSelf: isSelf,
-                isPeerRead: timMsg.isPeerRead ?? false,
-                msgTimestamp: msgTimeStamp,
-                cardId: cardId,
-                cardType: cardType,
-              );
+              switch (int.parse(timMsg.customElem!.desc!)) {
+                case MessageTypeEnum.CARD:
+                  Map<String, Object> customDataMap = Map<String, Object>.from(
+                      json.decode(timMsg.customElem!.data!));
+                  int cardId = customDataMap["card_id"]! as int;
+                  int cardType = customDataMap["card_type"]! as int;
+                  return MessageItem(
+                    messageType: MessageTypeEnum.CARD,
+                    avatarUrl: avatarUrl,
+                    isSelf: isSelf,
+                    isPeerRead: timMsg.isPeerRead ?? false,
+                    msgTimestamp: msgTimeStamp,
+                    cardId: cardId,
+                    cardType: cardType,
+                  );
+                default:
+                  return Container();
+              }
             default:
               return Container();
           }
@@ -146,7 +157,7 @@ class _MessageListPageState extends State<MessageListPage> {
       body: Column(
         children: [
           Expanded(child: body),
-          msgTextField(userStatus),
+          msgTextField(),
           Container(
             color: Colors.white,
             child: Row(
@@ -194,23 +205,17 @@ class _MessageListPageState extends State<MessageListPage> {
                     if (assets != null) {
                       var imageAsset = assets[0];
                       var file = await imageAsset.originFile;
-                      //发送图片消息
-                      await TencentImSDKPlugin.v2TIMManager
-                          .getMessageManager()
-                          .sendImageMessage(
-                            imagePath: file!.path,
-                            receiver: userId,
-                            groupID: "",
-                            priority: 0,
-                            onlineUserOnly: false,
-                            isExcludedFromUnreadCount: false,
-                          );
+                      await sendImgMessage(
+                          userStatus: userStatus,
+                          context: context,
+                          path: file!.path,
+                          userId: userId);
                     }
                   },
                 ),
                 //名片消息
                 iconButton(
-                  Icons.account_box_rounded,
+                  Icons.web_outlined,
                   () async {
                     if (cardList.isEmpty) {
                       final res = await showOkCancelAlertDialog(
@@ -222,7 +227,7 @@ class _MessageListPageState extends State<MessageListPage> {
                       );
                       if (res == OkCancelResult.ok) {
                         Navigator.of(context)
-                            .pushNamed(AppRouter.CardListPageRoute);
+                            .pushNamed(AppRouter.MainPageRoute, arguments: 1);
                       } else {
                         return;
                       }
@@ -258,7 +263,7 @@ class _MessageListPageState extends State<MessageListPage> {
     );
   }
 
-  Widget msgTextField(int userStatus) {
+  Widget msgTextField() {
     return Container(
       width: MediaQuery.of(context).size.width,
       // height: 70.r,
@@ -284,24 +289,12 @@ class _MessageListPageState extends State<MessageListPage> {
               isCollapsed: true,
             ),
             onSubmitted: (text) async {
-              switch (userStatus) {
-                case UserStatusEnum.USER_STATUS_FORBIDDEN:
-                  SmartDialog.showToast("该用户已被封禁");
-                  break;
-                case UserStatusEnum.USER_STATUS_FREEZE:
-                  SmartDialog.showToast("该用户已被冻结");
-                  break;
-                case UserStatusEnum.USER_STATUS_DELETE:
-                  SmartDialog.showToast("该用户已注销");
-                  break;
-                case UserStatusEnum.USER_STATUS_NORMAL:
-                  await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
-                    text: text,
-                    userID: userId,
-                  );
-                  _controller.text = "";
-                  print('发送文字消息');
-              }
+              await sendTextMessage(
+                  userId: userId,
+                  text: text,
+                  context: context,
+                  userStatus: userStatus);
+              _controller.text = "";
             },
           ),
         ),
@@ -327,20 +320,13 @@ class _MessageListPageState extends State<MessageListPage> {
     CardTypeEnum cardType = CardTypeEnum.getCardType(card.type!);
     return GestureDetector(
       onTap: () async {
-        await TencentImSDKPlugin.v2TIMManager
-            .getMessageManager()
-            .sendCustomMessage(
-                data: json.encode({
-                  "card_id": card.id,
-                  "card_type": card.type,
-                }),
-                receiver: userId,
-                groupID: "",
-                priority: 0,
-                offlinePushInfo: OfflinePushInfo(
-                  desc:
-                      "我给你发送了我的${CardTypeEnum.getCardType(card.type!).desc}名片，快来看看吧～",
-                ));
+        await sendCardMessage(
+          cardId: card.id!,
+          cardType: card.type!,
+          userId: userId,
+          context: context,
+          userStatus: userStatus,
+        );
         Navigator.of(context).pop();
       },
       child: Container(
@@ -365,4 +351,6 @@ class _MessageListPageState extends State<MessageListPage> {
       ),
     );
   }
+
+  get userStatus => int.parse(userModel.userStatus);
 }

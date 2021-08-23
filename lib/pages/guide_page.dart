@@ -6,6 +6,7 @@ import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/enums/gender_type_enum.dart';
 import 'package:fanmi/generated/json/user_info_entity_helper.dart';
 import 'package:fanmi/net/user_service.dart';
+import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/city_picker/city_picker.dart';
@@ -341,7 +342,7 @@ class WelcomeGuidePage extends StatelessWidget {
                 height: 10.r,
               ),
               Text(
-                userModel.userInfo.name!,
+                userModel.userInfo.name??"凡觅用户",
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 18.sp,
@@ -482,8 +483,10 @@ class WelcomeGuidePage4 extends StatelessWidget {
         var userModel = Provider.of<UserModel>(context, listen: false);
         UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
             .then((v) {
-          StorageManager.setUserInfo(userModel.userInfo);
-          Navigator.of(context).pushNamed(AppRouter.MainPageRoute);
+          // StorageManager.setUserInfo(userModel.userInfo);
+          initData(context);
+          Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
+
         }).onError((error, stackTrace) {
           SmartDialog.showToast("注册失败");
           StorageManager.sp.remove(StorageManager.uidKey);

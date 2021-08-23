@@ -1,11 +1,13 @@
 import 'package:fanmi/config/page_size_config.dart';
+import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/view_state_model.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class MessageListModel extends ViewStateModel {
+  String nowTalkingUserId = "";
   Map<String, List<V2TimMessage>> messageMap = Map();
+  List<String> initUserList = [];
 
   get pullCnt => PageSizeConfig.MESSAGE_PAGE_SIZE;
 
@@ -16,15 +18,19 @@ class MessageListModel extends ViewStateModel {
   }
 
   pullHistoryMessage(String userId) async {
-    if (!messageMap.containsKey(userId)) {
-      for (int i = 0; i < 3; i++) {
-        var lastMsgID = i > 0 ? messageMap[userId]!.last.msgID : null;
+    if (!initUserList.contains(userId)) {
+      initUserList.add(userId);
+      for (int i = 0; i < 5; i++) {
+        var lastMsgID = i > 0 ? messageMap[userId]!.first.msgID : null;
         var res = await TencentImSDKPlugin.v2TIMManager
             .getMessageManager()
             .getC2CHistoryMessageList(
                 userID: userId, count: pullCnt, lastMsgID: lastMsgID);
-
-        updateMessage(userId, res.data!);
+        if (res.data!.isNotEmpty) {
+          updateMessage(userId, res.data!);
+        } else {
+          break;
+        }
       }
     }
   }
@@ -65,8 +71,6 @@ class MessageListModel extends ViewStateModel {
       messageList.add(message);
       messageMap[key] = messageList;
     }
-    // messageMap[key]!
-    //     .sort((left, right) => right.timestamp!.compareTo(left.timestamp!));
     print("======1111111>>2222${key} ${message.status} ${message.progress}");
     notifyListeners();
   }

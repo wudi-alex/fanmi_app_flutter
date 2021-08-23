@@ -20,6 +20,7 @@ import 'package:tencent_im_sdk_plugin/enum/V2TimConversationListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimFriendshipListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimSDKListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/log_level.dart';
+import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/manager/v2_tim_manager.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message_receipt.dart';
@@ -104,45 +105,62 @@ class _SplashPageState extends State<SplashPage> {
               });
             },
             //发送消息进度监听
-            onSendMessageProgress: (message, progress) {
-              //消息进度
-              String key = message.userID!;
-              try {
-                Provider.of<MessageListModel>(
-                  context,
-                  listen: false,
-                ).addOneMessageIfNotExits(key, message);
-              } catch (err) {
-                print("error $err");
-              }
-              print(
-                  "消息发送进度 $progress ${message.timestamp} ${message.msgID} ${message.timestamp} ${message.status}");
-            },
+            // onSendMessageProgress: (message, progress) {
+            //   //消息进度
+            //   String key = message.userID!;
+            //   try {
+            //     Provider.of<MessageListModel>(
+            //       context,
+            //       listen: false,
+            //     ).addOneMessageIfNotExits(key, message);
+            //   } catch (err) {
+            //     print("error $err");
+            //   }
+            //   print(
+            //       "消息发送进度 $progress ${message.timestamp} ${message.msgID} ${message.timestamp} ${message.status}");
+            // },
             //接受到新消息
             onRecvNewMessage: (data) {
+              print('收到新消息');
+              var messageModel =
+                  Provider.of<MessageListModel>(context, listen: false);
               try {
-                String key = data.userID!;
-                //接收到好友申请消息，需要把消息里带过来的 名字/头像/是申请者/申请的名片id & type 更新好友信息
-                if (data.customElem != null &&
-                    data.customElem!.desc ==
-                        MessageTypeEnum.APPLICATION.toString()) {
-                  Map<String, String> customDataMap =
-                      json.decode(data.customElem!.data!);
-                  TencentImSDKPlugin.v2TIMManager
-                      .getFriendshipManager()
-                      .setFriendInfo(
-                    friendRemark: customDataMap['name'],
-                    userID: data.userID!,
-                    friendCustomInfo: {
-                      "avatar_url": customDataMap['avatar_url']!,
-                      "is_applicant": IsApplicantEnum.YES.toString(),
-                      "applied_card_id": customDataMap['applied_card_id']!,
-                      "applied_card_type": customDataMap['applied_card_type']!,
-                    },
-                  );
+                String userId = data.userID!;
+                if (data.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
+                  switch (int.parse(data.customElem!.desc!)) {
+                    //接收到好友申请消息，需要把消息里带过来的 名字/头像/是申请者/申请的名片id & type 更新好友信息
+                    case MessageTypeEnum.APPLICATION:
+                      Map<String, String> customDataMap =
+                          json.decode(data.customElem!.data!);
+                      TencentImSDKPlugin.v2TIMManager
+                          .getFriendshipManager()
+                          .setFriendInfo(
+                        friendRemark: customDataMap['name'],
+                        userID: data.userID!,
+                        friendCustomInfo: {
+                          "Tag_SNS_Custom_Avatar":
+                              customDataMap['Tag_SNS_Custom_Avatar']!,
+                          "Tag_SNS_Custom_IsApply":
+                              customDataMap['Tag_SNS_Custom_IsApply']!,
+                          "Tag_SNS_Custom_cid":
+                              customDataMap['Tag_SNS_Custom_cid']!,
+                          "Tag_SNS_Custom_ctype":
+                              customDataMap['Tag_SNS_Custom_ctype']!,
+                        },
+                      );
+                      break;
+                    case MessageTypeEnum.AGREE:
+                      break;
+                    case MessageTypeEnum.REFUSE:
+                      break;
+                  }
                 }
-                Provider.of<MessageListModel>(context, listen: false)
-                    .addOneMessageIfNotExits(key, data);
+
+                messageModel.addOneMessageIfNotExits(userId, data);
+                if (messageModel.nowTalkingUserId == userId) {
+                  //停留当前聊天页面，设置已读
+                  setRead(userId);
+                }
               } catch (err) {
                 print(err);
               }
@@ -180,6 +198,7 @@ class _SplashPageState extends State<SplashPage> {
             onConversationChanged: (data) {
               Provider.of<ConversionListModel>(context, listen: false)
                   .updateConversionInfoMap(data);
+
               Provider.of<MessageListModel>(
                 context,
                 listen: false,
@@ -197,7 +216,8 @@ class _SplashPageState extends State<SplashPage> {
       _timer = new Timer.periodic(const Duration(milliseconds: 1000), (v) {
         count--;
         if (count == 0) {
-          Navigator.of(context).pushNamed(AppRouter.MainPageRoute);
+          Navigator.of(context)
+              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
         } else {
           setState(() {});
         }

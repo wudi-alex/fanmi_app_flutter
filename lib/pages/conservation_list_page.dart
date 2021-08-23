@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
@@ -11,12 +12,13 @@ import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -26,7 +28,6 @@ class ConversionListPage extends StatefulWidget {
 }
 
 class _ConversionListPageState extends State<ConversionListPage> {
-  RefreshController _refreshController = RefreshController();
 
   @override
   Widget build(BuildContext context) {
@@ -38,67 +39,85 @@ class _ConversionListPageState extends State<ConversionListPage> {
       appBar: TitleAppBar(
         title: "消息",
       ),
-      body: SmartRefresher(
-        controller: _refreshController,
-        footer: ClassicFooter(
-          noDataText: "没有更多消息",
+      body: ListView.separated(
+        shrinkWrap: true,
+        separatorBuilder: (BuildContext context, int index) => Divider(
+          height: 0,
+          thickness: 0.3.r,
         ),
-        onLoading: () {
-          bool canLoadNext = conversionListModel.pullData();
-          if (canLoadNext) {
-            _refreshController.loadNoData();
-          } else {
-            _refreshController.loadComplete();
+        itemCount: conversionList.length,
+        itemBuilder: (context, index) {
+          Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>
+              conversionItem = conversionList[index];
+          var conversion = conversionItem.item1;
+          int unReadCnt = conversion.unreadCount!;
+          String name = conversionItem.item3 != null
+              ? conversionItem.item3!.friendRemark ??
+                  conversionItem.item1.showName!
+              : conversionItem.item1.showName!;
+          String avatarUrl = conversionItem.item3 != null
+              ? conversionItem.item3!.friendCustomInfo!["Tag_SNS_Custom_Avatar"] ??
+                  conversionItem.item1.faceUrl!
+              : conversionItem.item1.faceUrl!;
+          String content = "";
+          var lastMsg = conversion.lastMessage!;
+          switch (lastMsg.elemType) {
+            case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
+              content = lastMsg.textElem!.text!;
+              break;
+            case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
+              content = "[图片消息]";
+              break;
+            case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+              if (lastMsg.customElem!.desc ==
+                  MessageTypeEnum.APPLICATION.toString()) {
+                Map<String, String> customDataMap =
+                    json.decode(lastMsg.customElem!.data!);
+                content = customDataMap["text"]!;
+              } else {
+                content = "[名片消息]";
+              }
+              break;
           }
-        },
-        child: ListView.separated(
-          shrinkWrap: true,
-          separatorBuilder: (BuildContext context, int index) => Divider(
-            height: 0,
-            thickness: 0.3.r,
-          ),
-          itemCount: conversionList.length,
-          itemBuilder: (context, index) {
-            Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>
-                conversionItem = conversionList[index];
-            var conversion = conversionItem.item1;
-            int unReadCnt = conversion.unreadCount!;
-            String name = conversionItem.item3 != null
-                ? conversionItem.item3!.friendRemark ??
-                    conversionItem.item1.showName!
-                : conversionItem.item1.showName!;
-            String avatarUrl = conversionItem.item3 != null
-                ? conversionItem.item3!.friendCustomInfo!["avatar_url"] ??
-                    conversionItem.item1.faceUrl!
-                : conversionItem.item1.faceUrl!;
-            String content = "";
-            var lastMsg = conversion.lastMessage!;
-            switch (lastMsg.elemType) {
-              case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-                content = lastMsg.textElem!.text!;
-                break;
-              case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-                content = "[图片消息]";
-                break;
-              case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-                if (lastMsg.customElem!.desc ==
-                    MessageTypeEnum.APPLICATION.toString()) {
-                  Map<String, String> customDataMap =
-                      json.decode(lastMsg.customElem!.data!);
-                  content = customDataMap["text"]!;
-                } else {
-                  content = "[名片消息]";
-                }
-                break;
-            }
-            String time =
-                DateTime.fromMillisecondsSinceEpoch(lastMsg.timestamp! * 1000)
-                    .toString();
-            return GestureDetector(
+          String time =
+              DateTime.fromMillisecondsSinceEpoch(lastMsg.timestamp! * 1000)
+                  .toString();
+          return SwipeActionCell(
+            backgroundColor: Colors.white,
+            key: UniqueKey(),
+            trailingActions: <SwipeAction>[
+              SwipeAction(
+                  title: "删除",
+                  onTap: (CompletionHandler handler) async {
+                    final res = await showOkCancelAlertDialog(
+                      context: context,
+                      title: "删除会话",
+                      message: "删除后你将无法再和对方对话了哦，确认删除吗",
+                      okLabel: "删除",
+                      cancelLabel: "取消",
+                    );
+                    if (res == OkCancelResult.ok) {
+                      await TencentImSDKPlugin.v2TIMManager
+                          .getConversationManager()
+                          .deleteConversation(
+                            conversationID: conversion.conversationID,
+                          );
+                      conversionListModel.updateConversionInfoMap(
+                          [conversion],
+                          isDelete: true);
+                    } else {
+                      return;
+                    }
+                  },
+                  color: Colors.red),
+            ],
+            child: GestureDetector(
               onTap: () {
                 String userId = conversion.userID!;
                 msgModel.initData(userId);
-                Navigator.of(context).pushNamed(AppRouter.MessageListPageRoute,
+                setRead(userId);
+                Navigator.of(context).pushNamed(
+                    AppRouter.MessageListPageRoute,
                     arguments: userId);
               },
               child: conversionItemWidget(
@@ -107,9 +126,9 @@ class _ConversionListPageState extends State<ConversionListPage> {
                   name: name,
                   content: content,
                   time: time),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

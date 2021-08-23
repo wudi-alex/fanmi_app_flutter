@@ -1,11 +1,16 @@
+import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 
 import 'http_client.dart';
 
 class UserService {
   static Future getUserInfo() async {
-    var resp = await http
-        .post('/user/get_user_info', data: {"uid": StorageManager.uid});
+    String deviceInfo = await PlatformUtils.getDeviceInfo();
+    var resp = await http.post('/user/get_user_info', data: {
+      "uid": StorageManager.uid,
+      "platform": Platform.operatingSystem,
+      "device": deviceInfo,
+    });
     return resp;
   }
 

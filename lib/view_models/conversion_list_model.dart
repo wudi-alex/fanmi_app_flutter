@@ -1,5 +1,8 @@
+import 'package:fanmi/config/page_fonts.dart';
+import 'package:fanmi/config/page_size_config.dart';
 import 'package:fanmi/enums/is_applicant_enum.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_callback.dart';
@@ -20,7 +23,15 @@ class ConversionListModel extends ChangeNotifier {
   Map<String, V2TimUserFullInfo> userInfoMap = {};
   Map<String, V2TimFriendInfo> friendInfoMap = {};
 
-  get pullCnt => 100;
+  get pullCnt => PageSizeConfig.CONVERSION_PAGE_SIZE;
+
+  get unreadCntTotal {
+    int cnt = 0;
+    conversionMap.forEach((userId, conversionInfo) {
+      cnt += conversionInfo.unreadCount ?? 0;
+    });
+    return cnt;
+  }
 
   get conversionPageList {
     List<Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>> res =
@@ -45,15 +56,20 @@ class ConversionListModel extends ChangeNotifier {
     return res;
   }
 
-  init() {
-    pullData();
+  init() async{
+    while (true){
+      bool allLoad = await pullData();
+      if (allLoad) {
+        break;
+      }
+    }
   }
 
   pullData() async {
     var userList = await pullConversionData(nextSeq);
     await pullFriendInfoData(userList);
     await pullUserInfoData(userList);
-    return userList.length > pullCnt;
+    return userList.length < pullCnt;
   }
 
   Future<List<String>> pullConversionData(String nextSeq) async {

@@ -64,6 +64,19 @@ cardInfoEntityFromJson(CardInfoEntity data, Map<String, dynamic> json) {
 	if (json['qq_qr_url'] != null) {
 		data.qqQrUrl = json['qq_qr_url'].toString();
 	}
+	if (json['relation_is_applicant'] != null) {
+		data.relationIsApplicant = json['relation_is_applicant'] is String
+				? int.tryParse(json['relation_is_applicant'])
+				: json['relation_is_applicant'].toInt();
+	}
+	if (json['relation_name'] != null) {
+		data.relationName = json['relation_name'].toString();
+	}
+	if (json['relation_status'] != null) {
+		data.relationStatus = json['relation_status'] is String
+				? int.tryParse(json['relation_status'])
+				: json['relation_status'].toInt();
+	}
 	if (json['search_num'] != null) {
 		data.searchNum = json['search_num'] is String
 				? int.tryParse(json['search_num'])
@@ -111,6 +124,9 @@ Map<String, dynamic> cardInfoEntityToJson(CardInfoEntity entity) {
 	data['is_need_card'] = entity.isNeedCard;
 	data['name'] = entity.name;
 	data['qq_qr_url'] = entity.qqQrUrl;
+	data['relation_is_applicant'] = entity.relationIsApplicant;
+	data['relation_name'] = entity.relationName;
+	data['relation_status'] = entity.relationStatus;
 	data['search_num'] = entity.searchNum;
 	data['self_desc'] = entity.selfDesc;
 	data['sign'] = entity.sign;

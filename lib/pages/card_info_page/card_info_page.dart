@@ -1,6 +1,10 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/hippo_icon.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
+import 'package:fanmi/enums/relation_type_enum.dart';
+import 'package:fanmi/utils/common_methods.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/widgets/album.dart';
 import 'package:fanmi/view_models/card_info_view_model.dart';
 import 'package:fanmi/widgets/common_image.dart';
@@ -9,10 +13,8 @@ import 'package:fanmi/widgets/view_state_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
-import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 import 'custom_card_bar.dart';
 
@@ -37,6 +39,7 @@ class CardInfoPage extends StatelessWidget {
           return customScaffold(
               ViewStateEmptyWidget(onPressed: model.initData));
         }
+        checkFriend(userId: model.cardInfoEntity.uid!.toString());
         return Scaffold(
           body: CustomCardBar(
             data: model.cardInfoEntity,
@@ -223,28 +226,65 @@ class CardInfoPage extends StatelessWidget {
   Widget recognizeButton(BuildContext context, CardInfoViewModel model) =>
       InkWell(
         onTap: () async {
-          // if (isLogined) {
-          //   if (StorageManager.userEntity.uid ==
-          //       model.cardDetailEntity.cardUid) {
-          //     SmartDialog.showToast("我想和自己交个朋友～");
-          //     return;
-          //   }
-          //   Navigator.of(context).pushNamed(AppRouter.RecognizePageRoute,
-          //       arguments: [model.cardDetailEntity, gender, birthDate, city]);
-          // } else {
-          //   Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
-          // }
-          List<String>? msg = await showTextInputDialog(
-            context: context,
-            textFields: [DialogTextField()],
-          );
-          if (msg != null) {
-            V2TimValueCallback<V2TimMessage> res =
-                await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
-              text: msg[0],
-              userID: model.cardInfoEntity.uid.toString(),
-            );
+          var card = model.cardInfoEntity;
+          if (!StorageManager.isLogin) {
+            Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+            return;
           }
+          if (card.relationIsApplicant == 1) {
+            String name = card.relationName!;
+            if (card.relationStatus == RelationTypeEnum.AGREED) {
+              SmartDialog.showToast("又被你找到啦！对方是已经同意过你的「$name」哦～");
+            } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
+              SmartDialog.showToast("真不巧。。对方是已经拒绝过你的「$name」");
+            }
+            // else{
+            //   SmartDialog.showToast("对方是你正想认识的「$name」哦～快去消息页面找到ta吧～");
+            // }
+            return;
+          } else if (card.relationIsApplicant == 0) {
+            String name = card.relationName!;
+            if (card.relationStatus == RelationTypeEnum.AGREED) {
+              SmartDialog.showToast("太巧了！对方是你同意过的「$name」哦～");
+            } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
+              SmartDialog.showToast("真不巧。。对方是你已经拒绝过的「$name」");
+            }
+            // else{
+            //   SmartDialog.showToast("对方是正想认识你的「$name」哦～快去消息页面找到ta吧～");
+            // }
+            return;
+          }
+          // List<String>? msg = await showTextInputDialog(
+          //   context: context,
+          //   textFields: [DialogTextField()],
+          // );
+          // if (msg != null) {
+          //   V2TimValueCallback<V2TimMessage> res =
+          //       await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
+          //     text: msg[0],
+          //     userID: model.cardInfoEntity.uid.toString(),
+          //   );
+          // }
+          // SmartDialog.show(
+          //   alignmentTemp: Alignment.bottomCenter,
+          //   clickBgDismissTemp: true,
+          //   widget: Container(
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.only(
+          //         topLeft: Radius.circular(20.r),
+          //         topRight: Radius.circular(20.r),
+          //       ),
+          //       color: Colors.white,
+          //     ),
+          //     height: 300.r,
+          //     child: Column(
+          //       children: [
+          //         TextField(),
+          //       ],
+          //     ),
+          //   ),
+          // );
+          Navigator.of(context).pushNamed(AppRouter.RecognizePageRoute, arguments: card);
         },
         child: Container(
           height: 40.r,

@@ -60,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
           if (Navigator.of(context).canPop()) {
             Navigator.of(context).pop();
           } else {
-            Navigator.of(context).pushNamed(AppRouter.MainPageRoute);
+            Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
           }
         },
       ),
@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
     } else {
       initData(context);
-      Navigator.of(context).pushNamed(AppRouter.MainPageRoute);
+      Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
     }
   }
 

@@ -5,4 +5,5 @@ class MessageTypeEnum {
   static const int CARD = 3;
   static const int AGREE = 4;
   static const int REFUSE = 5;
+  static const int QR = 6;
 }

@@ -1,6 +1,8 @@
+import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/pages/card_edit_page.dart';
 import 'package:fanmi/pages/card_info_page/card_info_page.dart';
+import 'package:fanmi/pages/card_info_page/recoginize_page.dart';
 import 'package:fanmi/pages/card_list_page/card_list_page.dart';
 import 'package:fanmi/pages/guide_page.dart';
 import 'package:fanmi/pages/login_page.dart';
@@ -67,7 +69,6 @@ class AppRouter {
 
   static const String TextEditPageRoute = '/text_edit_page_route';
   static const String LongTextEditPageRoute = '/long_text_edit_page_route';
-  static const String CardListPageRoute = '/card_list_page_route';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -136,7 +137,9 @@ class AppRouter {
             settings: settings);
       case MainPageRoute:
         return PageTransition(
-            child: MainPage(),
+            child: MainPage(
+              initIndex: settings.arguments as int,
+            ),
             type: PageTransitionType.fade,
             settings: settings);
 
@@ -225,10 +228,10 @@ class AppRouter {
             child: MineAboutPage(),
             type: PageTransitionType.rightToLeft,
             settings: settings);
-      case CardListPageRoute:
+      case RecognizePageRoute:
         return PageTransition(
-            child: CardListPage(),
-            type: PageTransitionType.rightToLeft,
+            child: RecognizePage(card: settings.arguments as CardInfoEntity,),
+            type: PageTransitionType.bottomToTop,
             settings: settings);
     }
   }

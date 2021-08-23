@@ -47,7 +47,7 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     userModel = Provider.of<UserModel>(context);
     avatarModel = ImagePickerModel(
-        maxAssetsCount: 1, imgUrls: [userModel.userInfo.avatarUrl!]);
+        maxAssetsCount: 1, imgUrls: [userModel.userInfo.avatarUrl??""]);
     return Scaffold(
       appBar: TitleAppBar(
         title: "我的",
@@ -161,7 +161,7 @@ class _MinePageState extends State<MinePage> {
               }
             },
             child: Text(
-              userModel.userInfo.name!,
+              userModel.userInfo.name??"凡觅用户",
               style: TextStyle(color: Colors.grey, fontSize: 17.sp),
             ),
           ),
