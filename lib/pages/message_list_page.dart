@@ -5,9 +5,12 @@ import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/enums/is_applicant_enum.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
-import 'package:fanmi/enums/user_status_enum.dart';
+import 'package:fanmi/enums/relation_type_enum.dart';
+import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
@@ -23,7 +26,6 @@ import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class MessageListPage extends StatefulWidget {
@@ -61,8 +63,6 @@ class _MessageListPageState extends State<MessageListPage> {
 
   @override
   Widget build(BuildContext context) {
-    checkFriend(userId: userId);
-
     userModel = Provider.of<UserModel>(context);
     ConversionListModel conversionListModel =
         Provider.of<ConversionListModel>(context);
@@ -72,18 +72,17 @@ class _MessageListPageState extends State<MessageListPage> {
     var cardList = cardListModel.cardList as List<CardInfoEntity>;
 
     var selfUserInfo = userModel.userTimInfo;
-    var userInfo = conversionListModel.userInfoMap[userId];
-    // var friendInfo = conversionListModel.friendInfoMap[userId]!;
-    // var messageList = messageListModel.messageMap[userId];
+    var friendInfo = conversionListModel.friendInfoMap[userId]!;
 
     String selfAvatarUrl = selfUserInfo.faceUrl!;
-    // String friendAvatarUrl = friendInfo.friendCustomInfo!['avatar_url']!;
-    // String friendName = friendInfo.friendRemark!;
-    String friendAvatarUrl = selfUserInfo.faceUrl!;
-    String friendName = "对方";
 
-    // int userStatus = userInfo!.customInfo!["user_status"]! as int;
-    int userStatus = UserStatusEnum.USER_STATUS_NORMAL;
+    String friendAvatarUrl =
+        friendInfo.friendCustomInfo![prefixWrapper("Avatar")]!;
+    String friendName = friendInfo.friendRemark!;
+    String isApplicant =
+        friendInfo.friendCustomInfo![prefixWrapper("IsApply")]!;
+    String? wxUrl = friendInfo.friendCustomInfo![prefixWrapper("WX")];
+    String? qqUrl = friendInfo.friendCustomInfo![prefixWrapper("QQ")];
 
     Widget body;
     if (messageModel.isBusy) {
@@ -124,10 +123,10 @@ class _MessageListPageState extends State<MessageListPage> {
                 msgTimestamp: msgTimeStamp,
               );
             case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+              Map<String, Object> customDataMap = Map<String, Object>.from(
+                  json.decode(timMsg.customElem!.data!));
               switch (int.parse(timMsg.customElem!.desc!)) {
                 case MessageTypeEnum.CARD:
-                  Map<String, Object> customDataMap = Map<String, Object>.from(
-                      json.decode(timMsg.customElem!.data!));
                   int cardId = customDataMap["card_id"]! as int;
                   int cardType = customDataMap["card_type"]! as int;
                   return MessageItem(
@@ -138,6 +137,36 @@ class _MessageListPageState extends State<MessageListPage> {
                     msgTimestamp: msgTimeStamp,
                     cardId: cardId,
                     cardType: cardType,
+                  );
+                case MessageTypeEnum.APPLICATION:
+                  String text = customDataMap["text"]! as String;
+                  return MessageItem(
+                    messageType: MessageTypeEnum.NORMAL,
+                    avatarUrl: avatarUrl,
+                    isSelf: isSelf,
+                    isPeerRead: timMsg.isPeerRead ?? false,
+                    msgTimestamp: msgTimeStamp,
+                    msgText: text,
+                  );
+                case MessageTypeEnum.AGREE:
+                  String text = customDataMap["text"]! as String;
+                  return MessageItem(
+                    messageType: MessageTypeEnum.NORMAL,
+                    avatarUrl: avatarUrl,
+                    isSelf: isSelf,
+                    isPeerRead: timMsg.isPeerRead ?? false,
+                    msgTimestamp: msgTimeStamp,
+                    msgText: text,
+                  );
+                case MessageTypeEnum.QR:
+                  String url = customDataMap["url"]! as String;
+                  return MessageItem(
+                    messageType: MessageTypeEnum.IMG,
+                    avatarUrl: avatarUrl,
+                    isSelf: isSelf,
+                    isPeerRead: timMsg.isPeerRead ?? false,
+                    msgTimestamp: msgTimeStamp,
+                    imgUrl: url,
                   );
                 default:
                   return Container();
@@ -167,26 +196,64 @@ class _MessageListPageState extends State<MessageListPage> {
                 iconButton(
                   Icons.favorite,
                   () async {
-                    final res = await showOkCancelAlertDialog(
-                      context: context,
-                      title: "同意交友申请",
-                      message: "确定同意对方的交友申请吗？同意后你们将交换二维码哦",
-                      okLabel: "确定",
-                      cancelLabel: "取消",
-                    );
+                    if (isApplicant != IsApplicantEnum.YES.toString()) {
+                      SmartDialog.showToast("你是申请者哦～");
+                      return;
+                    }
+                    if (sendMessageCheckStatus(userStatus, context)) {
+                      final res = await showOkCancelAlertDialog(
+                        context: context,
+                        title: "同意交友申请",
+                        message: "确定同意对方的交友申请吗？同意后你们将交换二维码哦",
+                        okLabel: "确定",
+                        cancelLabel: "取消",
+                      );
+                      if (res == OkCancelResult.ok) {
+                        //设置关系为同意
+                        await RelationService.setRelation(
+                            uid: int.parse(userId),
+                            targetUid: StorageManager.uid,
+                            status: RelationTypeEnum.AGREED);
+                        //发送同意消息
+                        sendAgreeMessage(
+                            userId: userId, wxUrl: wxUrl, qqUrl: qqUrl);
+                      }
+                    }
                   },
                 ),
                 //拒绝
                 iconButton(
                   Icons.close,
                   () async {
-                    final res = await showOkCancelAlertDialog(
-                      context: context,
-                      title: "拒绝交友申请",
-                      message: "确定拒绝对方的交友申请吗？拒绝后双方将无法再交流并删除对话",
-                      okLabel: "确定",
-                      cancelLabel: "取消",
-                    );
+                    if (isApplicant != IsApplicantEnum.YES.toString()) {
+                      SmartDialog.showToast("你是申请者哦～");
+                      return;
+                    }
+                    if (sendMessageCheckStatus(userStatus, context)) {
+                      final res = await showOkCancelAlertDialog(
+                        context: context,
+                        title: "拒绝交友申请",
+                        message: "确定拒绝对方的交友申请吗？拒绝后双方将无法再交流并删除对话",
+                        okLabel: "确定",
+                        cancelLabel: "取消",
+                      );
+                      if (res == OkCancelResult.ok) {
+                        //设置关系为拒绝
+                        await RelationService.setRelation(
+                            uid: int.parse(userId),
+                            targetUid: StorageManager.uid,
+                            status: RelationTypeEnum.REFUSED);
+                        //发送删除消息
+                        sendRefuseMessage(userId: userId);
+                        //删除好友和对话消息，退出页面
+                        deleteFriend(userId: userId);
+                        conversionListModel.deleteConversion(userId);
+                        messageModel.clearMessage(userId);
+                        Navigator.of(context).pop();
+                      } else {
+                        return;
+                      }
+                    }
                   },
                 ),
                 //图片消息
@@ -205,7 +272,7 @@ class _MessageListPageState extends State<MessageListPage> {
                     if (assets != null) {
                       var imageAsset = assets[0];
                       var file = await imageAsset.originFile;
-                      await sendImgMessage(
+                      sendImgMessage(
                           userStatus: userStatus,
                           context: context,
                           path: file!.path,

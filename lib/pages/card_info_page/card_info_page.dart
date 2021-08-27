@@ -1,4 +1,3 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/hippo_icon.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
@@ -39,7 +38,6 @@ class CardInfoPage extends StatelessWidget {
           return customScaffold(
               ViewStateEmptyWidget(onPressed: model.initData));
         }
-        checkFriend(userId: model.cardInfoEntity.uid!.toString());
         return Scaffold(
           body: CustomCardBar(
             data: model.cardInfoEntity,
@@ -238,9 +236,9 @@ class CardInfoPage extends StatelessWidget {
             } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
               SmartDialog.showToast("真不巧。。对方是已经拒绝过你的「$name」");
             }
-            // else{
-            //   SmartDialog.showToast("对方是你正想认识的「$name」哦～快去消息页面找到ta吧～");
-            // }
+            else{
+              SmartDialog.showToast("对方是你正想认识的「$name」哦～");
+            }
             return;
           } else if (card.relationIsApplicant == 0) {
             String name = card.relationName!;
@@ -249,42 +247,13 @@ class CardInfoPage extends StatelessWidget {
             } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
               SmartDialog.showToast("真不巧。。对方是你已经拒绝过的「$name」");
             }
-            // else{
-            //   SmartDialog.showToast("对方是正想认识你的「$name」哦～快去消息页面找到ta吧～");
-            // }
+            else{
+              SmartDialog.showToast("对方是正想认识你的「$name」哦～");
+            }
             return;
           }
-          // List<String>? msg = await showTextInputDialog(
-          //   context: context,
-          //   textFields: [DialogTextField()],
-          // );
-          // if (msg != null) {
-          //   V2TimValueCallback<V2TimMessage> res =
-          //       await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
-          //     text: msg[0],
-          //     userID: model.cardInfoEntity.uid.toString(),
-          //   );
-          // }
-          // SmartDialog.show(
-          //   alignmentTemp: Alignment.bottomCenter,
-          //   clickBgDismissTemp: true,
-          //   widget: Container(
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.only(
-          //         topLeft: Radius.circular(20.r),
-          //         topRight: Radius.circular(20.r),
-          //       ),
-          //       color: Colors.white,
-          //     ),
-          //     height: 300.r,
-          //     child: Column(
-          //       children: [
-          //         TextField(),
-          //       ],
-          //     ),
-          //   ),
-          // );
-          Navigator.of(context).pushNamed(AppRouter.RecognizePageRoute, arguments: card);
+          Navigator.of(context)
+              .pushNamed(AppRouter.RecognizePageRoute, arguments: card);
         },
         child: Container(
           height: 40.r,

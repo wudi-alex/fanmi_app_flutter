@@ -15,7 +15,7 @@ class UserModel extends ChangeNotifier {
   MineBoardEntity boardEntity = MineBoardEntity();
   String timSig = "";
 
-  init() async {
+  init(VoidCallback callback) async {
     var userInfo = UserInfoEntity();
     try {
       var resp = await UserService.getUserInfo();
@@ -41,6 +41,7 @@ class UserModel extends ChangeNotifier {
         setUserInfo(userInfo);
         StorageManager.setUserInfo(userInfo);
         StorageManager.setTimUserSig(timSig);
+        callback.call();
       });
     }
   }
@@ -88,5 +89,5 @@ class UserModel extends ChangeNotifier {
 
   get userStatus =>
       userTimInfo.customInfo!["Tag_Profile_Custom_Status"] ??
-      UserStatusEnum.USER_STATUS_NORMAL;
+      UserStatusEnum.USER_STATUS_NORMAL.toString();
 }

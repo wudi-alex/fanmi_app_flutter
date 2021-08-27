@@ -1,20 +1,21 @@
 import 'package:fanmi/config/page_size_config.dart';
+import 'package:fanmi/enums/relation_entity.dart';
+import 'package:fanmi/generated/json/relation_entity_helper.dart';
+import 'package:fanmi/net/relation_service.dart';
+import 'package:fanmi/net/status_code.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation_result.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
-import 'package:tuple/tuple.dart';
 
 class ConversionListModel extends ChangeNotifier {
   String nextSeq = '0';
 
   Map<String, V2TimConversation> conversionMap = {};
-  Map<String, V2TimFriendInfo> friendInfoMap = {};
+  Map<String, RelationEntity> relationInfoMap = {};
 
   get pullCnt => PageSizeConfig.CONVERSION_PAGE_SIZE;
 
@@ -24,27 +25,6 @@ class ConversionListModel extends ChangeNotifier {
       cnt += conversionInfo.unreadCount ?? 0;
     });
     return cnt;
-  }
-
-  get conversionPageList {
-    List<Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>> res =
-        [];
-    conversionMap.forEach((userId, conversionInfo) {
-      List list = [];
-      list.add(conversionInfo);
-      if (friendInfoMap.containsKey(userId)) {
-        var friendInfo = friendInfoMap[userId]!;
-        list.add(friendInfo.userProfile);
-        list.add(friendInfo);
-      } else {
-        list.add(null);
-        list.add(null);
-      }
-      res.add(Tuple3.fromList(list));
-    });
-    res.sort((v1, v2) => v2.item1.lastMessage!.timestamp!
-        .compareTo(v1.item1.lastMessage!.timestamp!));
-    return res;
   }
 
   init() async {
@@ -58,7 +38,7 @@ class ConversionListModel extends ChangeNotifier {
 
   pullData() async {
     var userList = await pullConversionData(nextSeq);
-    await pullFriendInfoData(userList);
+    await pullRelationData(userList);
     return userList.length < pullCnt;
   }
 
@@ -78,21 +58,25 @@ class ConversionListModel extends ChangeNotifier {
     }
   }
 
-  pullFriendInfoData(List<String> users) async {
+  pullRelationData(List<String> users) async {
     if (users.isEmpty) {
       return;
     }
-    V2TimValueCallback<List<V2TimFriendInfoResult>> response =
-        await TencentImSDKPlugin.v2TIMManager
-            .getFriendshipManager()
-            .getFriendsInfo(
-              userIDList: users,
-            );
-    if (response.code == 0) {
-      List<V2TimFriendInfoResult> res = response.data!;
-      updateFriendInfoMap(res.map((v) => v.friendInfo!).toList());
-    } else {
-      SmartDialog.showToast("获取聊天对象信息错误");
+    try {
+      var resp = await RelationService.queryRelation(targetUidList: users);
+      if (resp.code == StatusCode.SUCCESS) {
+        List<RelationEntity> relationList = resp.data
+            .map<RelationEntity>((item) =>
+                relationEntityFromJson(RelationEntity(), item)
+                    as RelationEntity)
+            .toList();
+        relationList.forEach((relation) {
+          relationInfoMap[relation.uid.toString()] = relation;
+        });
+        await StorageManager.setRelationList(relationInfoMap.values.toList());
+      }
+    } catch (e, s) {
+      SmartDialog.showToast("获取对话用户信息失败");
     }
   }
 
@@ -108,20 +92,6 @@ class ConversionListModel extends ChangeNotifier {
     updateMap(newMap: newMap, originalMap: conversionMap, isDelete: isDelete);
   }
 
-  updateFriendInfoMap(List<V2TimFriendInfo> newList, {bool isDelete = false}) {
-    Map<String, V2TimFriendInfo> newMap = {};
-    newList.forEach((element) {
-      newMap[element.userID] = element;
-    });
-    updateMap(newMap: newMap, originalMap: friendInfoMap, isDelete: isDelete);
-  }
-
-  clear() {
-    conversionMap = {};
-    friendInfoMap = {};
-    notifyListeners();
-  }
-
   //删除对话
   Future deleteConversion(String userId) async {
     var conversionId = conversionMap[userId]!.conversationID;
@@ -133,6 +103,12 @@ class ConversionListModel extends ChangeNotifier {
           );
     } catch (e, s) {}
     updateConversionInfoMap([conversionMap[userId]], isDelete: true);
+  }
+
+  clear() {
+    conversionMap = {};
+    relationInfoMap = {};
+    notifyListeners();
   }
 
   updateMap<T>(

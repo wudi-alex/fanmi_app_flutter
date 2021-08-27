@@ -56,32 +56,43 @@ class _ConversionListPageState extends State<ConversionListPage> {
                   conversionItem.item1.showName!
               : conversionItem.item1.showName!;
           String avatarUrl = conversionItem.item3 != null
-              ? conversionItem.item3!.friendCustomInfo!["Tag_SNS_Custom_Avatar"] ??
+              ? conversionItem
+                      .item3!.friendCustomInfo![prefixWrapper("Avatar")] ??
                   conversionItem.item1.faceUrl!
               : conversionItem.item1.faceUrl!;
           String content = "";
-          var lastMsg = conversion.lastMessage!;
-          switch (lastMsg.elemType) {
-            case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-              content = lastMsg.textElem!.text!;
-              break;
-            case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-              content = "[图片消息]";
-              break;
-            case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-              if (lastMsg.customElem!.desc ==
-                  MessageTypeEnum.APPLICATION.toString()) {
-                Map<String, String> customDataMap =
-                    json.decode(lastMsg.customElem!.data!);
-                content = customDataMap["text"]!;
-              } else {
-                content = "[名片消息]";
-              }
-              break;
+          var lastMsg = conversion.lastMessage;
+          if (lastMsg != null) {
+            switch (lastMsg.elemType) {
+              case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
+                content = lastMsg.textElem!.text!;
+                break;
+              case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
+                content = "[图片消息]";
+                break;
+              case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+                switch (int.parse(lastMsg.customElem!.desc!)) {
+                  case MessageTypeEnum.APPLICATION:
+                    Map<String, Object> customDataMap =
+                        Map<String, Object>.from(
+                            json.decode(lastMsg.customElem!.data!));
+                    content = customDataMap["text"]! as String;
+                    break;
+                  case MessageTypeEnum.CARD:
+                    content = "[名片消息]";
+                    break;
+                  case MessageTypeEnum.QR:
+                    content = "[二维码消息]";
+                    break;
+                  default:
+                    content = "";
+                }
+                break;
+            }
           }
-          String time =
-              DateTime.fromMillisecondsSinceEpoch(lastMsg.timestamp! * 1000)
-                  .toString();
+          String time = DateTime.fromMillisecondsSinceEpoch(
+                  lastMsg != null ? lastMsg.timestamp! * 1000 : 0)
+              .toString();
           return SwipeActionCell(
             backgroundColor: Colors.white,
             key: UniqueKey(),
@@ -102,8 +113,7 @@ class _ConversionListPageState extends State<ConversionListPage> {
                           .deleteConversation(
                             conversationID: conversion.conversationID,
                           );
-                      conversionListModel.updateConversionInfoMap(
-                          [conversion],
+                      conversionListModel.updateConversionInfoMap([conversion],
                           isDelete: true);
                     } else {
                       return;
@@ -116,8 +126,7 @@ class _ConversionListPageState extends State<ConversionListPage> {
                 String userId = conversion.userID!;
                 msgModel.initData(userId);
                 setRead(userId);
-                Navigator.of(context).pushNamed(
-                    AppRouter.MessageListPageRoute,
+                Navigator.of(context).pushNamed(AppRouter.MessageListPageRoute,
                     arguments: userId);
               },
               child: conversionItemWidget(

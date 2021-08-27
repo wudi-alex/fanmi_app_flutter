@@ -1,5 +1,4 @@
 import 'package:fanmi/config/page_size_config.dart';
-import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/view_state_model.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
@@ -26,7 +25,7 @@ class MessageListModel extends ViewStateModel {
             .getMessageManager()
             .getC2CHistoryMessageList(
                 userID: userId, count: pullCnt, lastMsgID: lastMsgID);
-        if (res.data!.isNotEmpty) {
+        if (res.data!=null && res.data!.isNotEmpty) {
           updateMessage(userId, res.data!);
         } else {
           break;
@@ -89,11 +88,14 @@ class MessageListModel extends ViewStateModel {
     }
   }
 
+  clearMessage(String userId){
+    messageMap.remove(userId);
+    notifyListeners();
+  }
+
   clear() {
     messageMap = new Map();
     notifyListeners();
   }
 
-  //todo:发送消息，有文字消息/图片消息/名片消息/同意拒绝消息
-  sendMessage() {}
 }

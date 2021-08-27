@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:dio/dio.dart';
@@ -34,7 +35,7 @@ logout(BuildContext context) async {
 }
 
 initData(BuildContext context) {
-  Provider.of<UserModel>(context, listen: false).init().then((v) {
+  Provider.of<UserModel>(context, listen: false).init(() {
     Provider.of<ConversionListModel>(context, listen: false).init();
   });
   Provider.of<CardListModel>(context, listen: false).init();
@@ -80,7 +81,7 @@ sendMessageCheckStatus(int userStatus, BuildContext context) {
 }
 
 //发送文字消息
-Future sendTextMessage({
+sendTextMessage({
   required String userId,
   required String text,
   required BuildContext context,
@@ -95,7 +96,7 @@ Future sendTextMessage({
 }
 
 //发送名片消息
-Future sendCardMessage(
+sendCardMessage(
     {required int cardId,
     required int cardType,
     required String userId,
@@ -116,33 +117,36 @@ Future sendCardMessage(
 }
 
 //发送好友申请消息
-Future sendApplyMessage(
-    {required String name,
-    required String avatar,
-    required int cardId,
-    required int cardType,
-    required String userId,
-    required int userStatus,
-    required BuildContext context}) async {
-  if (sendMessageCheckStatus(userStatus, context)) {
-    await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
-          data: json.encode({
-            "name": name,
-            "Tag_SNS_Custom_Avatar": avatar,
-            "Tag_SNS_Custom_IsApply": IsApplicantEnum.YES,
-            "Tag_SNS_Custom_cid": cardId,
-            "Tag_SNS_Custom_ctype": cardType,
-          }),
-          receiver: userId,
-          groupID: "",
-          priority: 0,
-          desc: MessageTypeEnum.APPLICATION.toString(),
-        );
-  }
+sendApplyMessage({
+  required String name,
+  required String avatar,
+  required int cardId,
+  required int cardType,
+  required String userId,
+  required String text,
+  String? wxUrl,
+  String? qqUrl,
+}) async {
+  await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
+        data: json.encode({
+          "name": name,
+          "Avatar": avatar,
+          "IsApply": IsApplicantEnum.YES.toString(),
+          "cid": cardId.toString(),
+          "ctype": cardType.toString(),
+          "text": text,
+          "WX": wxUrl,
+          "QQ": qqUrl,
+        }),
+        receiver: userId,
+        groupID: "",
+        priority: 0,
+        desc: MessageTypeEnum.APPLICATION.toString(),
+      );
 }
 
 //发送图片消息
-Future sendImgMessage({
+sendImgMessage({
   required int userStatus,
   required BuildContext context,
   required String path,
@@ -160,12 +164,86 @@ Future sendImgMessage({
   }
 }
 
+//发送二维码消息
+sendQrMessage({required String userId, required String url}) async {
+  await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
+        receiver: userId,
+        groupID: "",
+        priority: 0,
+        desc: MessageTypeEnum.QR.toString(),
+        data: json.encode({
+          "url": url,
+        }),
+      );
+}
+
+//发送同意消息
+sendAgreeMessage(
+    {required String userId,
+    String? wxUrl,
+    String? qqUrl,
+    bool isApplicant = false}) async {
+  String text = "${isApplicant ? "谢谢你😄" : "我同意你的好友申请啦😊️"}，"
+      "这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～";
+  await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
+        receiver: userId,
+        groupID: "",
+        desc: isApplicant
+            ? MessageTypeEnum.NORMAL.toString()
+            : MessageTypeEnum.AGREE.toString(),
+        data: json.encode({
+          "text": text,
+        }),
+      );
+  //发送二维码消息
+  if (wxUrl != null && wxUrl.isNotEmpty) {
+    await sendQrMessage(userId: userId, url: wxUrl);
+  }
+  if (qqUrl != null && qqUrl.isNotEmpty) {
+    await sendQrMessage(userId: userId, url: qqUrl);
+  }
+}
+
+//发送拒绝消息
+sendRefuseMessage({
+  required String userId,
+}) async {
+  await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
+        receiver: userId,
+        groupID: "",
+        priority: 0,
+        desc: MessageTypeEnum.REFUSE.toString(),
+        data: '{}',
+      );
+}
+
 //检查是否是好友关系
 Future<int> checkFriend({required String userId}) async {
-  V2TimValueCallback<List<V2TimFriendCheckResult>> res =
-      await TencentImSDKPlugin.v2TIMManager.getFriendshipManager().checkFriend(
-    userIDList: [userId],
-    checkType: FriendType.V2TIM_FRIEND_TYPE_BOTH,
-  );
-  return res.data![0].resultType;
+  try {
+    V2TimValueCallback<List<V2TimFriendCheckResult>> res =
+        await TencentImSDKPlugin.v2TIMManager
+            .getFriendshipManager()
+            .checkFriend(
+      userIDList: [userId],
+      checkType: FriendType.V2TIM_FRIEND_TYPE_BOTH,
+    );
+    return res.data![0].resultType;
+  } catch (e, s) {
+    return 0;
+  }
 }
+
+//删除好友
+deleteFriend({required String userId}) async {
+  try {
+    await TencentImSDKPlugin.v2TIMManager
+        .getFriendshipManager()
+        .deleteFromFriendList(
+      userIDList: [userId],
+      deleteType: FriendType.V2TIM_FRIEND_TYPE_SINGLE,
+    );
+  } catch (e, s) {}
+}
+
+String prefixWrapper(String str) =>
+    Platform.isIOS ? "Tag_SNS_Custom_$str" : str;

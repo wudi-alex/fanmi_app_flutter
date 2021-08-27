@@ -6,8 +6,10 @@ import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/application_status_enum.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/enums/is_applicant_enum.dart';
+import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
+import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/svg_icon.dart';
@@ -15,8 +17,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
+import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class RecognizePage extends StatefulWidget {
@@ -43,7 +48,6 @@ class _RecognizePageState extends State<RecognizePage> {
 
   late UserModel userModel;
   late CardListModel cardListModel;
-
 
   get cardInfo => widget.card;
 
@@ -77,12 +81,16 @@ class _RecognizePageState extends State<RecognizePage> {
         actions: [
           TextButton(
             onPressed: () {
-              EasyLoading.show(status: "发送中");
-              send().then((v) {
-                EasyLoading.showSuccess("发送成功");
-              }).onError((error, stackTrace) {
-                EasyLoading.showError("发送失败");
-              });
+              if (selectCard == null &&
+                  userModel.userInfo.wxQrUrl == null &&
+                  userModel.userInfo.qqQrUrl == null) {
+                showOkAlertDialog(
+                    context: context,
+                    title: "发送申请消息",
+                    message: "你还没上传过二维码哦～可以在「我的-二维码」那里上传，或者添加你创建好的名片吧～");
+                return;
+              }
+              send();
             },
             child: Text(
               "发送",
@@ -196,14 +204,17 @@ class _RecognizePageState extends State<RecognizePage> {
                       children: cardList.map<Widget>((v) {
                         CardTypeEnum cardType =
                             CardTypeEnum.getCardType(v.type!);
-                        return sheetItem(CardTypeEnum.getCardType(v.type!), () async {
-                          setState(() {
-                            selectCard = v;
-                            selectColor = cardType.color;
-                            selectText = "你选择附加${cardType.desc}名片";
-                          });
-                          Navigator.of(context).pop();
-                        },);
+                        return sheetItem(
+                          CardTypeEnum.getCardType(v.type!),
+                          () async {
+                            setState(() {
+                              selectCard = v;
+                              selectColor = cardType.color;
+                              selectText = "你选择附加${cardType.desc}名片";
+                            });
+                            Navigator.of(context).pop();
+                          },
+                        );
                       }).toList(),
                     ),
                   ),
@@ -324,56 +335,106 @@ class _RecognizePageState extends State<RecognizePage> {
   }
 
   Future send() async {
-    //检查是否是好友
-    var friendRes = await checkFriend(userId: cardInfo.uid.toString());
-    if (friendRes == 0) {
-      //添加好友
-      TencentImSDKPlugin.v2TIMManager
-          .getFriendshipManager()
-          .addFriend(
-            userID: userId,
-            addType: FriendType.V2TIM_FRIEND_TYPE_BOTH,
-            remark: cardInfo.name,
-          )
-          .then((v) async {
-        //设置好友信息
-        await TencentImSDKPlugin.v2TIMManager
-            .getFriendshipManager()
-            .setFriendInfo(
-          userID: cardInfo.uid,
-          friendCustomInfo: {
-            "Tag_SNS_Custom_Avatar": cardInfo.avatarUrl,
-            "Tag_SNS_Custom_IsApply": IsApplicantEnum.NO.toString(),
-            "Tag_SNS_Custom_cid": cardInfo.id,
-            "Tag_SNS_Custom_ctype": cardInfo.type,
-          },
-        );
-        //发送好友申请消息
-        await sendApplyMessage(
-            name: selectCard != null
-                ? selectCard!.name!
-                : userModel.userInfo.name!,
-            avatar: selectCard != null
-                ? selectCard!.avatarUrl!
-                : userModel.userInfo.avatarUrl!,
-            cardId: cardInfo.id,
-            cardType: cardInfo.type,
-            userId: userId,
-            userStatus: userStatus,
-            context: context);
-      });
-    } else {
-      await sendTextMessage(
-          userId: userId, text: text, context: context, userStatus: userStatus);
+    String uName =
+        selectCard != null ? selectCard!.name! : userModel.userInfo.name!;
+    String uAvatar = selectCard != null
+        ? selectCard!.avatarUrl!
+        : userModel.userInfo.avatarUrl!;
+    String tAvatar = cardInfo.avatarUrl;
+    String tName = cardInfo.name;
+    String? uWx =
+        selectCard != null ? selectCard!.wxQrUrl : userModel.userInfo.wxQrUrl;
+    String? uQq =
+        selectCard != null ? selectCard!.qqQrUrl : userModel.userInfo.qqQrUrl;
+    String? tWx = cardInfo.wxQrUrl;
+    String? tQq = cardInfo.qqQrUrl;
+
+    whenComplete() {
+      EasyLoading.showSuccess("发送成功");
+      Navigator.of(context).pop();
     }
-    //发送附加名片消息
-    if (selectCard != null) {
-      await sendCardMessage(
-          cardId: selectCard!.id!,
-          cardType: selectCard!.type!,
-          userId: cardInfo.uid.toString(),
-          context: context,
-          userStatus: userStatus);
+
+    EasyLoading.show(status: "发送中");
+    //设置Relation表关系
+    await RelationService.addRelation(
+      targetUid: cardInfo.uid,
+      targetCardId: cardInfo.id,
+      targetCardType: cardInfo.type,
+      uAvatar: uAvatar,
+      uName: uName,
+      tAvatar: tAvatar,
+      tName: tName,
+      uWx: uWx,
+      uQq: uQq,
+      tWx: tWx,
+      tQq: tQq,
+      addCardId: selectCard != null ? selectCard!.id : null,
+      addCardType: selectCard != null ? selectCard!.type : null,
+    );
+    //添加好友
+    var addFriendRes =
+        await TencentImSDKPlugin.v2TIMManager.getFriendshipManager().addFriend(
+              userID: userId,
+              addType: FriendType.V2TIM_FRIEND_TYPE_SINGLE,
+              remark: cardInfo.name,
+            );
+    if (addFriendRes.code == 0) {
+      //设置好友信息
+      var setFriendRes = await TencentImSDKPlugin.v2TIMManager
+          .getFriendshipManager()
+          .setFriendInfo(
+        userID: cardInfo.uid.toString(),
+        friendRemark: cardInfo.name,
+        friendCustomInfo: {
+          "Avatar": cardInfo.avatarUrl,
+          "IsApply": IsApplicantEnum.NO.toString(),
+          "cid": cardInfo.id.toString(),
+          "ctype": cardInfo.type.toString(),
+          "WX": uWx ?? "",
+          "QQ": uQq ?? "",
+        },
+      );
+      if (setFriendRes.code == 0) {
+        //更新本地好友信息
+        V2TimValueCallback<List<V2TimFriendInfoResult>> response =
+            await TencentImSDKPlugin.v2TIMManager
+                .getFriendshipManager()
+                .getFriendsInfo(
+          userIDList: [userId],
+        );
+        Provider.of<ConversionListModel>(context, listen: false)
+            .updateFriendInfoMap(
+                response.data!.map((e) => e.friendInfo!).toList());
+        if (response.code == 0) {
+          Future.wait([
+            Future(() {
+              //发送好友申请消息
+              sendApplyMessage(
+                name: uName,
+                avatar: uAvatar,
+                cardId: cardInfo.id,
+                cardType: cardInfo.type,
+                userId: userId,
+                text: _editingController.text,
+                wxUrl: cardInfo.wxQrUrl ?? "",
+                qqUrl: cardInfo.qqQrUrl ?? "",
+              );
+            }),
+            Future(() {
+              if (selectCard != null) {
+                sendCardMessage(
+                    cardId: selectCard!.id!,
+                    cardType: selectCard!.type!,
+                    userId: cardInfo.uid.toString(),
+                    context: context,
+                    userStatus: userStatus);
+              }
+            }),
+          ]).whenComplete(() {
+            whenComplete();
+          });
+        }
+      }
     }
   }
 }

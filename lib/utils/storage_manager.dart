@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/entity/mine_board_entity.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
+import 'package:fanmi/enums/relation_entity.dart';
 import 'package:fanmi/generated/json/card_info_entity_helper.dart';
 import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
+import 'package:fanmi/generated/json/relation_entity_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fanmi/generated/json/user_info_entity_helper.dart';
 
@@ -17,6 +19,7 @@ class StorageManager {
   static const cardListKey = 'cardListKey';
   static const timUserSigKey = 'timUserSigKey';
   static const boardDataKey = 'boardDataKey';
+  static const relationListKey = 'relationListKey';
 
   static get isLogin => sp.getInt(uidKey) != null;
 
@@ -76,10 +79,27 @@ class StorageManager {
     await sp.setString(boardDataKey, json.encode(mineBoardEntityToJson(data)));
   }
 
+  static List<RelationEntity> getRelationList() {
+    var relationStringList = sp.getStringList(relationListKey) ?? [];
+    return relationStringList
+        .map((relationString) => relationEntityFromJson(
+            RelationEntity(), json.decode(relationString)) as RelationEntity)
+        .toList();
+  }
+
+  static setRelationList(List<RelationEntity> relationList) async {
+    await sp.setStringList(
+        relationListKey,
+        relationList
+            .map((relation) => json.encode(relationEntityToJson(relation)))
+            .toList());
+  }
+
   static clear() {
     sp.remove(uidKey);
     sp.remove(userKey);
     sp.remove(cardListKey);
     sp.remove(timUserSigKey);
+    sp.remove(relationListKey);
   }
 }

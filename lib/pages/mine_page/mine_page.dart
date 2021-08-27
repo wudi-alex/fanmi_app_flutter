@@ -1,6 +1,5 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
-import 'package:fanmi/entity/user_info_entity.dart';
 import 'package:fanmi/enums/gender_type_enum.dart';
 import 'package:fanmi/net/http_client.dart';
 import 'package:fanmi/net/status_code.dart';
@@ -12,7 +11,6 @@ import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/city_picker/city_picker.dart';
 import 'package:fanmi/widgets/common_image.dart';
-import 'package:fanmi/widgets/image_picker.dart';
 import 'package:fanmi/widgets/provider_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
