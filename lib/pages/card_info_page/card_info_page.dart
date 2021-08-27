@@ -229,27 +229,14 @@ class CardInfoPage extends StatelessWidget {
             Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
             return;
           }
-          if (card.relationIsApplicant == 1) {
-            String name = card.relationName!;
-            if (card.relationStatus == RelationTypeEnum.AGREED) {
-              SmartDialog.showToast("又被你找到啦！对方是已经同意过你的「$name」哦～");
-            } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
-              SmartDialog.showToast("真不巧。。对方是已经拒绝过你的「$name」");
-            }
-            else{
-              SmartDialog.showToast("对方是你正想认识的「$name」哦～");
-            }
+          if (card.relationIsApplicant == 1 &&
+              card.relationStatus == RelationTypeEnum.REFUSED) {
+            SmartDialog.showToast("真不巧。。对方已经拒绝过你");
+
             return;
-          } else if (card.relationIsApplicant == 0) {
-            String name = card.relationName!;
-            if (card.relationStatus == RelationTypeEnum.AGREED) {
-              SmartDialog.showToast("太巧了！对方是你同意过的「$name」哦～");
-            } else if (card.relationStatus == RelationTypeEnum.REFUSED) {
-              SmartDialog.showToast("真不巧。。对方是你已经拒绝过的「$name」");
-            }
-            else{
-              SmartDialog.showToast("对方是正想认识你的「$name」哦～");
-            }
+          } else if (card.relationIsApplicant == 0 &&
+              card.relationStatus == RelationTypeEnum.REFUSED) {
+            SmartDialog.showToast("真不巧。。你已经拒绝过对方");
             return;
           }
           Navigator.of(context)

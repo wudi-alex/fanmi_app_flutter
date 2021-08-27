@@ -349,92 +349,48 @@ class _RecognizePageState extends State<RecognizePage> {
     String? tWx = cardInfo.wxQrUrl;
     String? tQq = cardInfo.qqQrUrl;
 
-    whenComplete() {
+    EasyLoading.show(status: "发送中");
+    Future.wait([
+      Future(() {
+        //设置Relation表关系
+        RelationService.addRelation(
+          targetUid: cardInfo.uid,
+          targetCardId: cardInfo.id,
+          targetCardType: cardInfo.type,
+          uAvatar: uAvatar,
+          uName: uName,
+          tAvatar: tAvatar,
+          tName: tName,
+          uWx: uWx,
+          uQq: uQq,
+          tWx: tWx,
+          tQq: tQq,
+          addCardId: selectCard != null ? selectCard!.id : null,
+          addCardType: selectCard != null ? selectCard!.type : null,
+        );
+      }),
+      //发送文字消息
+      Future(() {
+        sendTextMessage(
+            userId: userId,
+            text: text,
+            context: context,
+            userStatus: userStatus);
+      }),
+      //发送名片消息
+      Future(() {
+        if (selectCard != null) {
+          sendCardMessage(
+              cardId: selectCard!.id!,
+              cardType: selectCard!.type!,
+              userId: cardInfo.uid.toString(),
+              context: context,
+              userStatus: userStatus);
+        }
+      }),
+    ]).whenComplete(() {
       EasyLoading.showSuccess("发送成功");
       Navigator.of(context).pop();
-    }
-
-    EasyLoading.show(status: "发送中");
-    //设置Relation表关系
-    await RelationService.addRelation(
-      targetUid: cardInfo.uid,
-      targetCardId: cardInfo.id,
-      targetCardType: cardInfo.type,
-      uAvatar: uAvatar,
-      uName: uName,
-      tAvatar: tAvatar,
-      tName: tName,
-      uWx: uWx,
-      uQq: uQq,
-      tWx: tWx,
-      tQq: tQq,
-      addCardId: selectCard != null ? selectCard!.id : null,
-      addCardType: selectCard != null ? selectCard!.type : null,
-    );
-    //添加好友
-    var addFriendRes =
-        await TencentImSDKPlugin.v2TIMManager.getFriendshipManager().addFriend(
-              userID: userId,
-              addType: FriendType.V2TIM_FRIEND_TYPE_SINGLE,
-              remark: cardInfo.name,
-            );
-    if (addFriendRes.code == 0) {
-      //设置好友信息
-      var setFriendRes = await TencentImSDKPlugin.v2TIMManager
-          .getFriendshipManager()
-          .setFriendInfo(
-        userID: cardInfo.uid.toString(),
-        friendRemark: cardInfo.name,
-        friendCustomInfo: {
-          "Avatar": cardInfo.avatarUrl,
-          "IsApply": IsApplicantEnum.NO.toString(),
-          "cid": cardInfo.id.toString(),
-          "ctype": cardInfo.type.toString(),
-          "WX": uWx ?? "",
-          "QQ": uQq ?? "",
-        },
-      );
-      if (setFriendRes.code == 0) {
-        //更新本地好友信息
-        V2TimValueCallback<List<V2TimFriendInfoResult>> response =
-            await TencentImSDKPlugin.v2TIMManager
-                .getFriendshipManager()
-                .getFriendsInfo(
-          userIDList: [userId],
-        );
-        Provider.of<ConversionListModel>(context, listen: false)
-            .updateFriendInfoMap(
-                response.data!.map((e) => e.friendInfo!).toList());
-        if (response.code == 0) {
-          Future.wait([
-            Future(() {
-              //发送好友申请消息
-              sendApplyMessage(
-                name: uName,
-                avatar: uAvatar,
-                cardId: cardInfo.id,
-                cardType: cardInfo.type,
-                userId: userId,
-                text: _editingController.text,
-                wxUrl: cardInfo.wxQrUrl ?? "",
-                qqUrl: cardInfo.qqQrUrl ?? "",
-              );
-            }),
-            Future(() {
-              if (selectCard != null) {
-                sendCardMessage(
-                    cardId: selectCard!.id!,
-                    cardType: selectCard!.type!,
-                    userId: cardInfo.uid.toString(),
-                    context: context,
-                    userStatus: userStatus);
-              }
-            }),
-          ]).whenComplete(() {
-            whenComplete();
-          });
-        }
-      }
-    }
+    });
   }
 }

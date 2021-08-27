@@ -47,6 +47,7 @@ class _MessageListPageState extends State<MessageListPage> {
   late UserModel userModel;
   late MessageListModel messageModel;
   late CardListModel cardListModel;
+  late ConversionListModel conversionListModel;
 
   @override
   void initState() {
@@ -64,25 +65,19 @@ class _MessageListPageState extends State<MessageListPage> {
   @override
   Widget build(BuildContext context) {
     userModel = Provider.of<UserModel>(context);
-    ConversionListModel conversionListModel =
-        Provider.of<ConversionListModel>(context);
+    conversionListModel = Provider.of<ConversionListModel>(context);
     messageModel = Provider.of<MessageListModel>(context);
     messageModel.nowTalkingUserId = userId;
     cardListModel = Provider.of<CardListModel>(context);
     var cardList = cardListModel.cardList as List<CardInfoEntity>;
-
+    var relation = conversionListModel.relationInfoMap[userId]!;
     var selfUserInfo = userModel.userTimInfo;
-    var friendInfo = conversionListModel.friendInfoMap[userId]!;
-
     String selfAvatarUrl = selfUserInfo.faceUrl!;
 
     String friendAvatarUrl =
-        friendInfo.friendCustomInfo![prefixWrapper("Avatar")]!;
-    String friendName = friendInfo.friendRemark!;
-    String isApplicant =
-        friendInfo.friendCustomInfo![prefixWrapper("IsApply")]!;
-    String? wxUrl = friendInfo.friendCustomInfo![prefixWrapper("WX")];
-    String? qqUrl = friendInfo.friendCustomInfo![prefixWrapper("QQ")];
+        relation.isApplicant == 1 ? relation.tAvatar! : relation.uAvatar!;
+    String friendName =
+        relation.isApplicant == 1 ? relation.tName! : relation.uName!;
 
     Widget body;
     if (messageModel.isBusy) {
@@ -138,16 +133,6 @@ class _MessageListPageState extends State<MessageListPage> {
                     cardId: cardId,
                     cardType: cardType,
                   );
-                case MessageTypeEnum.APPLICATION:
-                  String text = customDataMap["text"]! as String;
-                  return MessageItem(
-                    messageType: MessageTypeEnum.NORMAL,
-                    avatarUrl: avatarUrl,
-                    isSelf: isSelf,
-                    isPeerRead: timMsg.isPeerRead ?? false,
-                    msgTimestamp: msgTimeStamp,
-                    msgText: text,
-                  );
                 case MessageTypeEnum.AGREE:
                   String text = customDataMap["text"]! as String;
                   return MessageItem(
@@ -196,8 +181,11 @@ class _MessageListPageState extends State<MessageListPage> {
                 iconButton(
                   Icons.favorite,
                   () async {
-                    if (isApplicant != IsApplicantEnum.YES.toString()) {
+                    if (relation.isApplicant == IsApplicantEnum.YES) {
                       SmartDialog.showToast("你是申请者哦～");
+                      return;
+                    } else if (relation.status == RelationTypeEnum.AGREED) {
+                      SmartDialog.showToast("你已经同意过了哦～");
                       return;
                     }
                     if (sendMessageCheckStatus(userStatus, context)) {
@@ -214,9 +202,13 @@ class _MessageListPageState extends State<MessageListPage> {
                             uid: int.parse(userId),
                             targetUid: StorageManager.uid,
                             status: RelationTypeEnum.AGREED);
+                        conversionListModel.changeRelationStatus(
+                            userId, RelationTypeEnum.AGREED);
                         //发送同意消息
                         sendAgreeMessage(
-                            userId: userId, wxUrl: wxUrl, qqUrl: qqUrl);
+                            userId: userId,
+                            wxUrl: relation.tWx,
+                            qqUrl: relation.tQq);
                       }
                     }
                   },
@@ -225,8 +217,11 @@ class _MessageListPageState extends State<MessageListPage> {
                 iconButton(
                   Icons.close,
                   () async {
-                    if (isApplicant != IsApplicantEnum.YES.toString()) {
+                    if (relation.isApplicant == IsApplicantEnum.YES) {
                       SmartDialog.showToast("你是申请者哦～");
+                      return;
+                    } else if (relation.status == RelationTypeEnum.AGREED) {
+                      SmartDialog.showToast("你已经同意过了哦～");
                       return;
                     }
                     if (sendMessageCheckStatus(userStatus, context)) {
@@ -246,7 +241,6 @@ class _MessageListPageState extends State<MessageListPage> {
                         //发送删除消息
                         sendRefuseMessage(userId: userId);
                         //删除好友和对话消息，退出页面
-                        deleteFriend(userId: userId);
                         conversionListModel.deleteConversion(userId);
                         messageModel.clearMessage(userId);
                         Navigator.of(context).pop();

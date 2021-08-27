@@ -4,6 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
+import 'package:fanmi/enums/relation_entity.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/time_utils.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
@@ -16,8 +17,6 @@ import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_conversation.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 import 'package:tuple/tuple.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,7 +27,6 @@ class ConversionListPage extends StatefulWidget {
 }
 
 class _ConversionListPageState extends State<ConversionListPage> {
-
   @override
   Widget build(BuildContext context) {
     ConversionListModel conversionListModel =
@@ -47,19 +45,19 @@ class _ConversionListPageState extends State<ConversionListPage> {
         ),
         itemCount: conversionList.length,
         itemBuilder: (context, index) {
-          Tuple3<V2TimConversation, V2TimUserFullInfo?, V2TimFriendInfo?>
-              conversionItem = conversionList[index];
+          Tuple2<V2TimConversation, RelationEntity?> conversionItem =
+              conversionList[index];
           var conversion = conversionItem.item1;
+          var relation = conversionItem.item2;
           int unReadCnt = conversion.unreadCount!;
-          String name = conversionItem.item3 != null
-              ? conversionItem.item3!.friendRemark ??
-                  conversionItem.item1.showName!
-              : conversionItem.item1.showName!;
-          String avatarUrl = conversionItem.item3 != null
-              ? conversionItem
-                      .item3!.friendCustomInfo![prefixWrapper("Avatar")] ??
-                  conversionItem.item1.faceUrl!
-              : conversionItem.item1.faceUrl!;
+          String name = relation != null
+              ? (relation.isApplicant == 1 ? relation.tName! : relation.uName!)
+              : conversion.showName!;
+          String avatarUrl = relation != null
+              ? (relation.isApplicant == 1
+                  ? relation.tAvatar!
+                  : relation.uAvatar!)
+              : conversion.faceUrl!;
           String content = "";
           var lastMsg = conversion.lastMessage;
           if (lastMsg != null) {
@@ -103,7 +101,7 @@ class _ConversionListPageState extends State<ConversionListPage> {
                     final res = await showOkCancelAlertDialog(
                       context: context,
                       title: "删除会话",
-                      message: "删除后你将无法再和对方对话了哦，确认删除吗",
+                      message: "删除后无法和对方对话了哦，确认删除吗",
                       okLabel: "删除",
                       cancelLabel: "取消",
                     );
