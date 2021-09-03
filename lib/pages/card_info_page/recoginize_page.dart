@@ -3,13 +3,12 @@ import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
-import 'package:fanmi/enums/application_status_enum.dart';
+import 'package:fanmi/enums/action_type_enum.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
-import 'package:fanmi/enums/is_applicant_enum.dart';
+import 'package:fanmi/net/action_service.dart';
 import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
-import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/svg_icon.dart';
@@ -17,12 +16,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_im_sdk_plugin/enum/friend_type.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_friend_info_result.dart';
-import 'package:tencent_im_sdk_plugin/models/v2_tim_value_callback.dart';
-import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class RecognizePage extends StatefulWidget {
   final CardInfoEntity card;
@@ -348,6 +342,13 @@ class _RecognizePageState extends State<RecognizePage> {
         selectCard != null ? selectCard!.qqQrUrl : userModel.userInfo.qqQrUrl;
     String? tWx = cardInfo.wxQrUrl;
     String? tQq = cardInfo.qqQrUrl;
+
+    //添加点击事件
+    ActionService.addAction(
+        cardId: widget.card.id!,
+        cardType: widget.card.type!,
+        targetUid: widget.card.uid!,
+        actionType: ActionTypeEnum.ACTION_RECOGNIZE);
 
     EasyLoading.show(status: "发送中");
     Future.wait([

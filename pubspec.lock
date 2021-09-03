@@ -29,6 +29,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.1"
+  app_installer:
+    dependency: "direct main"
+    description:
+      name: app_installer
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.1.0"
   archive:
     dependency: transitive
     description:
@@ -106,6 +113,34 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.15.0"
+  connectivity:
+    dependency: "direct main"
+    description:
+      name: connectivity
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.6"
+  connectivity_for_web:
+    dependency: transitive
+    description:
+      name: connectivity_for_web
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.4.0+1"
+  connectivity_macos:
+    dependency: transitive
+    description:
+      name: connectivity_macos
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.1+2"
+  connectivity_platform_interface:
+    dependency: transitive
+    description:
+      name: connectivity_platform_interface
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.1"
   crypto:
     dependency: transitive
     description:
@@ -229,7 +264,7 @@ packages:
       name: flutter_easyloading
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.3"
   flutter_localizations:
     dependency: "direct main"
     description: flutter
@@ -262,7 +297,7 @@ packages:
       name: flutter_spinkit
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "5.0.0"
+    version: "5.1.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -282,6 +317,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_update_dialog:
+    dependency: "direct main"
+    description:
+      name: flutter_update_dialog
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -293,7 +335,7 @@ packages:
       name: fluwx
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.5.1"
+    version: "3.6.1+1"
   font_awesome_flutter:
     dependency: transitive
     description:
@@ -364,6 +406,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.0.1"
+  like_button:
+    dependency: "direct main"
+    description:
+      name: like_button
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.3"
   loading_gifs:
     dependency: "direct main"
     description:
@@ -525,6 +574,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.1"
+  pretty_qr_code:
+    dependency: "direct main"
+    description:
+      name: pretty_qr_code
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.0.2"
   process:
     dependency: transitive
     description:
@@ -560,6 +616,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.3.2"
+  qr:
+    dependency: transitive
+    description:
+      name: qr
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "2.1.0"
   quiver:
     dependency: transitive
     description:
@@ -574,13 +637,20 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.27.1"
+  screenshot:
+    dependency: "direct main"
+    description:
+      name: screenshot
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.2.3"
   shared_preferences:
     dependency: "direct main"
     description:
       name: shared_preferences
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.6"
+    version: "2.0.7"
   shared_preferences_linux:
     dependency: transitive
     description:
@@ -641,14 +711,14 @@ packages:
       name: sqflite
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.0+3"
+    version: "2.0.0+4"
   sqflite_common:
     dependency: transitive
     description:
       name: sqflite_common
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.0.0+2"
+    version: "2.0.1"
   stack_trace:
     dependency: transitive
     description:
@@ -683,7 +753,7 @@ packages:
       name: tencent_im_sdk_plugin
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.3.5"
+    version: "3.3.7"
   tencent_kit:
     dependency: "direct main"
     description:
@@ -774,7 +844,7 @@ packages:
       name: win32
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.5"
+    version: "2.2.8"
   xdg_directories:
     dependency: transitive
     description:

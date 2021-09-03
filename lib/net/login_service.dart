@@ -23,7 +23,7 @@ class LoginService {
       "name": name,
       "avatar_url": avatarUrl,
       "platform": Platform.operatingSystem,
-      "device":  deviceInfo,
+      "device": deviceInfo,
     });
     return resp;
   }

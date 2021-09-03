@@ -1,4 +1,6 @@
-
+import 'package:app_installer/app_installer.dart';
+import 'package:fanmi/config/appstore_config.dart';
+import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/platform_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +18,8 @@ class _MineAboutPageState extends State<MineAboutPage> {
   void initState() {
     super.initState();
     PlatformUtils.getAppVersion().then((v) => setState(() {
-      version = v;
-    }));
+          version = v;
+        }));
   }
 
   @override
@@ -51,7 +53,26 @@ class _MineAboutPageState extends State<MineAboutPage> {
               Text(
                 '版本号 $version',
                 style: TextStyle(color: Colors.grey, fontSize: 17.sp),
-              )
+              ),
+              GestureDetector(
+                onTap: () {
+                  UpdateManager.checkUpdate(
+                      context, AppStoreConfig.APK_UPDATE_JSON);
+                },
+                child: Text(
+                  '检查更新',
+                  style: TextStyle(color: Colors.blue, fontSize: 17.sp),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  AppInstaller.goStore("", AppStoreConfig.APPSTORE_ID, review: true);
+                },
+                child: Text(
+                  '喜欢凡觅吗？去商店评分支持一下我们吧😊',
+                  style: TextStyle(color: Colors.blue, fontSize: 17.sp),
+                ),
+              ),
             ],
           ),
         ),

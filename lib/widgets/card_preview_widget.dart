@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';

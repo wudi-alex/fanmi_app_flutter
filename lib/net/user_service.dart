@@ -1,3 +1,9 @@
+import 'package:fanmi/entity/board_item_entity.dart';
+import 'package:fanmi/entity/card_preview_entity.dart';
+import 'package:fanmi/entity/contact_entity.dart';
+import 'package:fanmi/generated/json/board_item_entity_helper.dart';
+import 'package:fanmi/generated/json/card_preview_entity_helper.dart';
+import 'package:fanmi/generated/json/contact_entity_helper.dart';
 import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 
@@ -30,5 +36,33 @@ class UserService {
     var resp = await http
         .post('/user/get_mine_board_data', data: {"uid": StorageManager.uid});
     return resp;
+  }
+
+  static Future getContactList(int? page) async {
+    var resp = await http.post('/user/get_contact_list',
+        data: {"uid": StorageManager.uid, "page": page});
+    return resp.data
+        .map<ContactEntity>((item) =>
+            contactEntityFromJson(ContactEntity(), item) as ContactEntity)
+        .toList();
+  }
+
+  static Future getFavorList(int? page) async {
+    var resp = await http.post('/user/get_favor_list',
+        data: {"uid": StorageManager.uid, "page": page});
+    return resp.data
+        .map<CardPreviewEntity>((item) =>
+            cardPreviewEntityFromJson(CardPreviewEntity(), item)
+                as CardPreviewEntity)
+        .toList();
+  }
+
+  static Future getBoardList(int? page) async {
+    var resp = await http.post('/user/get_board_list',
+        data: {"uid": StorageManager.uid, "page": page});
+    return resp.data
+        .map<BoardItemEntity>((item) =>
+            boardItemEntityFromJson(BoardItemEntity(), item) as BoardItemEntity)
+        .toList();
   }
 }

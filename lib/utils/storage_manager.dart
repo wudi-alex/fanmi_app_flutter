@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/entity/mine_board_entity.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
-import 'package:fanmi/enums/relation_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/generated/json/card_info_entity_helper.dart';
 import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
 import 'package:fanmi/generated/json/relation_entity_helper.dart';

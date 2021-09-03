@@ -5,4 +5,5 @@ class ActionTypeEnum {
   static const int ACTION_FAVOR = 3;
   static const int ACTION_RECOGNIZE = 4;
   static const int ACTION_REPORT = 5;
+  static const int ACTION_SHARE = 6;
 }

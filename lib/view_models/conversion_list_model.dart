@@ -1,5 +1,5 @@
 import 'package:fanmi/config/page_size_config.dart';
-import 'package:fanmi/enums/relation_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/generated/json/relation_entity_helper.dart';
 import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/net/status_code.dart';
@@ -55,16 +55,16 @@ class ConversionListModel extends ChangeNotifier {
     }
   }
 
+  errorCallBack() {
+    var list = StorageManager.getRelationList();
+    list.forEach((relation) {
+      relationInfoMap[relation.uid.toString()] = relation;
+    });
+  }
+
   pullData() async {
     var userList = await pullConversionData(nextSeq);
-    try {
-      await pullRelationData(userList);
-    } catch (e, s) {
-      var list = StorageManager.getRelationList();
-      list.forEach((relation) {
-        relationInfoMap[relation.uid.toString()] = relation;
-      });
-    }
+    await pullRelationData(userList);
     return userList.length < pullCnt;
   }
 

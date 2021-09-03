@@ -2,15 +2,19 @@ import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/pages/card_edit_page.dart';
 import 'package:fanmi/pages/card_info_page/card_info_page.dart';
+import 'package:fanmi/pages/card_info_page/card_report_page.dart';
+import 'package:fanmi/pages/card_info_page/card_share_sheet.dart';
 import 'package:fanmi/pages/card_info_page/recoginize_page.dart';
-import 'package:fanmi/pages/card_list_page/card_list_page.dart';
 import 'package:fanmi/pages/guide_page.dart';
 import 'package:fanmi/pages/login_page.dart';
 import 'package:fanmi/pages/long_text_edit_page.dart';
 import 'package:fanmi/pages/main_page.dart';
 import 'package:fanmi/pages/message_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_about_page.dart';
+import 'package:fanmi/pages/mine_page/mine_board_list_page.dart';
+import 'package:fanmi/pages/mine_page/mine_contact_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_contact_page.dart';
+import 'package:fanmi/pages/mine_page/mine_favor_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_mail_pwd_page.dart';
 import 'package:fanmi/pages/policy_page.dart';
 import 'package:fanmi/pages/search_page/search_page.dart';
@@ -36,8 +40,8 @@ class AppRouter {
   static const String SendResponseMailPageRoute =
       '/send_response_mail_page_route';
   static const String ReportMailPageRoute = '/send_report_mail_page_route';
-  static const String MineBoardDetailPageRoute =
-      '/mine_board_detail_page_route';
+  static const String MineBoardListPageRoute =
+      '/mine_board_list_page_route';
   static const String MineContactListPageRoute =
       '/mine_contact_list_page_route';
   static const String MineFavorCardPageRoute = '/mine_favor_card_page_route';
@@ -69,6 +73,8 @@ class AppRouter {
 
   static const String TextEditPageRoute = '/text_edit_page_route';
   static const String LongTextEditPageRoute = '/long_text_edit_page_route';
+
+  static const String SharePageRoute='/share_page_route';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -230,7 +236,48 @@ class AppRouter {
             settings: settings);
       case RecognizePageRoute:
         return PageTransition(
-            child: RecognizePage(card: settings.arguments as CardInfoEntity,),
+            child: RecognizePage(
+              card: settings.arguments as CardInfoEntity,
+            ),
+            type: PageTransitionType.bottomToTop,
+            settings: settings);
+      case MineContactDetailPageRoute:
+        return PageTransition(
+            child: MineContactDetailPage(
+              name: (settings.arguments as List)[0] as String,
+              wxQrUrl: (settings.arguments as List)[1] as String?,
+              qqQrUrl: (settings.arguments as List)[2] as String?,
+            ),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineContactListPageRoute:
+        return PageTransition(
+            child: MineContactListPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineFavorCardPageRoute:
+        return PageTransition(
+            child: MineFavorListPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineBoardListPageRoute:
+        return PageTransition(
+            child: MineBoardListPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case ReportMailPageRoute:
+        return PageTransition(
+            child: CardReportPage(
+              card: settings.arguments as CardInfoEntity,
+            ),
+            type: PageTransitionType.bottomToTop,
+            settings: settings);
+
+      case SharePageRoute:
+        return PageTransition(
+            child: CardShareSheet(
+              card: settings.arguments as CardInfoEntity,
+            ),
             type: PageTransitionType.bottomToTop,
             settings: settings);
     }

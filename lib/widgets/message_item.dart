@@ -18,6 +18,9 @@ class MessageItem extends StatelessWidget {
   final bool isSelf;
   final int? cardId;
   final int? cardType;
+  final int? selfAvatarCardId;
+  final int? otherAvatarCardId;
+
 
   get avatarSize => 43.r;
 
@@ -33,7 +36,9 @@ class MessageItem extends StatelessWidget {
       required this.avatarUrl,
       required this.isSelf,
       this.cardId,
-      this.cardType})
+      this.cardType,
+      this.selfAvatarCardId,
+      this.otherAvatarCardId})
       : super(key: key);
 
   @override
@@ -54,14 +59,16 @@ class MessageItem extends StatelessWidget {
                 )
               : SizedBox.shrink(),
           isSelf
-              ? selfMsgWrapper(content(context), contentMaxSize)
-              : msgWrapper(content(context), contentMaxSize),
+              ? selfMsgWrapper(content(context), contentMaxSize, context)
+              : msgWrapper(content(context), contentMaxSize, context),
         ],
       ),
     );
   }
 
-  Widget selfMsgWrapper(Widget content, double maxWidth) => Row(
+  Widget selfMsgWrapper(
+          Widget content, double maxWidth, BuildContext context) =>
+      Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -87,12 +94,20 @@ class MessageItem extends StatelessWidget {
               height: avatarSize,
               radius: 5.r,
               imgUrl: avatarUrl,
+              callback: selfAvatarCardId != null
+                  ? () {
+                      Navigator.of(context).pushNamed(
+                          AppRouter.CardInfoPageRoute,
+                          arguments: selfAvatarCardId);
+                    }
+                  : null,
             ),
           ),
         ],
       );
 
-  Widget msgWrapper(Widget content, double maxWidth) => Row(
+  Widget msgWrapper(Widget content, double maxWidth, BuildContext context) =>
+      Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -103,6 +118,13 @@ class MessageItem extends StatelessWidget {
               height: avatarSize,
               radius: 5.r,
               imgUrl: avatarUrl,
+              callback: otherAvatarCardId != null
+                  ? () {
+                      Navigator.of(context).pushNamed(
+                          AppRouter.CardInfoPageRoute,
+                          arguments: otherAvatarCardId);
+                    }
+                  : null,
             ),
           ),
           Container(

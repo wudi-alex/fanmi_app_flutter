@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
@@ -33,6 +34,8 @@ logout(BuildContext context) async {
 initData(BuildContext context) {
   Provider.of<UserModel>(context, listen: false).init(() {
     Provider.of<ConversionListModel>(context, listen: false).init();
+  }, () {
+    Provider.of<ConversionListModel>(context, listen: false).errorCallBack();
   });
   Provider.of<CardListModel>(context, listen: false).init();
 }
@@ -193,3 +196,8 @@ sendRefuseMessage({
 
 String prefixWrapper(String str) =>
     Platform.isIOS ? "Tag_SNS_Custom_$str" : str;
+
+Future<bool> noConnect() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  return connectivityResult == ConnectivityResult.none;
+}

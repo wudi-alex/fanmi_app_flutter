@@ -1,5 +1,4 @@
 import 'package:fanmi/net/http_client.dart';
-import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 
 class RelationService {

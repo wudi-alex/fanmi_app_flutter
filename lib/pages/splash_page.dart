@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/tim_config.dart';
+import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
+import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
@@ -13,6 +15,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:fluwx/fluwx.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimAdvancedMsgListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimConversationListener.dart';
@@ -38,6 +41,7 @@ class _SplashPageState extends State<SplashPage> {
     if (StorageManager.isLogin) {
       initData(context);
     }
+    UpdateManager.init();
     startTime();
     super.initState();
   }
@@ -67,6 +71,13 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   initSDK() async {
+    ///注册微信api
+    await registerWxApi(
+        appId: WeixinConfig.APP_ID,
+        doOnAndroid: true,
+        doOnIOS: true,
+        universalLink: WeixinConfig.UNI_LINK);
+
     V2TIMManager timManager = TencentImSDKPlugin.v2TIMManager;
     await timManager.initSDK(
       sdkAppID: TimConfig.APP_ID,
@@ -100,6 +111,21 @@ class _SplashPageState extends State<SplashPage> {
                 Provider.of<MessageListModel>(context, listen: false)
                     .updateReadReceiptByUserId(element.userID);
               });
+            },
+            //发送消息进度监听
+            onSendMessageProgress: (message, progress) {
+              //消息进度
+              String key = message.userID!;
+              try {
+                Provider.of<MessageListModel>(
+                  context,
+                  listen: false,
+                ).addOneMessageIfNotExits(key, message);
+              } catch (err) {
+                print("error $err");
+              }
+              print(
+                  "消息发送进度 $progress ${message.timestamp} ${message.msgID} ${message.timestamp} ${message.status}");
             },
             //接受到新消息
             onRecvNewMessage: (data) async {

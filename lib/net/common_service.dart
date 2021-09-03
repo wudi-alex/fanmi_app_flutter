@@ -16,8 +16,8 @@ class CommonService {
   }
 
   static Future verifyImg({required String imgUrl}) async {
-    var resp = await http
-        .post('/common/verify_img', data: {'uid': StorageManager.uid, 'img_url': imgUrl});
+    var resp = await http.post('/common/verify_img',
+        data: {'uid': StorageManager.uid, 'img_url': imgUrl});
     return resp;
   }
 

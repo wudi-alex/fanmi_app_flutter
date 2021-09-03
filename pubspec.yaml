@@ -1,7 +1,7 @@
 name: fanmi
 description: 凡觅客户端版本v0.2
 
-version: 0.2.0
+version: 0.1.9+1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -40,8 +40,6 @@ dependencies:
   # 展开文字
   expandable_text: ^2.2.0
   # 图片选择器
-#  image_picker: ^0.8.0+3
-#  multi_image_picker2: ^5.0.2
   wechat_assets_picker: ^6.0.2
   # 滑动组件
   extended_sliver: ^2.0.0
@@ -85,6 +83,19 @@ dependencies:
   loading_gifs: ^0.3.0
   # swiper
   flutter_swipe_action_cell: ^2.1.1
+  # 网络连接
+  connectivity: ^3.0.6
+  # 点赞按钮
+  like_button: ^2.0.3
+  # 自动更新对话框
+  flutter_update_dialog: ^2.0.0
+  # 跳转苹果商店
+  app_installer: ^1.1.0
+  # 二维码生成
+  pretty_qr_code: ^2.0.2
+  # 截图
+  screenshot: ^1.2.3
+
 
 dev_dependencies:
   flutter_test:

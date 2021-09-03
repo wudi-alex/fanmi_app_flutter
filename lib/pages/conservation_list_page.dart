@@ -4,7 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
-import 'package:fanmi/enums/relation_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/time_utils.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
@@ -13,6 +13,7 @@ import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
@@ -101,7 +102,7 @@ class _ConversionListPageState extends State<ConversionListPage> {
                     final res = await showOkCancelAlertDialog(
                       context: context,
                       title: "删除会话",
-                      message: "删除后无法和对方对话了哦，确认删除吗",
+                      message: "确认删除对话吗，历史消息也将被删除",
                       okLabel: "删除",
                       cancelLabel: "取消",
                     );
@@ -122,6 +123,14 @@ class _ConversionListPageState extends State<ConversionListPage> {
             child: GestureDetector(
               onTap: () {
                 String userId = conversion.userID!;
+                if (!conversionListModel.relationInfoMap.containsKey(userId)) {
+                  conversionListModel.errorCallBack();
+                  if (!conversionListModel.relationInfoMap
+                      .containsKey(userId)) {
+                    SmartDialog.showToast("请检查网络状况，稍后重试哦～");
+                  }
+                }
+
                 msgModel.initData(userId);
                 setRead(userId);
                 Navigator.of(context).pushNamed(AppRouter.MessageListPageRoute,

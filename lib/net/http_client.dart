@@ -76,7 +76,7 @@ final Http http = Http();
 class Http extends BaseHttp {
   @override
   void init() {
-    options.baseUrl = "https://api.fanminet.com";
+    options.baseUrl = "https://api.fanminet.com/api";
     interceptors..add(ApiInterceptor());
   }
 }
@@ -91,9 +91,9 @@ class ApiInterceptor extends InterceptorsWrapper {
 
   @override
   onResponse(
-      Response response,
-      ResponseInterceptorHandler handler,
-      ) {
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) {
     debugPrint('---api-response--->resp----->${response.data}');
     ResponseData respData = ResponseData.fromJson(response.data);
     if (respData.success) {

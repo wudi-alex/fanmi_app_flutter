@@ -25,8 +25,6 @@ class QrUploadViewModel extends ViewStateModel {
       return true;
     } catch (e, s) {
       print(e);
-      e as DioError;
-      SmartDialog.showToast(e.error.message);
       return false;
     }
   }

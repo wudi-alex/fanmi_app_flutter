@@ -1,11 +1,9 @@
 import 'package:fanmi/entity/card_preview_entity.dart';
 import 'package:fanmi/generated/json/card_preview_entity_helper.dart';
 import 'package:fanmi/utils/storage_manager.dart';
-import 'package:flutter/material.dart';
 import 'http_client.dart';
 
 class CardService {
-
   static Future getCardInfo({required int cardId}) async {
     var resp = await http.post('/card/get_card_info',
         data: {"uid": StorageManager.uid, "card_id": cardId});
@@ -78,5 +76,15 @@ class CardService {
             cardPreviewEntityFromJson(CardPreviewEntity(), item)
                 as CardPreviewEntity)
         .toList();
+  }
+
+  static Future reportCard(
+      {required int cardId, required Map reportDict}) async {
+    var resp = await http.post('/card/report', data: {
+      "uid": StorageManager.uid,
+      "card_id": cardId,
+      "report_dict": reportDict
+    });
+    return resp;
   }
 }

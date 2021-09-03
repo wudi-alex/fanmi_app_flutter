@@ -2,7 +2,6 @@ import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/hippo_icon.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
 import 'package:fanmi/enums/relation_type_enum.dart';
-import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/widgets/album.dart';
 import 'package:fanmi/view_models/card_info_view_model.dart';
@@ -14,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:like_button/like_button.dart';
 
 import 'custom_card_bar.dart';
 
@@ -79,7 +79,7 @@ class CardInfoPage extends StatelessWidget {
                                 left: 2.r, right: 27.r, bottom: 20.r, top: 5.r),
                           )
                         : SizedBox.shrink(),
-                    subtitleText("自我描述:"),
+                    subtitleText("描述:"),
                     contentText(model.cardInfoEntity.selfDesc!),
                     model.cardInfoEntity.album != null &&
                             model.cardInfoEntity.album != ""
@@ -116,7 +116,22 @@ class CardInfoPage extends StatelessWidget {
               ),
             ),
           ),
-          bottomNavigationBar: recognizeButton(context, model),
+          bottomNavigationBar: Material(
+            elevation: 0.5,
+            color: Colors.white,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 50.r,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  shareButton(model, context),
+                  recognizeButton(context, model),
+                  favorButton(model),
+                ],
+              ),
+            ),
+          ),
         );
       },
     );
@@ -228,11 +243,13 @@ class CardInfoPage extends StatelessWidget {
           if (!StorageManager.isLogin) {
             Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
             return;
+          } else if (card.uid == StorageManager.uid) {
+            SmartDialog.showToast("我想和自己做个朋友～");
+            return;
           }
           if (card.relationIsApplicant == 1 &&
               card.relationStatus == RelationTypeEnum.REFUSED) {
             SmartDialog.showToast("真不巧。。对方已经拒绝过你");
-
             return;
           } else if (card.relationIsApplicant == 0 &&
               card.relationStatus == RelationTypeEnum.REFUSED) {
@@ -243,19 +260,98 @@ class CardInfoPage extends StatelessWidget {
               .pushNamed(AppRouter.RecognizePageRoute, arguments: card);
         },
         child: Container(
-          height: 40.r,
-          width: 90.r,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(13.r)),
-              color: Colors.blue),
-          child: Center(
-            child: Text(
+            child: Row(
+          children: [
+            Icon(
+              Icons.send_rounded,
+              color: Colors.blue,
+              size: 21.5.r,
+            ),
+            SizedBox(
+              width: 2.5.r,
+            ),
+            Text(
               '想认识',
               style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18.sp,
+                  color: Colors.blue,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w500),
             ),
+          ],
+        )),
+      );
+
+  Widget favorButton(CardInfoViewModel model) => Container(
+        child: Row(
+          children: [
+            LikeButton(
+              isLiked: model.cardInfoEntity.isFavored == 1,
+              size: 24.r,
+              circleColor:
+                  CircleColor(start: Color(0xff00ddff), end: Colors.orange),
+              bubblesColor: BubblesColor(
+                dotPrimaryColor: Colors.yellow,
+                dotSecondaryColor: Colors.orange,
+              ),
+              likeBuilder: (bool isLiked) {
+                return Icon(
+                  Icons.star_rounded,
+                  color: isLiked ? Colors.orange : Colors.grey,
+                  size: 24.r,
+                );
+              },
+              onTap: (bool isFavored) async {
+                if (isFavored) {
+                  model.cancelFavor();
+                } else {
+                  model.addFavor();
+                }
+                return !isFavored;
+              },
+            ),
+            Text(
+              "收藏",
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w500),
+            ),
+          ],
+        ),
+      );
+
+  Widget shareButton(CardInfoViewModel model, BuildContext context) =>
+      GestureDetector(
+        onTap: () {
+          //添加点击事件
+          // ActionService.addAction(
+          //     cardId: model.cardInfoEntity.id!,
+          //     cardType: model.cardInfoEntity.type!,
+          //     targetUid: model.cardInfoEntity.uid!,
+          //     actionType: ActionTypeEnum.ACTION_SHARE);
+          Navigator.of(context).pushNamed(AppRouter.SharePageRoute,
+              arguments: model.cardInfoEntity);
+        },
+        child: Container(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.ios_share,
+                color: Colors.grey,
+                size: 21.5.r,
+              ),
+              SizedBox(
+                width: 2.5.r,
+              ),
+              Text(
+                "分享",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w500),
+              ),
+            ],
           ),
         ),
       );

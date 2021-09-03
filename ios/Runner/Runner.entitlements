@@ -6,5 +6,10 @@
 	<array>
 		<string>Default</string>
 	</array>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:help.wechat.com</string>
+		<string>applinks:api.fanminet.com</string>
+	</array>
 </dict>
 </plist>

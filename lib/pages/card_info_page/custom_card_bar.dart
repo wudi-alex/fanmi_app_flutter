@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_sliver/extended_sliver.dart';
+import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
+import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,8 +15,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class CustomCardBar extends StatefulWidget {
   final CardInfoEntity data;
   final Widget body;
+  final VoidCallback? callback;
 
-  const CustomCardBar({Key? key, required this.data, required this.body})
+  const CustomCardBar(
+      {Key? key, required this.data, required this.body, this.callback})
       : super(key: key);
 
   @override
@@ -155,11 +160,13 @@ class _CustomCardBarState extends State<CustomCardBar>
             ),
             actions: Padding(
               padding: EdgeInsets.all(10.0.r),
-              child: Icon(
-                Icons.more_horiz,
-                // color: _animatedBackButtonColors.evaluate(
-                //         AlwaysStoppedAnimation(_animationController.value)),
-                color: Colors.transparent,
+              child: GestureDetector(
+                onTap: actionCallback,
+                child: Icon(
+                  Icons.more_horiz,
+                  color: _animatedBackButtonColors.evaluate(
+                      AlwaysStoppedAnimation(_animationController.value)),
+                ),
               ),
             ),
           ),
@@ -167,5 +174,52 @@ class _CustomCardBarState extends State<CustomCardBar>
       },
       body: _body,
     );
+  }
+
+  actionCallback() {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return Container(
+              height: 70.r,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.r),
+                      topRight: Radius.circular(20.r)),
+                  color: Colors.white),
+              child: widget.data.uid == StorageManager.uid
+                  ? GestureDetector(
+                      child: Center(
+                        child: Text(
+                          "编辑",
+                          style: TextStyle(
+                              fontSize: 20.sp, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                            AppRouter.CardEditPageRoute,
+                            arguments:
+                                CardTypeEnum.getCardType(widget.data.type!));
+                      },
+                    )
+                  : GestureDetector(
+                      child: Center(
+                        child: Text(
+                          "举报",
+                          style: TextStyle(
+                              fontSize: 20.sp, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                            AppRouter.ReportMailPageRoute,
+                            arguments: widget.data);
+                      },
+                    ));
+        });
   }
 }

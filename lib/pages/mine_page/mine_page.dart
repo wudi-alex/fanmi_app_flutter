@@ -45,7 +45,7 @@ class _MinePageState extends State<MinePage> {
   Widget build(BuildContext context) {
     userModel = Provider.of<UserModel>(context);
     avatarModel = ImagePickerModel(
-        maxAssetsCount: 1, imgUrls: [userModel.userInfo.avatarUrl??""]);
+        maxAssetsCount: 1, imgUrls: [userModel.userInfo.avatarUrl ?? ""]);
     return Scaffold(
       appBar: TitleAppBar(
         title: "我的",
@@ -63,16 +63,13 @@ class _MinePageState extends State<MinePage> {
                 favorNum: userModel.boardEntity.favorNum ?? 0,
                 favorAddNum: userModel.boardEntity.favorAddNum ?? 0),
             onTap: () {
-              // todo:访客面板页
-              // Navigator.of(context)
-              //     .pushNamed(AppRouter.MineBoardDetailPageRoute);
+              Navigator.of(context).pushNamed(AppRouter.MineBoardListPageRoute);
             },
           ),
           block,
           CustomListTile(
             headerText: '通讯录',
             onTap: () {
-              //todo:通讯录页
               Navigator.of(context)
                   .pushNamed(AppRouter.MineContactListPageRoute);
             },
@@ -82,7 +79,6 @@ class _MinePageState extends State<MinePage> {
           CustomListTile(
             headerText: '收藏夹',
             onTap: () {
-              //todo:收藏夹页
               Navigator.of(context).pushNamed(AppRouter.MineFavorCardPageRoute);
             },
             child: Container(),
@@ -159,7 +155,7 @@ class _MinePageState extends State<MinePage> {
               }
             },
             child: Text(
-              userModel.userInfo.name??"凡觅用户",
+              userModel.userInfo.name ?? "凡觅用户",
               style: TextStyle(color: Colors.grey, fontSize: 17.sp),
             ),
           ),
@@ -217,7 +213,7 @@ class _MinePageState extends State<MinePage> {
               });
             },
             child: Text(
-              userModel.userInfo.city??"未知城市",
+              userModel.userInfo.city ?? "未知城市",
               style: TextStyle(color: Colors.grey, fontSize: 17.sp),
             ),
           ),
@@ -352,8 +348,7 @@ class _MinePageState extends State<MinePage> {
               final res = await showOkCancelAlertDialog(
                 context: context,
                 title: "注销账号",
-                message:
-                    "确认注销账号吗？注销后所有账号信息都会被删除",
+                message: "确认注销账号吗？注销后所有账号信息都会被删除",
                 okLabel: "注销",
                 cancelLabel: "取消",
               );

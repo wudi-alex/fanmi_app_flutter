@@ -1,4 +1,3 @@
-
 import 'package:fanmi/view_models/view_state_list_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';

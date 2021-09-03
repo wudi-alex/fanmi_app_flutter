@@ -1,6 +1,8 @@
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
+import 'package:fanmi/enums/action_type_enum.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/net/action_service.dart';
 import 'package:fanmi/pages/search_page/search_board.dart';
 import 'package:fanmi/pages/search_page/search_tab.dart';
 import 'package:fanmi/utils/storage_manager.dart';
@@ -80,15 +82,17 @@ class _SearchPageState extends State<SearchPage>
                     return CardPreviewWidget(
                       data: item,
                       callback: () {
-                        if (item.uid == StorageManager.uid) {
-                          Navigator.of(context).pushNamed(
-                              AppRouter.CardEditPageRoute,
-                              arguments: CardTypeEnum.getCardType(item.type!));
-                        } else {
-                          Navigator.of(context).pushNamed(
-                              AppRouter.CardInfoPageRoute,
-                              arguments: item.id);
+                        if (item.uid != StorageManager.uid) {
+                          //添加点击事件
+                          ActionService.addAction(
+                              cardId: item.id!,
+                              cardType: item.type!,
+                              targetUid: item.uid!,
+                              actionType: ActionTypeEnum.ACTION_CLICK);
                         }
+                        Navigator.of(context).pushNamed(
+                            AppRouter.CardInfoPageRoute,
+                            arguments: item.id);
                       },
                     );
                   }),

@@ -128,11 +128,6 @@ class _LoginPageState extends State<LoginPage> {
 
   init() async {
     ///检测是否安装微信
-    await registerWxApi(
-        appId: WeixinConfig.APP_ID,
-        doOnAndroid: true,
-        doOnIOS: true,
-        universalLink: WeixinConfig.UNI_LINK);
     isWeChatInstalled.then((v) {
       setState(() {
         isWeixinInstalled = v;

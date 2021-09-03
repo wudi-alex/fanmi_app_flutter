@@ -163,7 +163,7 @@ class _ShowLargeImageState extends State<ShowLargeImage> {
   }
 
   _bottomSheet(BuildContext context) => Container(
-        height: 130.r,
+        height: 100.r,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
@@ -173,25 +173,26 @@ class _ShowLargeImageState extends State<ShowLargeImage> {
         child: Column(
           children: [
             SizedBox(
-              height: 10,
+              height: 15.r,
             ),
-            TextButton(
-                onPressed: () {
-                  _saveImage();
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  '保存图片',
-                  style: TextStyle(fontSize: 20.sp, color: Colors.black),
-                )),
+            GestureDetector(
+              onTap: () {
+                _saveImage();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                '保存图片',
+                style: TextStyle(fontSize: 18.sp, color: Colors.black, fontWeight: FontWeight.w500),
+              ),
+            ),
             Divider(),
-            TextButton(
-                onPressed: () {
+            GestureDetector(
+                onTap: () {
                   Navigator.of(context).pop();
                 },
                 child: Text(
                   '取消保存',
-                  style: TextStyle(fontSize: 20.sp, color: Colors.black),
+                  style: TextStyle(fontSize: 18.sp, color: Colors.black, fontWeight: FontWeight.w500),
                 ))
           ],
         ),

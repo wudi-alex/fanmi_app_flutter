@@ -39,9 +39,13 @@ class ImagePickerModel extends ViewStateModel {
   }
 
   Future uploadImgList() async {
-   await Future.wait(
+    bool isImgSuccess = true;
+    var res = await Future.wait(
         List.generate(assets.length, (index) => upLoadImg(assets[index])));
-   return true;
+    for (bool e in res) {
+      isImgSuccess = isImgSuccess && e;
+    }
+    return isImgSuccess;
   }
 
   void removeAsset({required int index}) {
@@ -73,6 +77,7 @@ class ImagePickerModel extends ViewStateModel {
     var verifyResp = await CommonService.verifyImg(imgUrl: imgUrl);
     if (verifyResp.statusCode == StatusCode.SUCCESS) {
       imgUrls.add(imgUrl);
+      return true;
     }
   }
 }

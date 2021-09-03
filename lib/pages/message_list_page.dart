@@ -4,24 +4,27 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/enums/gender_type_enum.dart';
 import 'package:fanmi/enums/is_applicant_enum.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/enums/relation_type_enum.dart';
 import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
+import 'package:fanmi/utils/time_utils.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
-import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/message_item.dart';
 import 'package:fanmi/widgets/svg_icon.dart';
 import 'package:fanmi/widgets/view_state_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/message_elem_type.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_message.dart';
@@ -76,8 +79,6 @@ class _MessageListPageState extends State<MessageListPage> {
 
     String friendAvatarUrl =
         relation.isApplicant == 1 ? relation.tAvatar! : relation.uAvatar!;
-    String friendName =
-        relation.isApplicant == 1 ? relation.tName! : relation.uName!;
 
     Widget body;
     if (messageModel.isBusy) {
@@ -107,6 +108,12 @@ class _MessageListPageState extends State<MessageListPage> {
                 msgText: timMsg.textElem!.text,
                 isPeerRead: timMsg.isPeerRead ?? false,
                 msgTimestamp: msgTimeStamp,
+                selfAvatarCardId: relation.isApplicant == 1
+                    ? relation.addCardId
+                    : relation.targetCardId,
+                otherAvatarCardId: relation.isApplicant == 1
+                    ? relation.targetCardId
+                    : relation.addCardId,
               );
             case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
               return MessageItem(
@@ -116,6 +123,12 @@ class _MessageListPageState extends State<MessageListPage> {
                 imgUrl: timMsg.imageElem!.imageList![0]!.url,
                 isPeerRead: timMsg.isPeerRead ?? false,
                 msgTimestamp: msgTimeStamp,
+                selfAvatarCardId: relation.isApplicant == 1
+                    ? relation.addCardId
+                    : relation.targetCardId,
+                otherAvatarCardId: relation.isApplicant == 1
+                    ? relation.targetCardId
+                    : relation.addCardId,
               );
             case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
               Map<String, Object> customDataMap = Map<String, Object>.from(
@@ -132,6 +145,12 @@ class _MessageListPageState extends State<MessageListPage> {
                     msgTimestamp: msgTimeStamp,
                     cardId: cardId,
                     cardType: cardType,
+                    selfAvatarCardId: relation.isApplicant == 1
+                        ? relation.addCardId
+                        : relation.targetCardId,
+                    otherAvatarCardId: relation.isApplicant == 1
+                        ? relation.targetCardId
+                        : relation.addCardId,
                   );
                 case MessageTypeEnum.AGREE:
                   String text = customDataMap["text"]! as String;
@@ -142,6 +161,12 @@ class _MessageListPageState extends State<MessageListPage> {
                     isPeerRead: timMsg.isPeerRead ?? false,
                     msgTimestamp: msgTimeStamp,
                     msgText: text,
+                    selfAvatarCardId: relation.isApplicant == 1
+                        ? relation.addCardId
+                        : relation.targetCardId,
+                    otherAvatarCardId: relation.isApplicant == 1
+                        ? relation.targetCardId
+                        : relation.addCardId,
                   );
                 case MessageTypeEnum.QR:
                   String url = customDataMap["url"]! as String;
@@ -152,6 +177,12 @@ class _MessageListPageState extends State<MessageListPage> {
                     isPeerRead: timMsg.isPeerRead ?? false,
                     msgTimestamp: msgTimeStamp,
                     imgUrl: url,
+                    selfAvatarCardId: relation.isApplicant == 1
+                        ? relation.addCardId
+                        : relation.targetCardId,
+                    otherAvatarCardId: relation.isApplicant == 1
+                        ? relation.targetCardId
+                        : relation.addCardId,
                   );
                 default:
                   return Container();
@@ -164,9 +195,7 @@ class _MessageListPageState extends State<MessageListPage> {
       body = idleBody;
     }
     return Scaffold(
-      appBar: SubtitleAppBar(
-        title: friendName,
-      ),
+      appBar: appbar(relation),
       resizeToAvoidBottomInset: true,
       body: Column(
         children: [
@@ -411,6 +440,79 @@ class _MessageListPageState extends State<MessageListPage> {
         ),
       ),
     );
+  }
+
+  PreferredSizeWidget appbar(RelationEntity relation) {
+    String friendName =
+        relation.isApplicant == 1 ? relation.tName! : relation.uName!;
+    String cardDesc = CardTypeEnum.getCardType(relation.targetCardType!).desc;
+    return PreferredSize(
+        child: SafeArea(
+          child: Material(
+            elevation: 0.5,
+            color: Colors.white,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 5.r,
+                  child: BackButton(
+                    color: Colors.black,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 3.r),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            friendName,
+                            style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black),
+                          ),
+                          SizedBox(
+                            width: 1.r,
+                          ),
+                          SvgPicture.asset(
+                            GenderTypeEnum.getGender(relation.gender!).svgPath,
+                            width: 13.r,
+                            color: GenderTypeEnum.getGender(relation.gender!)
+                                .color,
+                          ),
+                          SizedBox(
+                            width: 2.r,
+                          ),
+                          Text(
+                            getAge(relation.birthDate).toString(),
+                            style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 2.r),
+                        child: Text(
+                          "${relation.city!} · ${relation.isApplicant == 1 ? "你看过ta的$cardDesc名片" : "ta看过你的$cardDesc名片"}",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        preferredSize: Size(MediaQuery.of(context).size.width, 54.r));
   }
 
   get userStatus => int.parse(userModel.userStatus);

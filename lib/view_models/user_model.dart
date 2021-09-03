@@ -15,7 +15,7 @@ class UserModel extends ChangeNotifier {
   MineBoardEntity boardEntity = MineBoardEntity();
   String timSig = "";
 
-  init(VoidCallback callback) async {
+  init(VoidCallback callback, VoidCallback errorCallback) async {
     var userInfo = UserInfoEntity();
     try {
       var resp = await UserService.getUserInfo();
@@ -42,6 +42,8 @@ class UserModel extends ChangeNotifier {
         StorageManager.setUserInfo(userInfo);
         StorageManager.setTimUserSig(timSig);
         callback.call();
+      }).onError((error, stackTrace) {
+
       });
     }
   }

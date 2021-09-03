@@ -1,11 +1,16 @@
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/config/appstore_config.dart';
 import 'package:fanmi/pages/search_page/search_page.dart';
+import 'package:fanmi/update/update.dart';
+import 'package:fanmi/utils/common_methods.dart';
+import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'card_list_page/card_list_page.dart';
 import 'conservation_list_page.dart';
@@ -37,6 +42,7 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _selectedIndex = widget.initIndex;
+    UpdateManager.checkUpdate(context, AppStoreConfig.APK_UPDATE_JSON);
   }
 
   @override
@@ -118,9 +124,12 @@ class _MainPageState extends State<MainPage> {
                   icon: Icon(Icons.account_circle), label: '我的'),
             ],
             currentIndex: _selectedIndex,
-            onTap: (index) {
+            onTap: (index) async {
+              bool isNoConnect = await noConnect();
               if (index != 0 && !isLogin) {
                 Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+              } else if (index != 0 && isNoConnect) {
+                SmartDialog.showToast("你好像没有连接到网络哦～");
               } else {
                 _pageController.jumpToPage(index);
               }

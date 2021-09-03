@@ -1,4 +1,4 @@
-import 'package:fanmi/enums/relation_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 
 relationEntityFromJson(RelationEntity data, Map<String, dynamic> json) {
 	if (json['add_card_id'] != null) {
