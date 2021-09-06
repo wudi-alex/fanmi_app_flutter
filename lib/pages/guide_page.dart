@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:ui';
 
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/enums/gender_type_enum.dart';
 import 'package:fanmi/generated/json/user_info_entity_helper.dart';
@@ -14,9 +14,12 @@ import 'package:fanmi/widgets/common_image.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intro_slider/intro_slider.dart';
+import 'package:intro_slider/slide_object.dart';
 import 'package:provider/provider.dart';
 
 class GuidePageModal extends StatelessWidget {
@@ -174,6 +177,8 @@ class BirthDateGuidePage extends StatefulWidget {
 
 class _BirthDateGuidePageState extends State<BirthDateGuidePage>
     with AutomaticKeepAliveClientMixin {
+  DateTime date = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -181,7 +186,9 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
     return GuidePageModal(
       callback: () {
         if (userModel.userInfo.birthDate == null) {
-          userModel.userInfo.birthDate = DateTime.now().toString();
+          // userModel.userInfo.birthDate = DateTime.now().toString();
+          SmartDialog.showToast("你还没有选择出生日期哦～");
+          return;
         }
         Navigator.of(context).pushNamed(AppRouter.CityGuidePageRoute);
       },
@@ -208,20 +215,33 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
               SizedBox(
                 height: 10.r,
               ),
-              Container(
-                width: 300.r,
-                height: 150.r,
-                margin: EdgeInsets.all(10.r),
-                child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.date,
-                  initialDateTime: DateTime.now(),
-                  minimumYear: DateTime.now().year - 100,
-                  maximumYear: DateTime.now().year,
-                  onDateTimeChanged: (DateTime value) {
-                    userModel.userInfo.birthDate = value.toString();
-                  },
+              GestureDetector(
+                onTap: () {
+                  DatePicker.showDatePicker(
+                    context,
+                    showTitleActions: true,
+                    minTime: DateTime(1900, 1, 1),
+                    maxTime: DateTime.now(),
+                    onConfirm: (date) {
+                      userModel.userInfo.birthDate = date.toString();
+                      userModel.notifyListeners();
+                    },
+                    currentTime: userModel.userInfo.birthDate != null
+                        ? DateTime.parse(userModel.userInfo.birthDate!)
+                        : DateTime.now(),
+                    locale: LocaleType.zh,
+                  );
+                },
+                child: Text(
+                  userModel.userInfo.birthDate != null
+                      ? userModel.userInfo.birthDate!.split(' ')[0]
+                      : "选择出生日期",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.blue),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -239,14 +259,26 @@ class CityGuidePage extends StatefulWidget {
 }
 
 class _CityGuidePageState extends State<CityGuidePage> {
-  String city = "选择城市";
-
   @override
   Widget build(BuildContext context) {
     var userModel = Provider.of<UserModel>(context);
     return GuidePageModal(
       callback: () {
-        Navigator.of(context).pushNamed(AppRouter.WelcomeGuidePageRoute1);
+        if (userModel.userInfo.city == null) {
+          SmartDialog.showToast("你还没有选择所在城市哦～");
+          return;
+        }
+        UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
+            .then((v) {
+          initData(context);
+          Navigator.of(context)
+              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
+        }).onError((error, stackTrace) {
+          SmartDialog.showToast("注册失败");
+          StorageManager.sp.remove(StorageManager.uidKey);
+          StorageManager.sp.remove(StorageManager.userKey);
+          Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+        });
       },
       child: Positioned(
         top: 150.r,
@@ -272,24 +304,21 @@ class _CityGuidePageState extends State<CityGuidePage> {
                 height: 10.r,
               ),
               TextButton(
-                  onPressed: () async {
-                    final res = await CustomCityPicker.showPicker(context);
-                    if (res.city != null) {
-                      setState(() {
-                        city = res.city!;
-                      });
-                      userModel.userInfo.city = res.city!;
-                    } else {
-                      setState(() {
-                        city = "选择城市";
-                      });
-                    }
-                  },
-                  child: Text(
-                    city,
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
-                  )),
+                onPressed: () async {
+                  final res = await CustomCityPicker.showPicker(context);
+                  if (res.city != null) {
+                    userModel.userInfo.city = res.city!;
+                    userModel.notifyListeners();
+                  }
+                },
+                child: Text(
+                  userModel.userInfo.city ?? "选择城市",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.sp,
+                      color: Colors.blue),
+                ),
+              ),
             ],
           ),
         ),
@@ -342,7 +371,7 @@ class WelcomeGuidePage extends StatelessWidget {
                 height: 10.r,
               ),
               Text(
-                userModel.userInfo.name??"凡觅用户",
+                userModel.userInfo.name ?? "凡觅用户",
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: 18.sp,
@@ -467,26 +496,13 @@ class WelcomeGuidePage4 extends StatelessWidget {
   Widget build(BuildContext context) {
     return GuidePageModal(
       callback: () {
-        // var resp = await CommonService.setUserInfo(
-        //     updateDict: userInfoEntityToJson(StorageManager.userEntity));
-        // if (resp.statusCode == StatusCode.NORMAL) {
-        //   await StorageManager.sharedPreferences.setString(
-        //       StorageManager.uidKey,
-        //       json.encode(userInfoEntityToJson(StorageManager.userEntity)));
-        // }
-        // var firstSystemMail = SystemMailEntity();
-        // firstSystemMail.createTime = DateTime.now().toString();
-        // firstSystemMail.content = Constants.first_system_mail;
-        // globalModel.systemDataList.add(firstSystemMail);
-        // globalModel.saveSystemMailList();
-        // globalModel.setSystemMailRead(1);
         var userModel = Provider.of<UserModel>(context, listen: false);
         UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
             .then((v) {
           // StorageManager.setUserInfo(userModel.userInfo);
           initData(context);
-          Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
-
+          Navigator.of(context)
+              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
         }).onError((error, stackTrace) {
           SmartDialog.showToast("注册失败");
           StorageManager.sp.remove(StorageManager.uidKey);
@@ -519,6 +535,52 @@ class WelcomeGuidePage4 extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class GuidePage extends StatefulWidget {
+  @override
+  _GuidePageState createState() => _GuidePageState();
+}
+
+class _GuidePageState extends State<GuidePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IntroSlider(
+      slides: [
+        Slide(
+          backgroundImage: AssetConstants.guide_background1,
+          backgroundImageFit: BoxFit.cover,
+          backgroundBlendMode: BlendMode.dst,
+        ),
+        Slide(
+          backgroundImage: AssetConstants.guide_background2,
+          backgroundImageFit: BoxFit.cover,
+          backgroundBlendMode: BlendMode.dst,
+        ),
+        Slide(
+          backgroundImage: AssetConstants.guide_background3,
+          backgroundImageFit: BoxFit.cover,
+          backgroundBlendMode: BlendMode.dst,
+        ),
+      ],
+      renderNextBtn: Container(),
+      renderSkipBtn: Container(),
+      renderDoneBtn: Text(
+        '完成',
+        style: TextStyle(color: Colors.lightBlueAccent, fontSize: 17.sp),
+      ),
+      colorActiveDot: Colors.lightBlueAccent,
+      colorDot: Colors.white,
+      onDonePress: () {
+        Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
+      },
     );
   }
 }

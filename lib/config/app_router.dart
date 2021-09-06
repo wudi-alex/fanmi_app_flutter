@@ -5,6 +5,7 @@ import 'package:fanmi/pages/card_info_page/card_info_page.dart';
 import 'package:fanmi/pages/card_info_page/card_report_page.dart';
 import 'package:fanmi/pages/card_info_page/card_share_sheet.dart';
 import 'package:fanmi/pages/card_info_page/recoginize_page.dart';
+import 'package:fanmi/pages/email_login_page.dart';
 import 'package:fanmi/pages/guide_page.dart';
 import 'package:fanmi/pages/login_page.dart';
 import 'package:fanmi/pages/long_text_edit_page.dart';
@@ -18,6 +19,7 @@ import 'package:fanmi/pages/mine_page/mine_favor_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_mail_pwd_page.dart';
 import 'package:fanmi/pages/policy_page.dart';
 import 'package:fanmi/pages/search_page/search_page.dart';
+import 'package:fanmi/pages/splash_page.dart';
 import 'package:fanmi/pages/text_edit_page.dart';
 import 'package:fanmi/pages/qr_page/qr_upload_page.dart';
 import 'package:fanmi/widgets/web_view_page.dart';
@@ -40,8 +42,7 @@ class AppRouter {
   static const String SendResponseMailPageRoute =
       '/send_response_mail_page_route';
   static const String ReportMailPageRoute = '/send_report_mail_page_route';
-  static const String MineBoardListPageRoute =
-      '/mine_board_list_page_route';
+  static const String MineBoardListPageRoute = '/mine_board_list_page_route';
   static const String MineContactListPageRoute =
       '/mine_contact_list_page_route';
   static const String MineFavorCardPageRoute = '/mine_favor_card_page_route';
@@ -74,7 +75,8 @@ class AppRouter {
   static const String TextEditPageRoute = '/text_edit_page_route';
   static const String LongTextEditPageRoute = '/long_text_edit_page_route';
 
-  static const String SharePageRoute='/share_page_route';
+  static const String SharePageRoute = '/share_page_route';
+  static const String GuidePageRoute = '/guide_page_route';
 
   static Route<dynamic>? generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -280,6 +282,16 @@ class AppRouter {
             ),
             type: PageTransitionType.bottomToTop,
             settings: settings);
+      case EmailLoginPageRoute:
+        return PageTransition(
+          child: EmailLoginPage(),
+          type: PageTransitionType.rightToLeft,
+        );
+      case GuidePageRoute:
+        return PageTransition(
+          child: GuidePage(),
+          type: PageTransitionType.fade,
+        );
     }
   }
 }

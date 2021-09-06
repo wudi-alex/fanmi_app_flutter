@@ -65,4 +65,10 @@ class UserService {
             boardItemEntityFromJson(BoardItemEntity(), item) as BoardItemEntity)
         .toList();
   }
+
+  static Future deleteUserAccount() async {
+    var resp = await http
+        .post('/user/delete_user_account', data: {"uid": StorageManager.uid});
+    return resp;
+  }
 }

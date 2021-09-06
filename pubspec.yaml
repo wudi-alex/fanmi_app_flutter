@@ -1,7 +1,7 @@
 name: fanmi
 description: 凡觅客户端版本v0.2
 
-version: 0.1.9+1
+version: 0.2.0
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -63,7 +63,7 @@ dependencies:
   # 极光推送
   jpush_flutter: ^2.1.2
   # 登录ui
-  flutter_login: ^2.1.0
+  flutter_login: ^2.2.1
   # 网页展示
   webview_flutter: ^2.0.9
   # im sdk
@@ -93,8 +93,10 @@ dependencies:
   app_installer: ^1.1.0
   # 二维码生成
   pretty_qr_code: ^2.0.2
-  # 截图
+  # 截图分享
   screenshot: ^1.2.3
+  # 引导页
+  intro_slider: ^3.0.2
 
 
 dev_dependencies:

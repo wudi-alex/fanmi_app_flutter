@@ -1,8 +1,12 @@
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/hippo_icon.dart';
+import 'package:fanmi/enums/action_type_enum.dart';
 import 'package:fanmi/enums/qr_type_enum.dart';
 import 'package:fanmi/enums/relation_type_enum.dart';
+import 'package:fanmi/enums/user_status_enum.dart';
+import 'package:fanmi/net/action_service.dart';
 import 'package:fanmi/utils/storage_manager.dart';
+import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/album.dart';
 import 'package:fanmi/view_models/card_info_view_model.dart';
 import 'package:fanmi/widgets/common_image.dart';
@@ -14,6 +18,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:like_button/like_button.dart';
+import 'package:provider/provider.dart';
 
 import 'custom_card_bar.dart';
 
@@ -24,6 +29,7 @@ class CardInfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var userModel = Provider.of<UserModel>(context);
     return ProviderWidget(
       model: CardInfoViewModel(cardId),
       onModelReady: (model) => (model! as CardInfoViewModel).initData(),
@@ -126,7 +132,7 @@ class CardInfoPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   shareButton(model, context),
-                  recognizeButton(context, model),
+                  recognizeButton(context, model, userModel),
                   favorButton(model),
                 ],
               ),
@@ -236,7 +242,8 @@ class CardInfoPage extends StatelessWidget {
     );
   }
 
-  Widget recognizeButton(BuildContext context, CardInfoViewModel model) =>
+  Widget recognizeButton(
+          BuildContext context, CardInfoViewModel model, UserModel userModel) =>
       InkWell(
         onTap: () async {
           var card = model.cardInfoEntity;
@@ -245,6 +252,10 @@ class CardInfoPage extends StatelessWidget {
             return;
           } else if (card.uid == StorageManager.uid) {
             SmartDialog.showToast("我想和自己做个朋友～");
+            return;
+          } else if (userModel.userInfo.userStatus ==
+              UserStatusEnum.USER_STATUS_FREEZE) {
+            SmartDialog.showToast("冻结期间无法认识别人哦～");
             return;
           }
           if (card.relationIsApplicant == 1 &&
@@ -324,11 +335,11 @@ class CardInfoPage extends StatelessWidget {
       GestureDetector(
         onTap: () {
           //添加点击事件
-          // ActionService.addAction(
-          //     cardId: model.cardInfoEntity.id!,
-          //     cardType: model.cardInfoEntity.type!,
-          //     targetUid: model.cardInfoEntity.uid!,
-          //     actionType: ActionTypeEnum.ACTION_SHARE);
+          ActionService.addAction(
+              cardId: model.cardInfoEntity.id!,
+              cardType: model.cardInfoEntity.type!,
+              targetUid: model.cardInfoEntity.uid!,
+              actionType: ActionTypeEnum.ACTION_SHARE);
           Navigator.of(context).pushNamed(AppRouter.SharePageRoute,
               arguments: model.cardInfoEntity);
         },

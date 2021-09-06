@@ -244,12 +244,14 @@ class _MinePageState extends State<MinePage> {
               );
             },
             child: Text(
-              userModel.userInfo.birthDate!.split(' ')[0],
+              userModel.userInfo.birthDate != null
+                  ? userModel.userInfo.birthDate!.split(' ')[0]
+                  : "",
               style: TextStyle(color: Colors.grey, fontSize: 17.sp),
             ),
           ),
           userModel.userInfo.loginPlatform == "email"
-              ? divider()
+              ? divider
               : SizedBox.shrink(),
           userModel.userInfo.loginPlatform == "email"
               ? CustomListTile(
@@ -324,7 +326,8 @@ class _MinePageState extends State<MinePage> {
                   EasyLoading.dismiss();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       AppRouter.LoginPageRoute,
-                      (Route<dynamic> route) => false);
+                      ModalRoute.withName('/'),
+                  );
                 });
               }
             },
@@ -352,6 +355,20 @@ class _MinePageState extends State<MinePage> {
                 okLabel: "注销",
                 cancelLabel: "取消",
               );
+              if (res == OkCancelResult.ok) {
+                EasyLoading.show(status: "注销中");
+                //注销后退出登录
+                UserService.deleteUserAccount().then((v) {
+                  logout(context).then((v) {
+                    EasyLoading.dismiss();
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      AppRouter.LoginPageRoute,
+                      ModalRoute.withName('/'),
+                    );
+                  });
+                });
+
+              }
             },
           ),
           block,

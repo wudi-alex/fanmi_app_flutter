@@ -35,12 +35,19 @@ class _SplashPageState extends State<SplashPage> {
   late Timer _timer;
   int count = 3;
 
+  late final heartBeatsTimer;
+
   @override
   void initState() {
     initSDK();
     if (StorageManager.isLogin) {
       initData(context);
     }
+    heartBeatsTimer = Timer.periodic(Duration(seconds: 60), (timer) {
+      try {
+        // timerUpdate(context);
+      } catch (e, s) {}
+    });
     UpdateManager.init();
     startTime();
     super.initState();
@@ -91,10 +98,18 @@ class _SplashPageState extends State<SplashPage> {
         onKickedOffline: () {
           SmartDialog.showToast('检测到你的账号在另一设备登录');
           logout(context);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRouter.LoginPageRoute,
+            ModalRoute.withName('/'),
+          );
         },
         onUserSigExpired: () {
           SmartDialog.showToast('登录凭证过期，请重新登录');
           logout(context);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRouter.LoginPageRoute,
+            ModalRoute.withName('/'),
+          );
         },
       ),
     );

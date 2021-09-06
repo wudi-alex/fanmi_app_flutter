@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/qq_config.dart';
-import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
 import 'package:fanmi/net/login_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
@@ -55,11 +54,9 @@ class _LoginPageState extends State<LoginPage> {
           color: Colors.black,
         ),
         onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-          } else {
-            Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
-          }
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              AppRouter.MainPageRoute, ModalRoute.withName('/'),
+              arguments: 0);
         },
       ),
       body: Container(
@@ -73,7 +70,9 @@ class _LoginPageState extends State<LoginPage> {
                 height: 150.r,
                 color: Colors.lightBlueAccent,
               ),
-              SizedBox(height: 10.r,),
+              SizedBox(
+                height: 10.r,
+              ),
               Image.asset(
                 "assets/images/fanmi_font.png",
                 width: 120.r,
@@ -196,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
     EasyLoading.dismiss();
     if (isNew == 1) {
       userModel.setUserInfo(userInfo);
-      Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
+      Navigator.of(context).pushNamed(AppRouter.GuidePageRoute);
     } else {
       initData(context);
       Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);

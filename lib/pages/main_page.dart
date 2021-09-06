@@ -1,12 +1,15 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/appstore_config.dart';
+import 'package:fanmi/enums/user_status_enum.dart';
 import 'package:fanmi/pages/search_page/search_page.dart';
 import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
+import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -55,6 +58,30 @@ class _MainPageState extends State<MainPage> {
     ConversionListModel conversionListModel =
         Provider.of<ConversionListModel>(context);
     int unreadCnt = conversionListModel.unreadCntTotal;
+    var userModel = Provider.of<UserModel>(context);
+    if (userModel.userInfo.userStatus == UserStatusEnum.USER_STATUS_FREEZE) {
+      Future.delayed(Duration(milliseconds: 500), () {
+        showOkAlertDialog(
+            context: context,
+            title: "你的账号已被冻结",
+            message:
+                "冻结期间无法认识别人和发送消息，创建的名片也不被展示，如需申诉请发送邮件至system_fanmi@163.com",
+            okLabel: "我已知悉");
+      });
+    } else if (userModel.userInfo.userStatus ==
+        UserStatusEnum.USER_STATUS_FORBIDDEN) {
+      Future.delayed(Duration(milliseconds: 500), () async {
+        var res = await showOkAlertDialog(
+          context: context,
+          title: "你的账号已被封禁",
+          message: "封禁期间无法使用凡觅服务，如需申诉请发送邮件至system_fanmi@163.com",
+          okLabel: "我已知悉",
+        );
+        if (res == OkCancelResult.ok) {
+          exit(0);
+        }
+      });
+    }
     return Scaffold(
       body: PageView.builder(
         itemBuilder: (ctx, index) => pages[index],

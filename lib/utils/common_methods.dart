@@ -5,8 +5,12 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/entity/mine_board_entity.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/enums/user_status_enum.dart';
+import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
+import 'package:fanmi/net/common_service.dart';
+import 'package:fanmi/net/user_service.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
@@ -28,7 +32,7 @@ logout(BuildContext context) async {
 
   ///本地缓存清除
   StorageManager.clear();
-  Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+  // Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
 }
 
 initData(BuildContext context) {
@@ -200,4 +204,20 @@ String prefixWrapper(String str) =>
 Future<bool> noConnect() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
   return connectivityResult == ConnectivityResult.none;
+}
+
+//定时更新最后登录时间和面板数据
+timerUpdate(BuildContext context) async {
+  if (StorageManager.isLogin) {
+    UserService.setUserInfo({
+      "last_login_time": DateTime.now().toString(),
+    });
+    UserService.getMineBoardData().then((boardDataResp) {
+      print('set boardData');
+      var boardDataEntity =
+          mineBoardEntityFromJson(MineBoardEntity(), boardDataResp.data);
+      var model = Provider.of<UserModel>(context, listen: false);
+      model.setMineBoard(boardDataEntity);
+    });
+  }
 }
