@@ -10,6 +10,7 @@ import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/svg.dart';
@@ -32,6 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   late WeChatAuthResponse weixinAuthResponse;
   TencentLoginResp? _qqLoginResp;
   late UserModel userModel;
+  bool agree = false;
 
   @override
   void initState() {
@@ -118,6 +120,42 @@ class _LoginPageState extends State<LoginPage> {
                 height: 7.r,
               ),
               Platform.isIOS ? appleButton() : SizedBox.shrink(),
+              SizedBox(
+                height: 14.r,
+              ),
+              RichText(
+                text: TextSpan(
+                    text: "登录即代表同意",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500, color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: "《隐私政策》",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => Navigator.of(context)
+                              .pushNamed(AppRouter.MinePrivacyPolicyPageRoute),
+                      ),
+                      TextSpan(
+                        text: "及",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "《用户协议》",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () => Navigator.of(context)
+                              .pushNamed(AppRouter.MineUserPolicyPageRoute),
+                      ),
+                    ]),
+              ),
             ],
           ),
         ),

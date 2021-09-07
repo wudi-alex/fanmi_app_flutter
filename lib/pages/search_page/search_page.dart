@@ -82,7 +82,8 @@ class _SearchPageState extends State<SearchPage>
                     return CardPreviewWidget(
                       data: item,
                       callback: () {
-                        if (item.uid != StorageManager.uid) {
+                        if (StorageManager.uid != null &&
+                            item.uid != StorageManager.uid) {
                           //添加点击事件
                           ActionService.addAction(
                               cardId: item.id!,

@@ -11,6 +11,7 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 class CustomCardBar extends StatefulWidget {
   final CardInfoEntity data;
@@ -215,6 +216,10 @@ class _CustomCardBarState extends State<CustomCardBar>
                         ),
                       ),
                       onTap: () {
+                        if(!StorageManager.isLogin){
+                          SmartDialog.showToast("请先登录哦～");
+                          return;
+                        }
                         Navigator.of(context).pushNamed(
                             AppRouter.ReportMailPageRoute,
                             arguments: widget.data);

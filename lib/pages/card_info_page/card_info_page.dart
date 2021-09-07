@@ -133,7 +133,7 @@ class CardInfoPage extends StatelessWidget {
                 children: [
                   shareButton(model, context),
                   recognizeButton(context, model, userModel),
-                  favorButton(model),
+                  favorButton(model, context),
                 ],
               ),
             ),
@@ -248,7 +248,7 @@ class CardInfoPage extends StatelessWidget {
         onTap: () async {
           var card = model.cardInfoEntity;
           if (!StorageManager.isLogin) {
-            Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+            SmartDialog.showToast("请先登录哦～");
             return;
           } else if (card.uid == StorageManager.uid) {
             SmartDialog.showToast("我想和自己做个朋友～");
@@ -292,7 +292,7 @@ class CardInfoPage extends StatelessWidget {
         )),
       );
 
-  Widget favorButton(CardInfoViewModel model) => Container(
+  Widget favorButton(CardInfoViewModel model, BuildContext context) => Container(
         child: Row(
           children: [
             LikeButton(
@@ -312,6 +312,10 @@ class CardInfoPage extends StatelessWidget {
                 );
               },
               onTap: (bool isFavored) async {
+                if (!StorageManager.isLogin) {
+                  SmartDialog.showToast("请先登录哦～");
+                  return false;
+                }
                 if (isFavored) {
                   model.cancelFavor();
                 } else {
@@ -334,6 +338,10 @@ class CardInfoPage extends StatelessWidget {
   Widget shareButton(CardInfoViewModel model, BuildContext context) =>
       GestureDetector(
         onTap: () {
+          if (!StorageManager.isLogin) {
+            SmartDialog.showToast("请先登录哦～");
+            return;
+          }
           //添加点击事件
           ActionService.addAction(
               cardId: model.cardInfoEntity.id!,

@@ -50,26 +50,6 @@ android {
             //选择要添加的对应 cpu 类型的 .so 库。
             abiFilters 'armeabi', 'armeabi-v7a', 'x86', 'x86_64', 'mips', 'mips64', 'arm64-v8a'
         }
-
-        manifestPlaceholders = [
-                JSHARE_PKGNAME : "com.fanminet.fanmi",
-                JPUSH_PKGNAME : "com.fanminet.fanmi",
-                JPUSH_APPKEY : "7a2d057f7592707ca6d56543", // NOTE: JPush 上注册的包名对应的 Appkey.
-                JPUSH_CHANNEL : "developer-default",
-                TENCENT_APPID : "1111833337",
-                TENCENT_APP_ID : "1111833337",
-                FACEBOOK_APPID : "facebook开发者应用的appID",
-                //暂时填写默认值即可.
-                MEIZU_APPKEY : "MZ-魅族的APPKEY",
-                MEIZU_APPID : "MZ-魅族的APPID",
-                XIAOMI_APPID : "MI-小米的APPID",
-                XIAOMI_APPKEY : "MI-小米的APPKEY",
-                OPPO_APPKEY : "OP-oppo的APPKEY",
-                OPPO_APPID : "OP-oppo的APPID",
-                OPPO_APPSECRET : "OP-oppo的APPSECRET",
-                VIVO_APPKEY : "vivo的APPKEY",
-                VIVO_APPID : "vivo的APPID"
-        ]
     }
 
     signingConfigs{

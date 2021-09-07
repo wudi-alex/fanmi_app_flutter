@@ -2,6 +2,8 @@ import 'package:fanmi/entity/mine_board_entity.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
 import 'package:fanmi/enums/user_status_enum.dart';
 import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
+import 'package:fanmi/net/http_client.dart';
+import 'package:fanmi/net/status_code.dart';
 import 'package:fanmi/net/user_service.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,24 +29,40 @@ class UserModel extends ChangeNotifier {
       //更新面板数据
       var boardResp = await UserService.getMineBoardData();
       setMineBoard(mineBoardEntityFromJson(MineBoardEntity(), boardResp.data));
-    } catch (e, s) {
-      setMineBoard(StorageManager.getBoardData());
-      timSig = StorageManager.getTimUserSig();
-      userInfo = StorageManager.getUserInfo();
-    } finally {
+
       ///tim登录
       TencentImSDKPlugin.v2TIMManager
           .login(
         userID: StorageManager.uid.toString(),
         userSig: timSig,
-      ).then((v) {
+      )
+          .then((v) {
         setUserInfo(userInfo);
         StorageManager.setUserInfo(userInfo);
         StorageManager.setTimUserSig(timSig);
         callback.call();
-      }).onError((error, stackTrace) {
+      }).onError((error, stackTrace) {});
+    } catch (e, s) {
+      if (e is DioError && e.error.code == StatusCode.USER_NOT_EXISTS) {
+        StorageManager.clear();
+      } else {
+        setMineBoard(StorageManager.getBoardData());
+        timSig = StorageManager.getTimUserSig();
+        userInfo = StorageManager.getUserInfo();
 
-      });
+        ///tim登录
+        TencentImSDKPlugin.v2TIMManager
+            .login(
+          userID: StorageManager.uid.toString(),
+          userSig: timSig,
+        )
+            .then((v) {
+          setUserInfo(userInfo);
+          StorageManager.setUserInfo(userInfo);
+          StorageManager.setTimUserSig(timSig);
+          callback.call();
+        }).onError((error, stackTrace) {});
+      }
     }
   }
 

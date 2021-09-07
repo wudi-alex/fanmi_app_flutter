@@ -15,13 +15,6 @@ PODS:
   - HydraAsync (2.0.6)
   - image_gallery_saver (1.5.0):
     - Flutter
-  - JCore (2.7.1)
-  - JPush (3.7.0):
-    - JCore (< 3.0.0, >= 2.0.0)
-  - jpush_flutter (0.0.2):
-    - Flutter
-    - JCore (= 2.7.1)
-    - JPush (= 3.7.0)
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
@@ -61,7 +54,6 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - fluwx (from `.symlinks/plugins/fluwx/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
-  - jpush_flutter (from `.symlinks/plugins/jpush_flutter/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
@@ -78,8 +70,6 @@ SPEC REPOS:
   trunk:
     - FMDB
     - HydraAsync
-    - JCore
-    - JPush
     - Reachability
     - TXIMSDK_Plus_iOS
 
@@ -96,8 +86,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/fluwx/ios"
   image_gallery_saver:
     :path: ".symlinks/plugins/image_gallery_saver/ios"
-  jpush_flutter:
-    :path: ".symlinks/plugins/jpush_flutter/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   path_provider:
@@ -130,9 +118,6 @@ SPEC CHECKSUMS:
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
-  JCore: 9d5bda3a172c65bbe14f2806ab0f6246f8a06065
-  JPush: 1fd7a326e7e6588eba517659ce1b79a144e54938
-  jpush_flutter: d5fd523a73277ed66d453fc7ac1c981d1fa525e2
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
