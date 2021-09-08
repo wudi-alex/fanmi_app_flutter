@@ -6,15 +6,78 @@ PODS:
     - Reachability
   - device_info (0.0.1):
     - Flutter
+  - Firebase/CoreOnly (8.6.0):
+    - FirebaseCore (= 8.6.0)
+  - Firebase/Messaging (8.6.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 8.6.0)
+  - firebase_core (1.6.0):
+    - Firebase/CoreOnly (= 8.6.0)
+    - Flutter
+  - firebase_messaging (10.0.6):
+    - Firebase/Messaging (= 8.6.0)
+    - firebase_core
+    - Flutter
+  - FirebaseCore (8.6.0):
+    - FirebaseCoreDiagnostics (~> 8.0)
+    - GoogleUtilities/Environment (~> 7.4)
+    - GoogleUtilities/Logger (~> 7.4)
+  - FirebaseCoreDiagnostics (8.6.0):
+    - GoogleDataTransport (~> 9.0)
+    - GoogleUtilities/Environment (~> 7.4)
+    - GoogleUtilities/Logger (~> 7.4)
+    - nanopb (~> 2.30908.0)
+  - FirebaseInstallations (8.6.0):
+    - FirebaseCore (~> 8.0)
+    - GoogleUtilities/Environment (~> 7.4)
+    - GoogleUtilities/UserDefaults (~> 7.4)
+    - PromisesObjC (< 3.0, >= 1.2)
+  - FirebaseMessaging (8.6.0):
+    - FirebaseCore (~> 8.0)
+    - FirebaseInstallations (~> 8.0)
+    - GoogleDataTransport (~> 9.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.4)
+    - GoogleUtilities/Environment (~> 7.4)
+    - GoogleUtilities/Reachability (~> 7.4)
+    - GoogleUtilities/UserDefaults (~> 7.4)
+    - nanopb (~> 2.30908.0)
   - Flutter (1.0.0)
+  - flutter_apns_only (0.0.1):
+    - Flutter
   - fluwx (0.0.1):
     - Flutter
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - GoogleDataTransport (9.1.0):
+    - GoogleUtilities/Environment (~> 7.2)
+    - nanopb (~> 2.30908.0)
+    - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleUtilities/AppDelegateSwizzler (7.5.2):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (7.5.2):
+    - PromisesObjC (< 3.0, >= 1.2)
+  - GoogleUtilities/Logger (7.5.2):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/Network (7.5.2):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (7.5.2)"
+  - GoogleUtilities/Reachability (7.5.2):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/UserDefaults (7.5.2):
+    - GoogleUtilities/Logger
   - HydraAsync (2.0.6)
   - image_gallery_saver (1.5.0):
     - Flutter
+  - nanopb (2.30908.0):
+    - nanopb/decode (= 2.30908.0)
+    - nanopb/encode (= 2.30908.0)
+  - nanopb/decode (2.30908.0)
+  - nanopb/encode (2.30908.0)
   - package_info (0.0.1):
     - Flutter
   - path_provider (0.0.1):
@@ -24,6 +87,7 @@ PODS:
   - photo_manager (1.0.0):
     - Flutter
     - FlutterMacOS
+  - PromisesObjC (2.0.0)
   - Reachability (3.2)
   - shared_preferences (0.0.1):
     - Flutter
@@ -51,7 +115,10 @@ DEPENDENCIES:
   - app_installer (from `.symlinks/plugins/app_installer/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
+  - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
+  - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
+  - flutter_apns_only (from `.symlinks/plugins/flutter_apns_only/ios`)
   - fluwx (from `.symlinks/plugins/fluwx/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
@@ -68,8 +135,17 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - Firebase
+    - FirebaseCore
+    - FirebaseCoreDiagnostics
+    - FirebaseInstallations
+    - FirebaseMessaging
     - FMDB
+    - GoogleDataTransport
+    - GoogleUtilities
     - HydraAsync
+    - nanopb
+    - PromisesObjC
     - Reachability
     - TXIMSDK_Plus_iOS
 
@@ -80,8 +156,14 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/connectivity/ios"
   device_info:
     :path: ".symlinks/plugins/device_info/ios"
+  firebase_core:
+    :path: ".symlinks/plugins/firebase_core/ios"
+  firebase_messaging:
+    :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
+  flutter_apns_only:
+    :path: ".symlinks/plugins/flutter_apns_only/ios"
   fluwx:
     :path: ".symlinks/plugins/fluwx/ios"
   image_gallery_saver:
@@ -113,15 +195,27 @@ SPEC CHECKSUMS:
   app_installer: 4301996bd8f3c6f75776416b8885a6d92928306f
   connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
   device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
+  Firebase: 21ac9f28b09a8bdfc005f34c984fca84e7e8786d
+  firebase_core: c21ac09a8d23afd3594b56ed786bad12e5266bba
+  firebase_messaging: 0da89f644566bce5822fa3a5d47c764c44f1cf1d
+  FirebaseCore: 620b677f70f5470a8e59cb77f3ddc666f6f09785
+  FirebaseCoreDiagnostics: 3721920bde3a9a6d5aa093c1d25e9d3e47f694af
+  FirebaseInstallations: 0ede6ffcd215b8f93c19d9b06c1c54e2d4107e98
+  FirebaseMessaging: ce0a5ee974f7bfe83b6cc5acce88c2d969e37c41
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  flutter_apns_only: 3d91c0ca9dbef4439874858590909a19f8ed06a4
   fluwx: c64c2b84b965279aaa251a80b5b6a1cd0ef7bd45
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  GoogleDataTransport: 85fd18ff3019bb85d3f2c551d04c481dedf71fc9
+  GoogleUtilities: 8de2a97a17e15b6b98e38e8770e2d129a57c0040
   HydraAsync: 8d589bd725b0224f899afafc9a396327405f8063
   image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
+  nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   photo_manager: 84fa94fbeb82e607333ea9a13c43b58e0903a463
+  PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sign_in_with_apple: 34f3f5456a45fd7ac5fb42905e2ad31dae061b4a

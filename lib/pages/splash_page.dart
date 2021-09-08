@@ -7,6 +7,7 @@ import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/common_methods.dart';
+import 'package:fanmi/utils/offline_push_tools.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
@@ -45,7 +46,7 @@ class _SplashPageState extends State<SplashPage> {
     }
     heartBeatsTimer = Timer.periodic(Duration(seconds: 60), (timer) {
       try {
-        // timerUpdate(context);
+        timerUpdate(context);
       } catch (e, s) {}
     });
     UpdateManager.init();
@@ -90,7 +91,6 @@ class _SplashPageState extends State<SplashPage> {
       sdkAppID: TimConfig.APP_ID,
       loglevel: LogLevel.V2TIM_LOG_DEBUG,
 
-      ///todo:用户状态监听
       listener: V2TimSDKListener(
         onSelfInfoUpdated: (data) {
           Provider.of<UserModel>(context, listen: false).setUserTimInfo(data);

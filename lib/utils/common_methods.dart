@@ -19,6 +19,7 @@ import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_im_sdk_plugin/enum/offlinePushInfo.dart';
 import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 logout(BuildContext context) async {
@@ -115,6 +116,7 @@ sendCardMessage(
           groupID: "",
           priority: 0,
           desc: MessageTypeEnum.CARD.toString(),
+          offlinePushInfo: OfflinePushInfo(title: '你收到了一条名片消息'),
         );
   }
 }
@@ -148,6 +150,7 @@ sendQrMessage({required String userId, required String url}) async {
         data: json.encode({
           "url": url,
         }),
+        offlinePushInfo: OfflinePushInfo(title: '你收到了一条二维码消息'),
       );
 }
 
@@ -174,6 +177,7 @@ sendAgreeMessage(
           data: json.encode({
             "text": text,
           }),
+          offlinePushInfo: OfflinePushInfo(title: '你收到了一条同意交友申请消息～'),
         );
   }
   //发送二维码消息
