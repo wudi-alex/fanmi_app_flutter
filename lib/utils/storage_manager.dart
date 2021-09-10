@@ -20,6 +20,7 @@ class StorageManager {
   static const timUserSigKey = 'timUserSigKey';
   static const boardDataKey = 'boardDataKey';
   static const relationListKey = 'relationListKey';
+  static String regId = '';
 
   static get isLogin => sp.getInt(uidKey) != null;
 

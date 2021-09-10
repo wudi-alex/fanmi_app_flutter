@@ -85,7 +85,7 @@ class _EmailLoginPageState extends State<EmailLoginPage> {
         },
         onSubmitAnimationCompleted: () {
           if (registerSuccess) {
-            Navigator.of(context).pushNamed(AppRouter.GuidePageRoute);
+            Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
             return;
           }
           Navigator.of(context)

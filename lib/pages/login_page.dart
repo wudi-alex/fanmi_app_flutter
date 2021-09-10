@@ -233,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
     EasyLoading.dismiss();
     if (isNew == 1) {
       userModel.setUserInfo(userInfo);
-      Navigator.of(context).pushNamed(AppRouter.GuidePageRoute);
+      Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
     } else {
       initData(context);
       Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);

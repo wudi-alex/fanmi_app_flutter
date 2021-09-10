@@ -23,6 +23,7 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.huawei.agconnect'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystorePropertiesFile = rootProject.file("key.properties")
@@ -52,23 +53,24 @@ android {
         }
 
         manifestPlaceholders = [
+                TENCENT_APPID : "1111833337",
+                TENCENT_APP_ID : "1111833337",
+
                 JSHARE_PKGNAME : "com.fanminet.fanmi",
                 JPUSH_PKGNAME : "com.fanminet.fanmi",
                 JPUSH_APPKEY : "7a2d057f7592707ca6d56543", // NOTE: JPush 上注册的包名对应的 Appkey.
                 JPUSH_CHANNEL : "developer-default",
-                TENCENT_APPID : "1111833337",
-                TENCENT_APP_ID : "1111833337",
                 FACEBOOK_APPID : "facebook开发者应用的appID",
                 //暂时填写默认值即可.
-                MEIZU_APPKEY : "MZ-魅族的APPKEY",
-                MEIZU_APPID : "MZ-魅族的APPID",
-                XIAOMI_APPID : "MI-小米的APPID",
-                XIAOMI_APPKEY : "MI-小米的APPKEY",
-                OPPO_APPKEY : "OP-oppo的APPKEY",
-                OPPO_APPID : "OP-oppo的APPID",
-                OPPO_APPSECRET : "OP-oppo的APPSECRET",
-                VIVO_APPKEY : "vivo的APPKEY",
-                VIVO_APPID : "vivo的APPID"
+                MEIZU_APPKEY : "4dd6740e44e24db39686d7d5e948385e",
+                MEIZU_APPID : "144002",
+                XIAOMI_APPID : "MI-2882303761520040822",
+                XIAOMI_APPKEY : "MI-5572004045822",
+                OPPO_APPKEY : "OP-eefae768d3cf4e05a0ae7fdbe748d9d5",
+                OPPO_APPID : "OP-30629209",
+                OPPO_APPSECRET : "OP-89bd06b267d54c05b0c934241432c694",
+                VIVO_APPKEY : "0d3724deba3ff48fad079266892c4d46",
+                VIVO_APPID : "105509681"
         ]
     }
 
@@ -86,6 +88,12 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.release
+            proguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug{
+            minifyEnabled false
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -98,4 +106,19 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:multidex:1.0.3'
     api 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+
+    implementation 'cn.jiguang.sdk:jcore:2.7.2'  // 此处以JCore 2.7.2 版本为例。
+    implementation 'cn.jiguang.sdk:jpush:4.2.8'  // 此处以JPush 4.0.0 版本为例
+    // 接入华为厂商
+    implementation 'com.huawei.hms:push:5.3.0.301'
+    //引入极光-华为插件，如果采用此配置，无需拷贝jpush-android-plugin-huawei-v4.x.x.jar文件，也无需配置cn.jpush.android.service.PluginHuaweiPlatformsService组件
+    implementation 'cn.jiguang.sdk.plugin:huawei:4.2.8'
+    // 接入魅族厂商
+    implementation 'cn.jiguang.sdk.plugin:meizu:4.2.8'
+    // 接入 VIVO 厂商
+    implementation 'cn.jiguang.sdk.plugin:vivo:4.2.8'
+    // 接入 OPPO 厂商
+    implementation 'cn.jiguang.sdk.plugin:oppo:4.2.8'
+    // 接入小米厂商
+    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.2.8'
 }

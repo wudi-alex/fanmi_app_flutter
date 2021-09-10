@@ -579,7 +579,7 @@ class _GuidePageState extends State<GuidePage> {
       colorActiveDot: Colors.lightBlueAccent,
       colorDot: Colors.white,
       onDonePress: () {
-        Navigator.of(context).pushNamed(AppRouter.PolicyPageRoute);
+        Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
       },
     );
   }

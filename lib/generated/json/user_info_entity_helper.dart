@@ -45,6 +45,9 @@ userInfoEntityFromJson(UserInfoEntity data, Map<String, dynamic> json) {
 	if (json['qq_qr_url'] != null) {
 		data.qqQrUrl = json['qq_qr_url'].toString();
 	}
+	if (json['reg_id'] != null) {
+		data.regId = json['reg_id'].toString();
+	}
 	if (json['uid'] != null) {
 		data.uid = json['uid'] is String
 				? int.tryParse(json['uid'])
@@ -80,6 +83,7 @@ Map<String, dynamic> userInfoEntityToJson(UserInfoEntity entity) {
 	data['platform'] = entity.platform;
 	data['province'] = entity.province;
 	data['qq_qr_url'] = entity.qqQrUrl;
+	data['reg_id'] = entity.regId;
 	data['uid'] = entity.uid;
 	data['update_time'] = entity.updateTime;
 	data['user_status'] = entity.userStatus;

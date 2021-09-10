@@ -1,8 +1,7 @@
-import 'package:dio/dio.dart';
 import 'package:fanmi/net/common_service.dart';
 import 'package:fanmi/net/status_code.dart';
 import 'package:fanmi/view_models/view_state_model.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+
 
 class QrUploadViewModel extends ViewStateModel {
   String qrType;

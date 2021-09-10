@@ -23,6 +23,8 @@ class UserInfoEntity with JsonConvert<UserInfoEntity> {
 	String? province;
 	@JSONField(name: "qq_qr_url")
 	String? qqQrUrl;
+	@JSONField(name: "reg_id")
+	String? regId;
 	int? uid;
 	@JSONField(name: "update_time")
 	String? updateTime;

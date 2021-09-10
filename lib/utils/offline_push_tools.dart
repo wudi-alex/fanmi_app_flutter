@@ -8,7 +8,7 @@ class OfflinePushTools {
 
   static setOfflinePush() async {
     if (Platform.isIOS) {
-      // const bool isReleaseMode = bool.fromEnvironment("dart.vm.product");
+      const bool isReleaseMode = bool.fromEnvironment("dart.vm.product");
 
       final connector = OfflinePushTools.connector;
       connector.configure();
@@ -19,7 +19,7 @@ class OfflinePushTools {
         V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
             .getOfflinePushManager()
             .setOfflinePushConfig(
-                businessID: 29300, token: connector.token.value ?? "");
+                businessID:isReleaseMode? 29300:29301, token: connector.token.value ?? "");
 
         if (res.code == 0) {
           print("设置推送成功");

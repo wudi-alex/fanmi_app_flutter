@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_kit/tencent_kit.dart';
@@ -37,14 +38,42 @@ class FanmiApp extends StatefulWidget {
 }
 
 class _FanmiAppState extends State<FanmiApp> {
+  final JPush jpush = new JPush();
+
   @override
   void initState() {
     super.initState();
+    jPushInit();
   }
 
   @override
   void dispose() {
     super.dispose();
+  }
+
+  jPushInit() async {
+    try {
+      jpush.addEventHandler(
+        onReceiveNotification: (Map<String, dynamic> message) async {
+          print("flutter onReceiveNotification: $message");
+        },
+      );
+    } on PlatformException {
+      print('Failed to get platform version.');
+    }
+    jpush.setup(
+      appKey: "7a2d057f7592707ca6d56543", //你自己应用的 AppKey
+      channel: "theChannel",
+      production: false,
+      debug: true,
+    );
+    jpush.applyPushAuthority(
+        NotificationSettingsIOS(sound: true, alert: true, badge: true));
+    jpush.setBadge(0);
+
+    jpush.getRegistrationID().then((v) {
+      StorageManager.regId = v;
+    });
   }
 
   @override

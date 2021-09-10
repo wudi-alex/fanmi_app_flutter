@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/tim_config.dart';
@@ -7,16 +6,17 @@ import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/common_methods.dart';
-import 'package:fanmi/utils/offline_push_tools.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:fluwx/fluwx.dart';
+import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimAdvancedMsgListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimConversationListener.dart';
@@ -90,7 +90,6 @@ class _SplashPageState extends State<SplashPage> {
     await timManager.initSDK(
       sdkAppID: TimConfig.APP_ID,
       loglevel: LogLevel.V2TIM_LOG_DEBUG,
-
       listener: V2TimSDKListener(
         onSelfInfoUpdated: (data) {
           Provider.of<UserModel>(context, listen: false).setUserTimInfo(data);
@@ -241,8 +240,12 @@ class _SplashPageState extends State<SplashPage> {
       _timer = new Timer.periodic(const Duration(milliseconds: 1000), (v) {
         count--;
         if (count == 0) {
-          Navigator.of(context)
-              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
+          if (StorageManager.isLogin) {
+            Navigator.of(context)
+                .pushNamed(AppRouter.MainPageRoute, arguments: 0);
+          } else {
+            Navigator.of(context).pushNamed(AppRouter.GuidePageRoute);
+          }
         } else {
           setState(() {});
         }

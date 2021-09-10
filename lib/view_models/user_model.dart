@@ -38,7 +38,7 @@ class UserModel extends ChangeNotifier {
         userSig: timSig,
       )
           .then((v) {
-        OfflinePushTools.setOfflinePush();
+        // OfflinePushTools.setOfflinePush();
         setUserInfo(userInfo);
         StorageManager.setUserInfo(userInfo);
         StorageManager.setTimUserSig(timSig);

@@ -1,4 +1,5 @@
 import 'package:fanmi/utils/platform_utils.dart';
+import 'package:fanmi/utils/storage_manager.dart';
 
 import 'http_client.dart';
 
@@ -9,6 +10,7 @@ class LoginService {
       "code": code,
       "platform": Platform.operatingSystem,
       "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }
@@ -24,6 +26,7 @@ class LoginService {
       "avatar_url": avatarUrl,
       "platform": Platform.operatingSystem,
       "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }
@@ -35,7 +38,8 @@ class LoginService {
       "user_identifier": userIdentifier,
       "name": name,
       "platform": Platform.operatingSystem,
-      "device": deviceInfo
+      "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }
@@ -49,7 +53,8 @@ class LoginService {
       "email": email,
       "email_password": emailPassword,
       "platform": Platform.operatingSystem,
-      "device": deviceInfo
+      "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }
@@ -63,7 +68,8 @@ class LoginService {
       "email": email,
       "email_password": emailPassword,
       "platform": Platform.operatingSystem,
-      "device": deviceInfo
+      "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }

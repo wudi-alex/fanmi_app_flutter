@@ -10,12 +10,15 @@ import 'package:fanmi/utils/storage_manager.dart';
 import 'http_client.dart';
 
 class UserService {
+
   static Future getUserInfo() async {
+    print(StorageManager.regId);
     String deviceInfo = await PlatformUtils.getDeviceInfo();
     var resp = await http.post('/user/get_user_info', data: {
       "uid": StorageManager.uid,
       "platform": Platform.operatingSystem,
       "device": deviceInfo,
+      "reg_id":StorageManager.regId,
     });
     return resp;
   }
