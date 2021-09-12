@@ -5,7 +5,6 @@ import 'package:fanmi/generated/json/mine_board_entity_helper.dart';
 import 'package:fanmi/net/http_client.dart';
 import 'package:fanmi/net/status_code.dart';
 import 'package:fanmi/net/user_service.dart';
-import 'package:fanmi/utils/offline_push_tools.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_sdk_plugin/models/v2_tim_user_full_info.dart';

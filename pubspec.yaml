@@ -1,7 +1,7 @@
 name: fanmi
-description: 凡觅客户端版本v0.2
+description: 凡觅客户端版本v1
 
-version: 0.2.1+1
+version: 0.2.2+1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -72,7 +72,6 @@ dependencies:
   flutter_easyloading: ^3.0.0
   # 弹跳特效
   flutter_bounce: ^1.1.0
-  modal_bottom_sheet: ^2.0.0
   #对话框
   adaptive_dialog: ^1.1.0
   #日期选择框
@@ -97,8 +96,6 @@ dependencies:
   intro_slider: ^3.0.2
   # 极光推送
   jpush_flutter: ^2.1.5
-  # apns
-  flutter_apns: ^1.5.1
 
 
 
