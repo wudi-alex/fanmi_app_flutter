@@ -34,9 +34,12 @@ class AppRouter {
   static const String MailPageRoute = '/mail';
   static const String RecognizePageRoute = '/recognize_mail';
   static const String CardEditPageRoute = '/card_edit_page';
+
   static const String GenderGuidePageRoute = '/gender_guide_page';
   static const String BirthDateGuidePageRoute = '/birth_date_guide_page';
   static const String CityGuidePageRoute = '/city_guide_page';
+  static const String QrGuidePageRoute = '/qr_guide_page_route';
+
   static const String MailMessagePageRoute = '/mail_message_page';
   static const String MailSystemMessagePageRoute = '/mail_system_message_page';
   static const String SendResponseMailPageRoute =
@@ -65,10 +68,6 @@ class AppRouter {
   static const String PolicyPageRoute = '/policy_page_route';
 
   static const String WelcomeGuidePageRoute = '/welcome_guide_page';
-  static const String WelcomeGuidePageRoute1 = '/welcome_guide_page1';
-  static const String WelcomeGuidePageRoute2 = '/welcome_guide_page2';
-  static const String WelcomeGuidePageRoute3 = '/welcome_guide_page3';
-  static const String WelcomeGuidePageRoute4 = '/welcome_guide_page4';
 
   static const String MessageListPageRoute = '/message_list_page_route';
 
@@ -112,29 +111,14 @@ class AppRouter {
             child: BirthDateGuidePage(),
             type: PageTransitionType.fade,
             settings: settings);
+      case QrGuidePageRoute:
+        return PageTransition(
+            child: QrGuidePage(),
+            type: PageTransitionType.fade,
+            settings: settings);
       case WelcomeGuidePageRoute:
         return PageTransition(
             child: WelcomeGuidePage(),
-            type: PageTransitionType.fade,
-            settings: settings);
-      case WelcomeGuidePageRoute1:
-        return PageTransition(
-            child: WelcomeGuidePage1(),
-            type: PageTransitionType.fade,
-            settings: settings);
-      case WelcomeGuidePageRoute2:
-        return PageTransition(
-            child: WelcomeGuidePage2(),
-            type: PageTransitionType.fade,
-            settings: settings);
-      case WelcomeGuidePageRoute3:
-        return PageTransition(
-            child: WelcomeGuidePage3(),
-            type: PageTransitionType.fade,
-            settings: settings);
-      case WelcomeGuidePageRoute4:
-        return PageTransition(
-            child: WelcomeGuidePage4(),
             type: PageTransitionType.fade,
             settings: settings);
 

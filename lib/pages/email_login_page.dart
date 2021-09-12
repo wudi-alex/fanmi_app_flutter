@@ -6,7 +6,6 @@ import 'package:fanmi/generated/json/user_info_entity_helper.dart';
 import 'package:fanmi/net/login_service.dart';
 import 'package:fanmi/net/status_code.dart';
 import 'package:fanmi/utils/common_methods.dart';
-import 'package:fanmi/utils/platform_utils.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/material.dart';

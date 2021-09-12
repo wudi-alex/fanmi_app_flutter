@@ -93,7 +93,11 @@ class _SearchBoardState extends State<SearchBoard> {
         size: 30.r,
       ),
       onTap: () async {
-        await model.initData();
+        if (model.searchWord != null && model.searchWord!.length == 1) {
+          SmartDialog.showToast("暂时不支持单字搜索哦～");
+        } else {
+          await model.initData();
+        }
       });
 
   Widget cardIcon(CardTypeEnum cardType, SearchListViewModel model) =>

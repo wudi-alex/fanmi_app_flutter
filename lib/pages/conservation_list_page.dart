@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:badges/badges.dart';
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
 import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/utils/common_methods.dart';
@@ -11,6 +12,7 @@ import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/common_image.dart';
+import 'package:fanmi/widgets/view_state_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -34,6 +36,16 @@ class _ConversionListPageState extends State<ConversionListPage> {
         Provider.of<ConversionListModel>(context);
     MessageListModel msgModel = Provider.of<MessageListModel>(context);
     var conversionList = conversionListModel.conversionPageList;
+    if (conversionList.length == 0) {
+      return Scaffold(
+        appBar: TitleAppBar(
+          title: "消息",
+        ),
+        body: CustomEmptyWidget(
+          img: AssetConstants.no_message_background,
+        ),
+      );
+    }
     return Scaffold(
       appBar: TitleAppBar(
         title: "消息",

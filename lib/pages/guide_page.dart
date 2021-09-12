@@ -4,6 +4,7 @@ import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/enums/gender_type_enum.dart';
+import 'package:fanmi/enums/qr_type_enum.dart';
 import 'package:fanmi/generated/json/user_info_entity_helper.dart';
 import 'package:fanmi/net/user_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intro_slider/intro_slider.dart';
+import 'package:intro_slider/scrollbar_behavior_enum.dart';
 import 'package:intro_slider/slide_object.dart';
 import 'package:provider/provider.dart';
 
@@ -186,7 +188,6 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
     return GuidePageModal(
       callback: () {
         if (userModel.userInfo.birthDate == null) {
-          // userModel.userInfo.birthDate = DateTime.now().toString();
           SmartDialog.showToast("你还没有选择出生日期哦～");
           return;
         }
@@ -206,7 +207,7 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
                 height: 10.r,
               ),
               Text(
-                "建议选择真实年龄:)",
+                "建议选择你的真实年龄哦^-^",
                 style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
@@ -268,17 +269,7 @@ class _CityGuidePageState extends State<CityGuidePage> {
           SmartDialog.showToast("你还没有选择所在城市哦～");
           return;
         }
-        UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
-            .then((v) {
-          initData(context);
-          Navigator.of(context)
-              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
-        }).onError((error, stackTrace) {
-          SmartDialog.showToast("注册失败");
-          StorageManager.sp.remove(StorageManager.uidKey);
-          StorageManager.sp.remove(StorageManager.userKey);
-          Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
-        });
+        Navigator.of(context).pushNamed(AppRouter.QrGuidePageRoute);
       },
       child: Positioned(
         top: 150.r,
@@ -294,7 +285,7 @@ class _CityGuidePageState extends State<CityGuidePage> {
                 height: 10.r,
               ),
               Text(
-                "选择后获取同城名片更方便哦:)",
+                "获取同城名片更方便哦^-^",
                 style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
@@ -327,6 +318,104 @@ class _CityGuidePageState extends State<CityGuidePage> {
   }
 }
 
+class QrGuidePage extends StatefulWidget {
+  @override
+  _QrGuidePageState createState() => _QrGuidePageState();
+}
+
+class _QrGuidePageState extends State<QrGuidePage> {
+  @override
+  Widget build(BuildContext context) {
+    var userModel = Provider.of<UserModel>(context);
+    return GuidePageModal(
+      callback: () {
+        UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
+            .then((v) {
+          initData(context);
+          Navigator.of(context)
+              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
+        }).onError((error, stackTrace) {
+          SmartDialog.showToast("注册失败");
+          StorageManager.sp.remove(StorageManager.uidKey);
+          StorageManager.sp.remove(StorageManager.userKey);
+          Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
+        });
+      },
+      child: Positioned(
+        top: 150.r,
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Text(
+                "选择需要上传的二维码",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25.sp,
+                ),
+              ),
+              SizedBox(
+                height: 10.r,
+              ),
+              Text(
+                "你需要先上传二维码才能和对方交换哦^-^",
+                style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    color: Colors.grey),
+              ),
+              Text(
+                "（可跳过，想认识ta时要记得上传哦～）",
+                style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 16.sp,
+                    color: Colors.grey),
+              ),
+              SizedBox(
+                height: 10.r,
+              ),
+              TextButton(
+                  onPressed: () async {
+                    var res = await Navigator.of(context).pushNamed(
+                        AppRouter.QrUploadPageRoute,
+                        arguments: [QrTypeEnum.WEIXIN, null]) as String?;
+                    if (res != null) {
+                      userModel.userInfo.wxQrUrl = res;
+                      userModel.notifyListeners();
+                    }
+                  },
+                  child: Text(
+                    userModel.userInfo.wxQrUrl != null ? "微信（已上传）" : "微信",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.sp,
+                        color: Colors.blue),
+                  )),
+              TextButton(
+                  onPressed: () async {
+                    var res = await Navigator.of(context).pushNamed(
+                        AppRouter.QrUploadPageRoute,
+                        arguments: [QrTypeEnum.QQ, null]) as String?;
+                    if (res != null) {
+                      userModel.userInfo.qqQrUrl = res;
+                      userModel.notifyListeners();
+                    }
+                  },
+                  child: Text(
+                    userModel.userInfo.qqQrUrl != null ? "QQ（已上传）" : "QQ",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.sp,
+                        color: Colors.blue),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class WelcomeGuidePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -351,7 +440,7 @@ class WelcomeGuidePage extends StatelessWidget {
                 height: 10.r,
               ),
               Text(
-                "应用内可以修改你的头像和昵称:)",
+                "应用内可以修改你的头像和昵称^-^",
                 style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontSize: 16.sp,
@@ -385,160 +474,6 @@ class WelcomeGuidePage extends StatelessWidget {
   }
 }
 
-class WelcomeGuidePage1 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GuidePageModal(
-      callback: () {
-        Navigator.of(context).pushNamed(AppRouter.WelcomeGuidePageRoute2);
-      },
-      child: Positioned(
-        top: 150.r,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20.r),
-          child: Column(
-            children: [
-              Text(
-                "在凡觅，你可以",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.sp),
-              ),
-              SizedBox(
-                height: 20.r,
-              ),
-              Text(
-                "寻找你的另一半\n认识有共同兴趣的朋友\n结交有专业背景的人\n发布求助信息\n发现各种各样的群组",
-                maxLines: 10,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 22.sp),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class WelcomeGuidePage2 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GuidePageModal(
-      callback: () {
-        Navigator.of(context).pushNamed(AppRouter.WelcomeGuidePageRoute3);
-      },
-      child: Positioned(
-        top: 150.r,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20.r),
-          child: Column(
-            children: [
-              Text(
-                "在凡觅，你可以",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.sp),
-              ),
-              SizedBox(
-                height: 20.r,
-              ),
-              Text(
-                "创建你的个性名片\n让别人找到你\n通过搜索关键词\n找到你想认识的人的名片",
-                maxLines: 10,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 22.sp),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class WelcomeGuidePage3 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GuidePageModal(
-      callback: () {
-        Navigator.of(context).pushNamed(AppRouter.WelcomeGuidePageRoute4);
-      },
-      child: Positioned(
-        top: 150.r,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20.r),
-          child: Column(
-            children: [
-              Text(
-                "在凡觅，你可以",
-                maxLines: 2,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.sp),
-              ),
-              SizedBox(
-                height: 20.r,
-              ),
-              Text(
-                "发现你感兴趣的名片\n对名片创建者发送申请邮件\n若对方同意你的申请\n你将获取对方的联系方式\n(微信/QQ二维码)",
-                maxLines: 10,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 22.sp),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class WelcomeGuidePage4 extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GuidePageModal(
-      callback: () {
-        var userModel = Provider.of<UserModel>(context, listen: false);
-        UserService.regUserInfo(userInfoEntityToJson(userModel.userInfo))
-            .then((v) {
-          // StorageManager.setUserInfo(userModel.userInfo);
-          initData(context);
-          Navigator.of(context)
-              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
-        }).onError((error, stackTrace) {
-          SmartDialog.showToast("注册失败");
-          StorageManager.sp.remove(StorageManager.uidKey);
-          StorageManager.sp.remove(StorageManager.userKey);
-          Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
-        });
-      },
-      child: Positioned(
-        top: 150.r,
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 20.r),
-          child: Column(
-            children: [
-              Text(
-                "凡觅，\n你最好的\n社交辅助工具",
-                maxLines: 3,
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25.sp),
-              ),
-              SizedBox(
-                height: 20.r,
-              ),
-              Text(
-                "新用户引导完成\n点击下一步\n进入凡觅主页",
-                maxLines: 10,
-                textAlign: TextAlign.center,
-                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 22.sp),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class GuidePage extends StatefulWidget {
   @override
   _GuidePageState createState() => _GuidePageState();
@@ -552,35 +487,44 @@ class _GuidePageState extends State<GuidePage> {
 
   @override
   Widget build(BuildContext context) {
-    return IntroSlider(
-      slides: [
-        Slide(
-          backgroundImage: AssetConstants.guide_background1,
-          backgroundImageFit: BoxFit.cover,
-          backgroundBlendMode: BlendMode.dst,
+    return Scaffold(
+      body: IntroSlider(
+        slides: [
+          Slide(
+            pathImage: AssetConstants.guide_background1,
+            widthImage: 280.r,
+            heightImage: 450.r,
+            foregroundImageFit: BoxFit.contain,
+            backgroundColor: Colors.white,
+          ),
+          Slide(
+            pathImage: AssetConstants.guide_background2,
+            widthImage: 280.r,
+            heightImage: 450.r,
+            foregroundImageFit: BoxFit.contain,
+            backgroundColor: Colors.white,
+          ),
+          Slide(
+            pathImage: AssetConstants.guide_background3,
+            widthImage: 280.r,
+            heightImage: 450.r,
+            foregroundImageFit: BoxFit.contain,
+            backgroundColor: Colors.white,
+          ),
+        ],
+        renderNextBtn: Container(),
+        renderSkipBtn: Container(),
+        renderDoneBtn: Text(
+          '完成',
+          style: TextStyle(color: Colors.lightBlueAccent, fontSize: 17.sp),
         ),
-        Slide(
-          backgroundImage: AssetConstants.guide_background2,
-          backgroundImageFit: BoxFit.cover,
-          backgroundBlendMode: BlendMode.dst,
-        ),
-        Slide(
-          backgroundImage: AssetConstants.guide_background3,
-          backgroundImageFit: BoxFit.cover,
-          backgroundBlendMode: BlendMode.dst,
-        ),
-      ],
-      renderNextBtn: Container(),
-      renderSkipBtn: Container(),
-      renderDoneBtn: Text(
-        '完成',
-        style: TextStyle(color: Colors.lightBlueAccent, fontSize: 17.sp),
+        colorActiveDot: Colors.lightBlueAccent,
+        colorDot: Colors.grey,
+        onDonePress: () {
+          Navigator.of(context)
+              .pushNamed(AppRouter.MainPageRoute, arguments: 0);
+        },
       ),
-      colorActiveDot: Colors.lightBlueAccent,
-      colorDot: Colors.white,
-      onDonePress: () {
-        Navigator.of(context).pushNamed(AppRouter.MainPageRoute, arguments: 0);
-      },
     );
   }
 }

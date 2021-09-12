@@ -145,6 +145,8 @@
 	<string>本地保存图片服务需要访问您的图片库</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>上传图片服务需要访问您的图片库</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>获取IDFA标记权限以向您精准推送未读消息</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -156,8 +158,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

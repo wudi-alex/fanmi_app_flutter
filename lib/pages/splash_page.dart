@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/tim_config.dart';
 import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
@@ -69,9 +70,9 @@ class _SplashPageState extends State<SplashPage> {
         height: MediaQuery.of(context).size.height,
         child: Center(
           child: Image.asset(
-            "assets/images/logo_trans_blue.png",
-            width: 200.r,
-            height: 200.r,
+            AssetConstants.splash_background,
+            width: 375.r,
+            height: 667.r,
           ),
         ),
       ),
