@@ -3,12 +3,16 @@ import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/config/color_constants.dart';
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
+import 'package:fanmi/entity/card_preview_entity.dart';
+import 'package:fanmi/entity/relation_entity.dart';
 import 'package:fanmi/enums/action_type_enum.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/generated/json/relation_entity_helper.dart';
 import 'package:fanmi/net/action_service.dart';
 import 'package:fanmi/net/relation_service.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/view_models/card_list_model.dart';
+import 'package:fanmi/view_models/conversion_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/svg_icon.dart';
@@ -21,7 +25,10 @@ import 'package:provider/provider.dart';
 class RecognizePage extends StatefulWidget {
   final CardInfoEntity card;
 
-  const RecognizePage({Key? key, required this.card}) : super(key: key);
+  const RecognizePage({
+    Key? key,
+    required this.card,
+  }) : super(key: key);
 
   @override
   _RecognizePageState createState() => _RecognizePageState();
@@ -42,6 +49,7 @@ class _RecognizePageState extends State<RecognizePage> {
 
   late UserModel userModel;
   late CardListModel cardListModel;
+  late ConversionListModel conversionListModel;
 
   get cardInfo => widget.card;
 
@@ -69,6 +77,7 @@ class _RecognizePageState extends State<RecognizePage> {
   Widget build(BuildContext context) {
     cardListModel = Provider.of<CardListModel>(context);
     userModel = Provider.of<UserModel>(context);
+    conversionListModel = Provider.of<ConversionListModel>(context);
     return Scaffold(
       appBar: PopUpAppBar(
         title: "发送申请消息",
@@ -369,6 +378,27 @@ class _RecognizePageState extends State<RecognizePage> {
           addCardId: selectCard != null ? selectCard!.id : null,
           addCardType: selectCard != null ? selectCard!.type : null,
         );
+        //添加RelationMap
+        conversionListModel.relationInfoMap[cardInfo.uid.toString()] =
+            relationEntityFromJson(RelationEntity(), {
+          "target_uid": cardInfo.uid,
+          "target_card_id": cardInfo.id,
+          "target_card_type": cardInfo.type,
+          "u_avatar": uAvatar,
+          "u_name": uName,
+          "t_avatar": tAvatar,
+          "t_name": tName,
+          "u_wx": uWx,
+          "u_qq": uQq,
+          "t_wx": tWx,
+          "t_qq": tQq,
+          "add_card_id": selectCard != null ? selectCard!.id : null,
+          "add_card_type": selectCard != null ? selectCard!.type : null,
+          "gender": cardInfo.gender,
+          "birth_date": cardInfo.birthDate,
+          "city": cardInfo.city,
+          "is_applicant": 1,
+        });
       }),
       //发送文字消息
       Future(() {

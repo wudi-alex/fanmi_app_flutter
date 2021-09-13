@@ -376,9 +376,11 @@ class _QrGuidePageState extends State<QrGuidePage> {
               ),
               TextButton(
                   onPressed: () async {
-                    var res = await Navigator.of(context).pushNamed(
-                        AppRouter.QrUploadPageRoute,
-                        arguments: [QrTypeEnum.WEIXIN, null]) as String?;
+                    var res = await Navigator.of(context)
+                        .pushNamed(AppRouter.QrUploadPageRoute, arguments: [
+                      QrTypeEnum.WEIXIN,
+                      userModel.userInfo.wxQrUrl
+                    ]) as String?;
                     if (res != null) {
                       userModel.userInfo.wxQrUrl = res;
                       userModel.notifyListeners();
@@ -393,9 +395,11 @@ class _QrGuidePageState extends State<QrGuidePage> {
                   )),
               TextButton(
                   onPressed: () async {
-                    var res = await Navigator.of(context).pushNamed(
-                        AppRouter.QrUploadPageRoute,
-                        arguments: [QrTypeEnum.QQ, null]) as String?;
+                    var res = await Navigator.of(context)
+                        .pushNamed(AppRouter.QrUploadPageRoute, arguments: [
+                      QrTypeEnum.QQ,
+                      userModel.userInfo.qqQrUrl
+                    ]) as String?;
                     if (res != null) {
                       userModel.userInfo.qqQrUrl = res;
                       userModel.notifyListeners();

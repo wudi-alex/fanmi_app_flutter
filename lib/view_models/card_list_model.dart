@@ -27,5 +27,8 @@ class CardListModel extends ChangeNotifier {
     });
   }
 
-  clear() {}
+  clear() {
+    cardMap = Map();
+    notifyListeners();
+  }
 }

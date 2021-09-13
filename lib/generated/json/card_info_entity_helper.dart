@@ -7,6 +7,9 @@ cardInfoEntityFromJson(CardInfoEntity data, Map<String, dynamic> json) {
 	if (json['avatar_url'] != null) {
 		data.avatarUrl = json['avatar_url'].toString();
 	}
+	if (json['birth_date'] != null) {
+		data.birthDate = json['birth_date'].toString();
+	}
 	if (json['card_favor_num'] != null) {
 		data.cardFavorNum = json['card_favor_num'] is String
 				? int.tryParse(json['card_favor_num'])
@@ -16,6 +19,9 @@ cardInfoEntityFromJson(CardInfoEntity data, Map<String, dynamic> json) {
 		data.cardStatus = json['card_status'] is String
 				? int.tryParse(json['card_status'])
 				: json['card_status'].toInt();
+	}
+	if (json['city'] != null) {
+		data.city = json['city'].toString();
 	}
 	if (json['click_num'] != null) {
 		data.clickNum = json['click_num'] is String
@@ -32,6 +38,11 @@ cardInfoEntityFromJson(CardInfoEntity data, Map<String, dynamic> json) {
 		data.exposureNum = json['exposure_num'] is String
 				? int.tryParse(json['exposure_num'])
 				: json['exposure_num'].toInt();
+	}
+	if (json['gender'] != null) {
+		data.gender = json['gender'] is String
+				? int.tryParse(json['gender'])
+				: json['gender'].toInt();
 	}
 	if (json['id'] != null) {
 		data.id = json['id'] is String
@@ -111,12 +122,15 @@ Map<String, dynamic> cardInfoEntityToJson(CardInfoEntity entity) {
 	final Map<String, dynamic> data = new Map<String, dynamic>();
 	data['album'] = entity.album;
 	data['avatar_url'] = entity.avatarUrl;
+	data['birth_date'] = entity.birthDate;
 	data['card_favor_num'] = entity.cardFavorNum;
 	data['card_status'] = entity.cardStatus;
+	data['city'] = entity.city;
 	data['click_num'] = entity.clickNum;
 	data['cover_url'] = entity.coverUrl;
 	data['create_time'] = entity.createTime;
 	data['exposure_num'] = entity.exposureNum;
+	data['gender'] = entity.gender;
 	data['id'] = entity.id;
 	data['is_exposure_contact'] = entity.isExposureContact;
 	data['is_exposure_data'] = entity.isExposureData;

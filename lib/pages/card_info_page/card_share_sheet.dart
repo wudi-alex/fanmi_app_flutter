@@ -1,19 +1,18 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fanmi/config/appstore_config.dart';
 import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
-import 'package:fanmi/update/update.dart';
+import 'package:fanmi/enums/gender_type_enum.dart';
+import 'package:fanmi/utils/time_utils.dart';
 import 'package:fanmi/widgets/appbars.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluwx/fluwx.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -241,10 +240,32 @@ class _CardShareContentState extends State<CardShareContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  card.name,
-                  style:
-                      TextStyle(fontWeight: FontWeight.w500, fontSize: 20.sp),
+                Row(
+                  children: [
+                    Text(
+                      card.name,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 20.sp),
+                    ),
+                    SizedBox(width: 1.r,),
+                    SvgPicture.asset(
+                      GenderTypeEnum.getGender(card.gender).svgPath,
+                      color: GenderTypeEnum.getGender(card.gender).color,
+                      width: 14.r,
+                      height: 14.r,
+                    ),
+                    Text(
+                      getAge(card.birthDate).toString(),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 16.sp),
+                    ),
+                    SizedBox(width: 5.r,),
+                    Text(
+                      card.city,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 16.sp,),
+                    ),
+                  ],
                 ),
                 Text(
                   card.sign,

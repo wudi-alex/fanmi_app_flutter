@@ -33,7 +33,6 @@ logout(BuildContext context) async {
 
   ///本地缓存清除
   StorageManager.clear();
-  // Navigator.of(context).pushNamed(AppRouter.LoginPageRoute);
 }
 
 initData(BuildContext context) {
@@ -92,10 +91,11 @@ sendTextMessage({
   required int userStatus,
 }) async {
   if (sendMessageCheckStatus(userStatus, context)) {
-    await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
-      text: text,
-      userID: userId,
-    );
+    await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendTextMessage(
+          text: text,
+          groupID: '',
+          receiver: userId,
+        );
   }
 }
 
@@ -161,12 +161,13 @@ sendAgreeMessage(
     String? qqUrl,
     bool isApplicant = false}) async {
   String text = "${isApplicant ? "谢谢你😄" : "我同意你的好友申请啦😊️"}，"
-      "这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～";
+      "这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～）";
   if (isApplicant) {
-    await TencentImSDKPlugin.v2TIMManager.sendC2CTextMessage(
-      text: text,
-      userID: userId,
-    );
+    await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendTextMessage(
+          text: text,
+          receiver: userId,
+          groupID: "",
+        );
   } else {
     await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
           receiver: userId,

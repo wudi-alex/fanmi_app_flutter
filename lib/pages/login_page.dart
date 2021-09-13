@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:fanmi/config/app_router.dart';
+import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/qq_config.dart';
 import 'package:fanmi/entity/user_info_entity.dart';
 import 'package:fanmi/net/login_service.dart';
@@ -67,19 +68,9 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                "assets/images/logo_trans_white.png",
+                AssetConstants.fanmi_logo,
                 width: 150.r,
                 height: 150.r,
-                color: Colors.lightBlueAccent,
-              ),
-              SizedBox(
-                height: 10.r,
-              ),
-              Image.asset(
-                "assets/images/fanmi_font.png",
-                width: 120.r,
-                height: 70.r,
-                color: Colors.lightBlueAccent,
               ),
               SizedBox(
                 height: 100.r,
