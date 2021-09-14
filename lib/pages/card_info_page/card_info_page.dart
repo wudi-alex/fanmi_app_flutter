@@ -22,16 +22,21 @@ import 'package:provider/provider.dart';
 
 import 'custom_card_bar.dart';
 
-class CardInfoPage extends StatelessWidget {
+class CardInfoPage extends StatefulWidget {
   final int cardId;
 
   const CardInfoPage({Key? key, required this.cardId}) : super(key: key);
 
   @override
+  _CardInfoPageState createState() => _CardInfoPageState();
+}
+
+class _CardInfoPageState extends State<CardInfoPage> {
+  @override
   Widget build(BuildContext context) {
     var userModel = Provider.of<UserModel>(context);
     return ProviderWidget(
-      model: CardInfoViewModel(cardId),
+      model: CardInfoViewModel(widget.cardId),
       onModelReady: (model) => (model! as CardInfoViewModel).initData(),
       builder: (context, model, child) {
         model as CardInfoViewModel;
@@ -127,7 +132,7 @@ class CardInfoPage extends StatelessWidget {
             color: Colors.white,
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: 50.r,
+              height: 60.r,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -276,7 +281,7 @@ class CardInfoPage extends StatelessWidget {
             Icon(
               Icons.send_rounded,
               color: Colors.blue,
-              size: 21.5.r,
+              size: 23.r,
             ),
             SizedBox(
               width: 2.5.r,
@@ -285,14 +290,15 @@ class CardInfoPage extends StatelessWidget {
               '想认识',
               style: TextStyle(
                   color: Colors.blue,
-                  fontSize: 16.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w500),
             ),
           ],
         )),
       );
 
-  Widget favorButton(CardInfoViewModel model, BuildContext context) => Container(
+  Widget favorButton(CardInfoViewModel model, BuildContext context) =>
+      Container(
         child: Row(
           children: [
             LikeButton(
@@ -308,7 +314,7 @@ class CardInfoPage extends StatelessWidget {
                 return Icon(
                   Icons.star_rounded,
                   color: isLiked ? Colors.orange : Colors.grey,
-                  size: 24.r,
+                  size: 26.r,
                 );
               },
               onTap: (bool isFavored) async {
@@ -324,12 +330,24 @@ class CardInfoPage extends StatelessWidget {
                 return !isFavored;
               },
             ),
-            Text(
-              "收藏",
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500),
+            GestureDetector(
+              onTap: () {
+                if (!StorageManager.isLogin) {
+                  SmartDialog.showToast("请先登录哦～");
+                }
+                if (model.cardInfoEntity.isFavored == 1) {
+                  model.cancelFavor();
+                } else {
+                  model.addFavor();
+                }
+              },
+              child: Text(
+                "收藏",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.w500),
+              ),
             ),
           ],
         ),
@@ -358,7 +376,7 @@ class CardInfoPage extends StatelessWidget {
               Icon(
                 Icons.ios_share,
                 color: Colors.grey,
-                size: 21.5.r,
+                size: 23.r,
               ),
               SizedBox(
                 width: 2.5.r,
@@ -367,7 +385,7 @@ class CardInfoPage extends StatelessWidget {
                 "分享",
                 style: TextStyle(
                     color: Colors.grey,
-                    fontSize: 16.sp,
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.w500),
               ),
             ],

@@ -20,6 +20,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 
 class RecognizePage extends StatefulWidget {
@@ -338,6 +339,10 @@ class _RecognizePageState extends State<RecognizePage> {
   }
 
   Future send() async {
+    if (text == null || text.length == 0) {
+      SmartDialog.showToast("你还没有写消息内容哦～");
+      return;
+    }
     String uName =
         selectCard != null ? selectCard!.name! : userModel.userInfo.name!;
     String uAvatar = selectCard != null

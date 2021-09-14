@@ -13,11 +13,9 @@ import 'package:fanmi/view_models/message_list_model.dart';
 import 'package:fanmi/view_models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:fluwx/fluwx.dart';
-import 'package:jpush_flutter/jpush_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimAdvancedMsgListener.dart';
 import 'package:tencent_im_sdk_plugin/enum/V2TimConversationListener.dart';
@@ -149,10 +147,6 @@ class _SplashPageState extends State<SplashPage> {
                   Provider.of<MessageListModel>(context, listen: false);
               var conversionModel =
                   Provider.of<ConversionListModel>(context, listen: false);
-              //假如有消息过来，则补充查询关系
-              if (!conversionModel.relationInfoMap.containsKey(data.userID)) {
-                conversionModel.pullRelationData([data.userID!]);
-              }
               try {
                 String userId = data.userID!;
                 if (data.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
@@ -192,7 +186,16 @@ class _SplashPageState extends State<SplashPage> {
                 if (data.elemType != MessageElemType.V2TIM_ELEM_TYPE_CUSTOM ||
                     data.customElem!.desc !=
                         MessageTypeEnum.REFUSE.toString()) {
-                  messageModel.addOneMessageIfNotExits(userId, data);
+                  //假如有消息过来，则补充查询关系
+                  if (!conversionModel.relationInfoMap
+                      .containsKey(data.userID)) {
+                    conversionModel.pullRelationData([data.userID!]).then((v) {
+                      messageModel.addOneMessageIfNotExits(userId, data);
+                    });
+                  } else {
+                    messageModel.addOneMessageIfNotExits(userId, data);
+                  }
+
                   if (messageModel.nowTalkingUserId == userId) {
                     //停留当前聊天页面，设置已读
                     setRead(userId);

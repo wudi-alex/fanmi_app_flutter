@@ -140,8 +140,7 @@ class Album extends StatelessWidget {
           ),
           photoSpan(
               imgUrls.sublist(
-                6,
-              ),
+                6,),
               context)
         ],
       );
@@ -187,7 +186,7 @@ class Album extends StatelessWidget {
           ],
         ),
       );
-    } else if (imgUrls.length == 3) {
+    } else if (imgUrls.length >= 3) {
       return Container(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
