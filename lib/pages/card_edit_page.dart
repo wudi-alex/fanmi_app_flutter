@@ -77,7 +77,9 @@ class _CardEditPageState extends State<CardEditPage> {
     albumModel = ImagePickerModel(
       maxAssetsCount: 9,
       imgUrls: card.album != null && card.album!.isNotEmpty
-          ? card.album!.split(";")
+          ? ((card.album!.split(";").length > 9)
+              ? card.album!.split(";").sublist(0, 9)
+              : card.album!.split(";"))
           : [],
     );
   }
@@ -124,7 +126,7 @@ class _CardEditPageState extends State<CardEditPage> {
                         left: 2.r, right: 27.r, bottom: 10.r, top: 20.r),
                   )
                 : SizedBox.shrink(),
-            subtitleText("自我描述:"),
+            subtitleText("描述:"),
             descWidget(),
             subtitleText("相册:"),
             Padding(
@@ -158,27 +160,27 @@ class _CardEditPageState extends State<CardEditPage> {
             SizedBox(
               height: 8.r,
             ),
-            cardSwitch("展示名片曝光数点击数等数据", card.isExposureData == 1, (value) {
+            cardSwitch("查看名片时显示面板数据（点击数等）", card.isExposureData == 1, (value) {
               setState(() {
                 card.isExposureData = value ? 1 : 0;
               });
             }),
-            cardSwitch("禁止名片对外展示",
+            cardSwitch("查看名片时显示二维码", card.isExposureContact == 1, (value) {
+              setState(() {
+                card.isExposureContact = value ? 1 : 0;
+              });
+            }),
+            cardSwitch("名片只接受有附加名片的申请消息", card.isNeedCard == 1, (value) {
+              setState(() {
+                card.isNeedCard = value ? 1 : 0;
+              });
+            }),
+            cardSwitch("隐藏名片（不可被搜索/推荐/查看）",
                 card.cardStatus == CardStatusEnum.CARD_STATUS_NO_SHOW, (value) {
               setState(() {
                 card.cardStatus = value
                     ? CardStatusEnum.CARD_STATUS_NO_SHOW
                     : CardStatusEnum.CARD_STATUS_NORMAL;
-              });
-            }),
-            cardSwitch("可被直接查看二维码", card.isExposureContact == 1, (value) {
-              setState(() {
-                card.isExposureContact = value ? 1 : 0;
-              });
-            }),
-            cardSwitch("需要对方发送申请消息时附加名片", card.isNeedCard == 1, (value) {
-              setState(() {
-                card.isNeedCard = value ? 1 : 0;
               });
             }),
             SizedBox(

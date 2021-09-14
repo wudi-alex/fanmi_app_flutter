@@ -217,6 +217,9 @@ class _SplashPageState extends State<SplashPage> {
               conversionModel.updateConversionInfoMap(data);
             },
             onConversationChanged: (data) {
+              var conversionModel =
+                  Provider.of<ConversionListModel>(context, listen: false);
+
               //假如是拒绝信息，不处理
               if (data.last.lastMessage!.elemType ==
                       MessageElemType.V2TIM_ELEM_TYPE_CUSTOM &&
@@ -224,8 +227,16 @@ class _SplashPageState extends State<SplashPage> {
                       MessageTypeEnum.REFUSE.toString()) {
                 return;
               }
-              Provider.of<ConversionListModel>(context, listen: false)
-                  .updateConversionInfoMap(data);
+              //假如有消息过来，则补充查询关系
+              var userId = data.last.lastMessage!.userID!;
+              if (userId != StorageManager.uid.toString() &&
+                  !conversionModel.relationInfoMap.containsKey(userId)) {
+                conversionModel.pullRelationData([userId]).then((v) {
+                  conversionModel.updateConversionInfoMap(data);
+                });
+              } else {
+                conversionModel.updateConversionInfoMap(data);
+              }
 
               Provider.of<MessageListModel>(
                 context,

@@ -179,12 +179,34 @@ class BirthDateGuidePage extends StatefulWidget {
 
 class _BirthDateGuidePageState extends State<BirthDateGuidePage>
     with AutomaticKeepAliveClientMixin {
-  DateTime date = DateTime.now();
+  late UserModel userModel;
+  DateTime? guideDate;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 100), () {
+      DatePicker.showDatePicker(
+        context,
+        showTitleActions: true,
+        minTime: DateTime(1900, 1, 1),
+        maxTime: DateTime.now(),
+        onConfirm: (date) {
+          userModel.userInfo.birthDate = date.toString();
+          setState(() {
+            guideDate = date;
+          });
+        },
+        currentTime: DateTime.now(),
+        locale: LocaleType.zh,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    var userModel = Provider.of<UserModel>(context);
+    userModel = Provider.of<UserModel>(context);
     return GuidePageModal(
       callback: () {
         if (userModel.userInfo.birthDate == null) {
@@ -225,7 +247,9 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
                     maxTime: DateTime.now(),
                     onConfirm: (date) {
                       userModel.userInfo.birthDate = date.toString();
-                      userModel.notifyListeners();
+                      setState(() {
+                        guideDate = date;
+                      });
                     },
                     currentTime: userModel.userInfo.birthDate != null
                         ? DateTime.parse(userModel.userInfo.birthDate!)
@@ -234,8 +258,8 @@ class _BirthDateGuidePageState extends State<BirthDateGuidePage>
                   );
                 },
                 child: Text(
-                  userModel.userInfo.birthDate != null
-                      ? userModel.userInfo.birthDate!.split(' ')[0]
+                  guideDate != null
+                      ? guideDate.toString().split(' ')[0]
                       : "选择出生日期",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -260,9 +284,27 @@ class CityGuidePage extends StatefulWidget {
 }
 
 class _CityGuidePageState extends State<CityGuidePage> {
+  late UserModel userModel;
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
+
+  init() {
+    Future.delayed(Duration(milliseconds: 100), () async {
+      final res = await CustomCityPicker.showPicker(context);
+      if (res.city != null) {
+        userModel.userInfo.city = res.city!;
+        userModel.notifyListeners();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    var userModel = Provider.of<UserModel>(context);
+    userModel = Provider.of<UserModel>(context);
     return GuidePageModal(
       callback: () {
         if (userModel.userInfo.city == null) {

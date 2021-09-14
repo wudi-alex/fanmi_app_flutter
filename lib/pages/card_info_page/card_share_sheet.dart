@@ -125,18 +125,22 @@ class _CardShareSheetState extends State<CardShareSheet> {
           ],
         ),
         onTap: () {
-          screenshotController.capture().then((image) async {
-            //Capture Done
-            Directory tempDir = await getTemporaryDirectory();
-            String storagePath = tempDir.path;
-            File file = new File(
-                '$storagePath/${DateTime.now().microsecondsSinceEpoch}.png');
-            if (!file.existsSync()) {
-              file.createSync();
-            }
-            file.writeAsBytesSync(image!);
-            callback.call(file);
-          });
+          try {
+            screenshotController.capture().then((image) async {
+              //Capture Done
+              Directory tempDir = await getTemporaryDirectory();
+              String storagePath = tempDir.path;
+              File file = new File(
+                  '$storagePath/${DateTime.now().microsecondsSinceEpoch}.png');
+              if (!file.existsSync()) {
+                file.createSync();
+              }
+              file.writeAsBytesSync(image!);
+              callback.call(file);
+            });
+          } catch (e, s) {
+            print(e);
+          }
         },
       );
 }
@@ -153,8 +157,10 @@ class CardShareContent extends StatefulWidget {
 class _CardShareContentState extends State<CardShareContent> {
   get card => widget.card;
 
-  get album => (widget.card.album != null && widget.card.album != "")
-      ? widget.card.album!.split(";")
+  get album => (card.album != null && card.album != "")
+      ? ((card.album!.split(";").length > 9)
+          ? card.album!.split(";").sublist(0, 9)
+          : card.album!.split(";"))
       : null;
 
   @override
@@ -247,7 +253,9 @@ class _CardShareContentState extends State<CardShareContent> {
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20.sp),
                     ),
-                    SizedBox(width: 1.r,),
+                    SizedBox(
+                      width: 1.r,
+                    ),
                     SvgPicture.asset(
                       GenderTypeEnum.getGender(card.gender).svgPath,
                       color: GenderTypeEnum.getGender(card.gender).color,
@@ -259,11 +267,15 @@ class _CardShareContentState extends State<CardShareContent> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500, fontSize: 16.sp),
                     ),
-                    SizedBox(width: 5.r,),
+                    SizedBox(
+                      width: 5.r,
+                    ),
                     Text(
                       card.city,
                       style: TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 16.sp,),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16.sp,
+                      ),
                     ),
                   ],
                 ),
@@ -315,6 +327,7 @@ class _CardShareContentState extends State<CardShareContent> {
         margin: EdgeInsets.symmetric(horizontal: 15.r, vertical: 5.r),
         padding: EdgeInsets.symmetric(horizontal: 15.r, vertical: 10.r),
         child: Container(
+          width: MediaQuery.of(context).size.width,
           child: child,
         ),
       );

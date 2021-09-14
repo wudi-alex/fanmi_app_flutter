@@ -162,11 +162,33 @@ class _CustomCardBarState extends State<CustomCardBar>
             actions: Padding(
               padding: EdgeInsets.all(10.0.r),
               child: GestureDetector(
-                onTap: actionCallback,
-                child: Icon(
-                  Icons.more_horiz,
-                  color: _animatedBackButtonColors.evaluate(
-                      AlwaysStoppedAnimation(_animationController.value)),
+                onTap: () {
+                  if (widget.data.uid == StorageManager.uid) {
+                    Navigator.of(context).pushNamed(AppRouter.CardEditPageRoute,
+                        arguments: CardTypeEnum.getCardType(widget.data.type!));
+                  } else {
+                    if (!StorageManager.isLogin) {
+                      SmartDialog.showToast("请先登录哦～");
+                      return;
+                    }
+                    Navigator.of(context).pushNamed(
+                        AppRouter.ReportMailPageRoute,
+                        arguments: widget.data);
+                  }
+                },
+                // child: Icon(
+                //   Icons.more_horiz,
+                //   color: _animatedBackButtonColors.evaluate(
+                //       AlwaysStoppedAnimation(_animationController.value)),
+                // ),
+                child: Text(
+                  widget.data.uid == StorageManager.uid ? "编辑" : "举报",
+                  style: TextStyle(
+                    color: _animatedBackButtonColors.evaluate(
+                        AlwaysStoppedAnimation(_animationController.value)),
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -216,7 +238,7 @@ class _CustomCardBarState extends State<CustomCardBar>
                         ),
                       ),
                       onTap: () {
-                        if(!StorageManager.isLogin){
+                        if (!StorageManager.isLogin) {
                           SmartDialog.showToast("请先登录哦～");
                           return;
                         }
