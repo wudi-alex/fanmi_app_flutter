@@ -377,8 +377,26 @@ class _MessageListPageState extends State<MessageListPage> {
             decoration: InputDecoration(
               border: InputBorder.none,
               isCollapsed: true,
+              suffixIcon: GestureDetector(
+                child: Icon(Icons.send),
+                onTap: () async {
+                  if(_controller.text.length==0){
+                    return;
+                  }
+                  await sendTextMessage(
+                      userId: userId,
+                      text: _controller.text,
+                      context: context,
+                      userStatus: userStatus);
+                  _controller.text = "";
+                },
+              ),
+              suffixIconConstraints: BoxConstraints(minHeight: 20.r),
             ),
             onSubmitted: (text) async {
+              if(text.length==0){
+                return;
+              }
               await sendTextMessage(
                   userId: userId,
                   text: text,

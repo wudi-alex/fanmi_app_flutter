@@ -529,9 +529,12 @@ class _CardEditPageState extends State<CardEditPage> {
         if (resp.statusCode == StatusCode.SUCCESS) {
           EasyLoading.showSuccess("$actionDesc成功");
           if (isCreateMode) {
-            card.id = resp.data['card_id'];
+            CardInfoEntity createdCard = cardInfoEntityFromJson(
+                CardInfoEntity(), resp.data['card_data']);
+            cardListModel.cardMap[cardType.value] = createdCard;
+          } else {
+            cardListModel.cardMap[cardType.value] = card;
           }
-          cardListModel.cardMap[cardType.value] = card;
           StorageManager.setCardListInfo(cardListModel.cardList);
           Navigator.of(context).pop();
         }
