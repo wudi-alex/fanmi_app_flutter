@@ -55,8 +55,8 @@ class SearchListViewModel extends ViewStateRefreshListModel<CardPreviewEntity> {
     await initData();
   }
 
-  setRankType(int rankType) async {
-    rankType = rankType;
+  setRankType(int type) async {
+    rankType = type;
     notifyListeners();
     await initData();
   }
