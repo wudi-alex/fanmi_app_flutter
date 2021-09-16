@@ -23,7 +23,7 @@ class MineContactPage extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 8.r, horizontal: 20.r),
               child: Text(
                 "任选一种或者多种二维码上传就可以哦～",
-                style: TextStyle(fontSize: 15.sp),
+                style: TextStyle(fontSize: 14.sp),
               ),
             ),
             QrListTile(

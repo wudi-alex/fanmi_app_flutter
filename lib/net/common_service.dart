@@ -27,4 +27,20 @@ class CommonService {
     });
     return resp;
   }
+
+  static Future agreeAutoResp({
+    required String fromAccount,
+    required String text,
+    String? wxQrUrl,
+    String? qqQrUrl,
+  }) async {
+    var resp = await http.post('/im/agree_auto_resp', data: {
+      "from_account": fromAccount,
+      "to_account": StorageManager.uid.toString(),
+      "text": text,
+      "wx_qr_url": wxQrUrl,
+      "qq_qr_url": qqQrUrl,
+    });
+    return resp;
+  }
 }

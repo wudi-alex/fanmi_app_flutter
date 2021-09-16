@@ -200,7 +200,7 @@ class _CardEditPageState extends State<CardEditPage> {
       title: Text(
         "$actionDesc${widget.cardType.desc}名片",
         style: TextStyle(
-            color: Colors.black, fontSize: 18.sp, fontWeight: FontWeight.w500),
+            color: Colors.black, fontSize: 17.sp, fontWeight: FontWeight.w500),
       ),
       leading: IconButton(
         color: Colors.black,
@@ -249,7 +249,7 @@ class _CardEditPageState extends State<CardEditPage> {
           },
           child: Text(
             "$actionDesc完成",
-            style: TextStyle(fontSize: 17.sp, color: Colors.blue),
+            style: TextStyle(fontSize: 16.sp, color: Colors.blue),
           ),
         )
       ],

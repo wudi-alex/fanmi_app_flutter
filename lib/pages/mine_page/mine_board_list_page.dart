@@ -126,7 +126,7 @@ class BoardItem extends StatelessWidget {
                 ],
               ),
               Container(
-                constraints: BoxConstraints(maxWidth: 260.r),
+                constraints: BoxConstraints(maxWidth: 250.r),
                 child: Text(
                   text,
                   style: TextStyle(color: Colors.grey, fontSize: 14.sp),

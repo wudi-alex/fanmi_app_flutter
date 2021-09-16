@@ -28,7 +28,7 @@ class CustomListTile extends StatelessWidget {
                   Text(
                     headerText,
                     style:
-                        TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500),
+                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
                   ),
                   Spacer(),
                   Padding(

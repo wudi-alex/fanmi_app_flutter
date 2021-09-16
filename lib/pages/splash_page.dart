@@ -5,6 +5,7 @@ import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/tim_config.dart';
 import 'package:fanmi/config/weixin_config.dart';
 import 'package:fanmi/enums/message_type_enum.dart';
+import 'package:fanmi/net/common_service.dart';
 import 'package:fanmi/update/update.dart';
 import 'package:fanmi/utils/common_methods.dart';
 import 'package:fanmi/utils/storage_manager.dart';
@@ -151,16 +152,6 @@ class _SplashPageState extends State<SplashPage> {
                 String userId = data.userID!;
                 if (data.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
                   switch (int.parse(data.customElem!.desc!)) {
-                    case MessageTypeEnum.AGREE:
-                      var relationMap = conversionModel.relationInfoMap;
-                      if (userId != StorageManager.uid.toString()) {
-                        sendAgreeMessage(
-                            userId: userId,
-                            wxUrl: relationMap[userId]!.uWx,
-                            qqUrl: relationMap[userId]!.uQq,
-                            isApplicant: true);
-                      }
-                      break;
                     case MessageTypeEnum.REFUSE:
                       if (messageModel.nowTalkingUserId == userId) {
                         //停留当前聊天页面，直接退出

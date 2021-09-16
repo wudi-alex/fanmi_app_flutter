@@ -155,32 +155,23 @@ sendQrMessage({required String userId, required String url}) async {
 }
 
 //发送同意消息
-sendAgreeMessage(
-    {required String userId,
-    String? wxUrl,
-    String? qqUrl,
-    bool isApplicant = false}) async {
-  String text = "${isApplicant ? "谢谢你😄" : "我同意你的好友申请啦😊️"}，"
-      "这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～）";
-  if (isApplicant) {
-    await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendTextMessage(
-          text: text,
-          receiver: userId,
-          groupID: "",
-        );
-  } else {
-    await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendCustomMessage(
-          receiver: userId,
-          groupID: "",
-          desc: isApplicant
-              ? MessageTypeEnum.NORMAL.toString()
-              : MessageTypeEnum.AGREE.toString(),
-          data: json.encode({
-            "text": text,
-          }),
-          offlinePushInfo: OfflinePushInfo(title: '你收到了一条同意交友申请消息～'),
-        );
-  }
+sendAgreeMessage({
+  required String userId,
+  String? wxUrl,
+  String? qqUrl,
+  String? autoWxUrl,
+  String? autoQqUrl,
+}) async {
+  String agreeText =
+      "我同意你的好友申请啦😊️,这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～）";
+  String respText =
+      "谢谢你😄,这是我的${(wxUrl != null && wxUrl.isNotEmpty) ? ((qqUrl != null && qqUrl.isNotEmpty) ? "微信&QQ" : "微信") : "QQ"}二维码 (在「我的-通讯录」里也有哦～）";
+
+  await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendTextMessage(
+        text: agreeText,
+        receiver: userId,
+        groupID: "",
+      );
   //发送二维码消息
   if (wxUrl != null && wxUrl.isNotEmpty) {
     await sendQrMessage(userId: userId, url: wxUrl);
@@ -188,6 +179,13 @@ sendAgreeMessage(
   if (qqUrl != null && qqUrl.isNotEmpty) {
     await sendQrMessage(userId: userId, url: qqUrl);
   }
+
+  //触发自动回复
+  await CommonService.agreeAutoResp(
+      fromAccount: userId,
+      text: respText,
+      wxQrUrl: autoWxUrl,
+      qqQrUrl: autoQqUrl);
 }
 
 //发送拒绝消息

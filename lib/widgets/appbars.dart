@@ -14,7 +14,7 @@ class TitleAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         title,
         style: TextStyle(
-            fontSize: 20.sp, fontWeight: FontWeight.bold, color: Colors.black),
+            fontSize: 18.sp, fontWeight: FontWeight.bold, color: Colors.black),
       ),
       centerTitle: true,
       elevation: 0.5,

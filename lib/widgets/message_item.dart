@@ -22,9 +22,9 @@ class MessageItem extends StatelessWidget {
   final int? otherAvatarCardId;
 
 
-  get avatarSize => 43.r;
+  get avatarSize => 41.r;
 
-  get avatarPad => 6.r;
+  get avatarPad => 4.r;
 
   const MessageItem(
       {Key? key,
@@ -147,10 +147,10 @@ class MessageItem extends StatelessWidget {
             elevation: 1.0,
             color: isSelf ? Colors.lightBlueAccent : Colors.white,
             child: Container(
-              padding: EdgeInsets.all(8.r),
+              padding: EdgeInsets.all(7.r),
               child: Text(
                 msgText!,
-                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w400),
+                style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w400),
               ),
             ),
           ),
@@ -183,7 +183,7 @@ class MessageItem extends StatelessWidget {
                     TextSpan(
                       text: '我给你发送了我的${cardTypeEnum.desc}名片，',
                       style: TextStyle(
-                          fontSize: 17.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w400,
                           color: Colors.black),
                     ),
@@ -191,7 +191,7 @@ class MessageItem extends StatelessWidget {
                         text: '点击这里来看看吧～',
                         style: TextStyle(
                           decoration: TextDecoration.underline,
-                          fontSize: 17.sp,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.w400,
                           color: cardTypeEnum.color,
                         ),

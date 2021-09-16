@@ -41,7 +41,7 @@ class CardListBoard extends StatelessWidget {
               type.desc,
               style: TextStyle(
                   color: Colors.white,
-                  fontSize: 23.sp,
+                  fontSize: 21.sp,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -51,7 +51,7 @@ class CardListBoard extends StatelessWidget {
               type.info,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 19.sp,
+                fontSize: 18.sp,
               ),
             )
           ],

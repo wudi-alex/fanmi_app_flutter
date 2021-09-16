@@ -156,7 +156,7 @@ class _MinePageState extends State<MinePage> {
             },
             child: Text(
               userModel.userInfo.name ?? "凡觅用户",
-              style: TextStyle(color: Colors.grey, fontSize: 17.sp),
+              style: TextStyle(color: Colors.grey, fontSize: 16.sp),
             ),
           ),
           divider,
@@ -191,7 +191,7 @@ class _MinePageState extends State<MinePage> {
               userModel.userInfo.gender == GenderTypeEnum.Female.value
                   ? "女"
                   : "男",
-              style: TextStyle(color: Colors.grey, fontSize: 17.sp),
+              style: TextStyle(color: Colors.grey, fontSize: 16.sp),
             ),
           ),
           divider,
@@ -214,7 +214,7 @@ class _MinePageState extends State<MinePage> {
             },
             child: Text(
               userModel.userInfo.city ?? "未知城市",
-              style: TextStyle(color: Colors.grey, fontSize: 17.sp),
+              style: TextStyle(color: Colors.grey, fontSize: 16.sp),
             ),
           ),
           divider,
@@ -247,7 +247,7 @@ class _MinePageState extends State<MinePage> {
               userModel.userInfo.birthDate != null
                   ? userModel.userInfo.birthDate!.split(' ')[0]
                   : "",
-              style: TextStyle(color: Colors.grey, fontSize: 17.sp),
+              style: TextStyle(color: Colors.grey, fontSize: 16.sp),
             ),
           ),
           userModel.userInfo.loginPlatform == "email"

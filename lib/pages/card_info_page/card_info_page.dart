@@ -290,8 +290,8 @@ class _CardInfoPageState extends State<CardInfoPage> {
               '想认识',
               style: TextStyle(
                   color: Colors.blue,
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w500),
+                  fontSize: 17.sp,
+                  fontWeight: FontWeight.w400),
             ),
           ],
         )),
@@ -345,8 +345,8 @@ class _CardInfoPageState extends State<CardInfoPage> {
                 "收藏",
                 style: TextStyle(
                     color: Colors.grey,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w500),
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w400),
               ),
             ),
           ],
@@ -385,8 +385,8 @@ class _CardInfoPageState extends State<CardInfoPage> {
                 "分享",
                 style: TextStyle(
                     color: Colors.grey,
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.w500),
+                    fontSize: 17.sp,
+                    fontWeight: FontWeight.w400),
               ),
             ],
           ),

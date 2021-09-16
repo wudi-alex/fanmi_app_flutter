@@ -99,7 +99,7 @@ class _CustomCardBarState extends State<CustomCardBar>
               _name,
               style: TextStyle(
                   color: Colors.black,
-                  fontSize: 20.sp,
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.w500),
             ),
             leading: BackButton(
@@ -186,7 +186,7 @@ class _CustomCardBarState extends State<CustomCardBar>
                   style: TextStyle(
                     color: _animatedBackButtonColors.evaluate(
                         AlwaysStoppedAnimation(_animationController.value)),
-                    fontSize: 17.sp,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

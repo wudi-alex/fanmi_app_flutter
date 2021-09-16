@@ -37,7 +37,7 @@ class _QrListTileState extends State<QrListTile> {
       child: ListTile(
         title: Text(
           '${widget.qrType}二维码',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -45,7 +45,7 @@ class _QrListTileState extends State<QrListTile> {
             Text(
               qrUrl != null && qrUrl != "" ? "已上传" : "",
               style: TextStyle(
-                  fontSize: 17.sp,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.blue),
             ),
@@ -55,7 +55,7 @@ class _QrListTileState extends State<QrListTile> {
             Icon(
               Icons.arrow_forward_ios_outlined,
               color: Colors.grey,
-              size: 21.sp,
+              size: 20.sp,
             ),
           ],
         ),

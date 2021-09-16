@@ -235,9 +235,12 @@ class _MessageListPageState extends State<MessageListPage> {
                             userId, RelationTypeEnum.AGREED);
                         //发送同意消息
                         sendAgreeMessage(
-                            userId: userId,
-                            wxUrl: relation.tWx,
-                            qqUrl: relation.tQq);
+                          userId: userId,
+                          wxUrl: relation.tWx,
+                          qqUrl: relation.tQq,
+                          autoWxUrl: relation.uWx,
+                          autoQqUrl: relation.uQq,
+                        );
                       }
                     }
                   },
@@ -380,7 +383,7 @@ class _MessageListPageState extends State<MessageListPage> {
               suffixIcon: GestureDetector(
                 child: Icon(Icons.send),
                 onTap: () async {
-                  if(_controller.text.length==0){
+                  if (_controller.text.length == 0) {
                     return;
                   }
                   await sendTextMessage(
@@ -394,7 +397,7 @@ class _MessageListPageState extends State<MessageListPage> {
               suffixIconConstraints: BoxConstraints(minHeight: 20.r),
             ),
             onSubmitted: (text) async {
-              if(text.length==0){
+              if (text.length == 0) {
                 return;
               }
               await sendTextMessage(
@@ -488,7 +491,7 @@ class _MessageListPageState extends State<MessageListPage> {
                           Text(
                             friendName,
                             style: TextStyle(
-                                fontSize: 18.sp,
+                                fontSize: 17.sp,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black),
                           ),

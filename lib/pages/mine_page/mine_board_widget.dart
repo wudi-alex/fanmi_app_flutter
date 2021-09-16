@@ -44,17 +44,17 @@ class MineBoard extends StatelessWidget {
                 MineBoardItem(
                   title: "曝光",
                   titleStyle: TextStyle(
-                      fontSize: 18.sp,
+                      fontSize: 17.sp,
                       color: Colors.grey,
                       fontWeight: FontWeight.w400),
                   num: exposureNum,
                   numStyle: TextStyle(
-                      fontSize: 40.sp,
+                      fontSize: 37.sp,
                       color: Colors.black,
                       fontWeight: FontWeight.w500),
                   addNum: exposureAddNum,
                   icon: Icons.remove_red_eye_outlined,
-                  iconSize: 20.sp,
+                  iconSize: 19.sp,
                 ),
                 SizedBox(
                   height: 20.r,
@@ -65,47 +65,47 @@ class MineBoard extends StatelessWidget {
                     MineBoardItem(
                       title: "搜索",
                       titleStyle: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: 17.sp,
                           color: Colors.grey,
                           fontWeight: FontWeight.w400),
                       num: searchNum,
                       numStyle: TextStyle(
-                          fontSize: 25.sp,
+                          fontSize: 23.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: searchAddNum,
                       icon: Icons.search,
-                      iconSize: 20.sp,
+                      iconSize: 19.sp,
                     ),
                     MineBoardItem(
                       title: "点击",
                       titleStyle: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: 17.sp,
                           color: Colors.grey,
                           fontWeight: FontWeight.w400),
                       num: clickNum,
                       numStyle: TextStyle(
-                          fontSize: 25.sp,
+                          fontSize: 23.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: clickAddNum,
                       icon: HippoIcon.operation,
-                      iconSize: 20.sp,
+                      iconSize: 19.sp,
                     ),
                     MineBoardItem(
                       title: "收藏",
                       titleStyle: TextStyle(
-                          fontSize: 18.sp,
+                          fontSize: 17.sp,
                           color: Colors.grey,
                           fontWeight: FontWeight.w400),
                       num: favorNum,
                       numStyle: TextStyle(
-                          fontSize: 25.sp,
+                          fontSize: 23.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: favorAddNum,
                       icon: Icons.star_border_outlined,
-                      iconSize: 20.sp,
+                      iconSize: 19.sp,
                     ),
                   ],
                 )
@@ -115,7 +115,7 @@ class MineBoard extends StatelessWidget {
               child: Icon(
                 Icons.arrow_forward_ios_outlined,
                 color: Colors.grey,
-                size: 25,
+                size: 23,
               ),
               right: 0,
               top: 55,
