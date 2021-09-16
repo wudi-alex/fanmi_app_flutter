@@ -1,7 +1,6 @@
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
 import 'package:fanmi/enums/action_type_enum.dart';
-import 'package:fanmi/enums/card_type_enum.dart';
 import 'package:fanmi/net/action_service.dart';
 import 'package:fanmi/pages/search_page/search_board.dart';
 import 'package:fanmi/pages/search_page/search_tab.dart';
