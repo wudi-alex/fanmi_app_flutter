@@ -49,7 +49,7 @@ class MineBoard extends StatelessWidget {
                       fontWeight: FontWeight.w400),
                   num: exposureNum,
                   numStyle: TextStyle(
-                      fontSize: 37.sp,
+                      fontSize: 30.sp,
                       color: Colors.black,
                       fontWeight: FontWeight.w500),
                   addNum: exposureAddNum,
@@ -70,7 +70,7 @@ class MineBoard extends StatelessWidget {
                           fontWeight: FontWeight.w400),
                       num: searchNum,
                       numStyle: TextStyle(
-                          fontSize: 23.sp,
+                          fontSize: 20.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: searchAddNum,
@@ -85,7 +85,7 @@ class MineBoard extends StatelessWidget {
                           fontWeight: FontWeight.w400),
                       num: clickNum,
                       numStyle: TextStyle(
-                          fontSize: 23.sp,
+                          fontSize: 20.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: clickAddNum,
@@ -100,7 +100,7 @@ class MineBoard extends StatelessWidget {
                           fontWeight: FontWeight.w400),
                       num: favorNum,
                       numStyle: TextStyle(
-                          fontSize: 23.sp,
+                          fontSize: 20.sp,
                           color: Colors.black,
                           fontWeight: FontWeight.w500),
                       addNum: favorAddNum,
