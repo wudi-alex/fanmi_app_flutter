@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:fanmi/config/app_router.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
 import 'package:fanmi/enums/action_type_enum.dart';
@@ -113,7 +116,21 @@ class _SearchPageState extends State<SearchPage>
                 ),
               ),
             ),
-            body: body,
+            body: GestureDetector(
+              child: body,
+              onHorizontalDragStart: (v) async {
+                final res = await showOkCancelAlertDialog(
+                  context: context,
+                  title: "退出凡觅",
+                  message: "确定退出凡觅吗",
+                  okLabel: "确定",
+                  cancelLabel: "取消",
+                );
+                if (res == OkCancelResult.ok) {
+                  exit(0);
+                }
+              },
+            ),
             resizeToAvoidBottomInset: false,
           );
         });

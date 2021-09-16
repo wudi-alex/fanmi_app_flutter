@@ -215,6 +215,11 @@ class _CardShareContentState extends State<CardShareContent> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500, fontSize: 15.sp),
                     ),
+                    Text(
+                      "(安卓用户建议使用浏览器打开)",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400, fontSize: 11.sp),
+                    ),
                   ],
                 ),
                 qrWidget(),
