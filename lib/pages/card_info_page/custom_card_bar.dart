@@ -1,3 +1,4 @@
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:extended_sliver/extended_sliver.dart';
 import 'package:fanmi/config/app_router.dart';
@@ -5,13 +6,16 @@ import 'package:fanmi/config/asset_constants.dart';
 import 'package:fanmi/config/text_constants.dart';
 import 'package:fanmi/entity/card_info_entity.dart';
 import 'package:fanmi/enums/card_type_enum.dart';
+import 'package:fanmi/net/user_service.dart';
 import 'package:fanmi/utils/storage_manager.dart';
 import 'package:fanmi/widgets/common_image.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:tencent_im_sdk_plugin/tencent_im_sdk_plugin.dart';
 
 class CustomCardBar extends StatefulWidget {
   final CardInfoEntity data;
@@ -49,6 +53,8 @@ class _CustomCardBarState extends State<CustomCardBar>
   get _name => widget.data.name;
 
   get _sign => widget.data.sign ?? TextConstants.DEFAULT_CARD_SIGN;
+
+  get _card => widget.data;
 
   @override
   void initState() {
@@ -163,33 +169,34 @@ class _CustomCardBarState extends State<CustomCardBar>
               padding: EdgeInsets.all(10.0.r),
               child: GestureDetector(
                 onTap: () {
-                  if (widget.data.uid == StorageManager.uid) {
-                    Navigator.of(context).pushNamed(AppRouter.CardEditPageRoute,
-                        arguments: CardTypeEnum.getCardType(widget.data.type!));
-                  } else {
-                    if (!StorageManager.isLogin) {
-                      SmartDialog.showToast("请先登录哦～");
-                      return;
-                    }
-                    Navigator.of(context).pushNamed(
-                        AppRouter.ReportMailPageRoute,
-                        arguments: widget.data);
-                  }
+                  // if (widget.data.uid == StorageManager.uid) {
+                  //   Navigator.of(context).pushNamed(AppRouter.CardEditPageRoute,
+                  //       arguments: CardTypeEnum.getCardType(widget.data.type!));
+                  // } else {
+                  //   if (!StorageManager.isLogin) {
+                  //     SmartDialog.showToast("请先登录哦～");
+                  //     return;
+                  //   }
+                  //   Navigator.of(context).pushNamed(
+                  //       AppRouter.ReportMailPageRoute,
+                  //       arguments: widget.data);
+                  // }
+                  actionCallback();
                 },
-                // child: Icon(
-                //   Icons.more_horiz,
-                //   color: _animatedBackButtonColors.evaluate(
-                //       AlwaysStoppedAnimation(_animationController.value)),
-                // ),
-                child: Text(
-                  widget.data.uid == StorageManager.uid ? "编辑" : "举报",
-                  style: TextStyle(
-                    color: _animatedBackButtonColors.evaluate(
-                        AlwaysStoppedAnimation(_animationController.value)),
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Icon(
+                  Icons.more_horiz,
+                  color: _animatedBackButtonColors.evaluate(
+                      AlwaysStoppedAnimation(_animationController.value)),
                 ),
+                // child: Text(
+                //   widget.data.uid == StorageManager.uid ? "编辑" : "举报",
+                //   style: TextStyle(
+                //     color: _animatedBackButtonColors.evaluate(
+                //         AlwaysStoppedAnimation(_animationController.value)),
+                //     fontSize: 16.sp,
+                //     fontWeight: FontWeight.w500,
+                //   ),
+                // ),
               ),
             ),
           ),
@@ -206,7 +213,7 @@ class _CustomCardBarState extends State<CustomCardBar>
         backgroundColor: Colors.transparent,
         builder: (BuildContext context) {
           return Container(
-              height: 70.r,
+              height: 90.r,
               width: MediaQuery.of(context).size.width,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
@@ -229,23 +236,80 @@ class _CustomCardBarState extends State<CustomCardBar>
                                 CardTypeEnum.getCardType(widget.data.type!));
                       },
                     )
-                  : GestureDetector(
-                      child: Center(
-                        child: Text(
-                          "举报",
-                          style: TextStyle(
-                              fontSize: 20.sp, fontWeight: FontWeight.w500),
+                  : Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          child: Center(
+                            child: Text(
+                              "拉黑",
+                              style: TextStyle(
+                                  fontSize: 20.sp, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          onTap: () async {
+                            if (!StorageManager.isLogin) {
+                              SmartDialog.showToast("请先登录哦～");
+                              return;
+                            }
+                            final res = await showOkCancelAlertDialog(
+                              context: context,
+                              title: "拉黑该名片及用户",
+                              message: "确定拉黑该名片及用户吗？拉黑后将屏蔽该用户所有内容及消息",
+                              okLabel: "确定",
+                              cancelLabel: "取消",
+                            );
+                            if (res == OkCancelResult.ok) {
+                              EasyLoading.show(status: "拉黑中");
+                              Future.wait([
+                                UserService.addBlock(
+                                    blockedUid: widget.data.uid!,
+                                    blockDict: {
+                                      "uid": StorageManager.uid,
+                                      "blocked_uid": widget.data.uid,
+                                      "blocked_card_id": widget.data.id,
+                                      "blocked_avatar": widget.data.avatarUrl,
+                                      "blocked_name": widget.data.name,
+                                    }),
+                                TencentImSDKPlugin.v2TIMManager
+                                    .getFriendshipManager()
+                                    .addToBlackList(
+                                  userIDList: [
+                                    widget.data.uid.toString(),
+                                  ],
+                                )
+                              ]).then((v) {
+                                EasyLoading.showSuccess("拉黑成功");
+                                Navigator.of(context).pop();
+                              }).onError((error, stackTrace) {
+                                EasyLoading.showError("拉黑失败");
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          },
                         ),
-                      ),
-                      onTap: () {
-                        if (!StorageManager.isLogin) {
-                          SmartDialog.showToast("请先登录哦～");
-                          return;
-                        }
-                        Navigator.of(context).pushNamed(
-                            AppRouter.ReportMailPageRoute,
-                            arguments: widget.data);
-                      },
+                        Divider(
+                          height: 0.1,
+                        ),
+                        GestureDetector(
+                          child: Center(
+                            child: Text(
+                              "举报",
+                              style: TextStyle(
+                                  fontSize: 20.sp, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                          onTap: () {
+                            if (!StorageManager.isLogin) {
+                              SmartDialog.showToast("请先登录哦～");
+                              return;
+                            }
+                            Navigator.of(context).pushNamed(
+                                AppRouter.ReportMailPageRoute,
+                                arguments: widget.data);
+                          },
+                        ),
+                      ],
                     ));
         });
   }

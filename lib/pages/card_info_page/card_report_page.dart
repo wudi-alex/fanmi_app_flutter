@@ -154,7 +154,7 @@ class _CardReportPageState extends State<CardReportPage> {
                 textInputAction: TextInputAction.done,
                 style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
                 decoration: InputDecoration(
-                  hintText: "请描述您需要举报该卡片/用户的具体信息（可附加图片）",
+                  hintText: "请描述您需要举报该名片/用户的具体信息（可附加图片）",
                   contentPadding: EdgeInsets.all(5.r),
                   border: OutlineInputBorder(),
                   isCollapsed: true,

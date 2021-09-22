@@ -12,6 +12,7 @@ import 'package:fanmi/pages/long_text_edit_page.dart';
 import 'package:fanmi/pages/main_page.dart';
 import 'package:fanmi/pages/message_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_about_page.dart';
+import 'package:fanmi/pages/mine_page/mine_block_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_board_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_contact_list_page.dart';
 import 'package:fanmi/pages/mine_page/mine_contact_page.dart';
@@ -56,6 +57,7 @@ class AppRouter {
   static const String MineMailPasswordPageRoute =
       '/mine_mail_password_page_route';
   static const String MineContactUsPageRoute = '/mine_contact_us_page_route';
+  static const String MineBlockListPageRoute = '/mine_block_list_page_route';
   static const String MineUserPolicyPageRoute = '/mine_user_policy_page_route';
   static const String MinePrivacyPolicyPageRoute =
       '/mine_privacy_policy_page_route';
@@ -249,6 +251,11 @@ class AppRouter {
       case MineBoardListPageRoute:
         return PageTransition(
             child: MineBoardListPage(),
+            type: PageTransitionType.rightToLeft,
+            settings: settings);
+      case MineBlockListPageRoute:
+        return PageTransition(
+            child: MineBlockListPage(),
             type: PageTransitionType.rightToLeft,
             settings: settings);
       case ReportMailPageRoute:

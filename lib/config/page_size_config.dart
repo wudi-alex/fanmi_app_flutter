@@ -5,4 +5,5 @@ class PageSizeConfig {
   static const int CONTACT_PAGE_SIZE = 20;
   static const int FAVOR_PAGE_SIZE = 10;
   static const int BOARD_LIST_PAGE_SIZE = 20;
+  static const int BLOCK_LIST_PAGE_SIZE = 20;
 }

@@ -267,7 +267,7 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.all(Radius.circular(20.r)),
           height: 45.r,
           style: SignInWithAppleButtonStyle.whiteOutlined,
-          text: 'Apple登录',
+          text: '通过Apple登录',
           onPressed: () async {
             final credential = await SignInWithApple.getAppleIDCredential(
               scopes: [

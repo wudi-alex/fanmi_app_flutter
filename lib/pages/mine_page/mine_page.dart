@@ -83,6 +83,14 @@ class _MinePageState extends State<MinePage> {
             },
             child: Container(),
           ),
+          divider,
+          CustomListTile(
+            headerText: '黑名单',
+            onTap: () {
+              Navigator.of(context).pushNamed(AppRouter.MineBlockListPageRoute);
+            },
+            child: Container(),
+          ),
           block,
           CustomListTile(
             headerText: '头像',
@@ -325,8 +333,8 @@ class _MinePageState extends State<MinePage> {
                 logout(context).then((v) {
                   EasyLoading.dismiss();
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRouter.LoginPageRoute,
-                      ModalRoute.withName('/'),
+                    AppRouter.LoginPageRoute,
+                    ModalRoute.withName('/'),
                   );
                 });
               }
@@ -367,7 +375,6 @@ class _MinePageState extends State<MinePage> {
                     );
                   });
                 });
-
               }
             },
           ),

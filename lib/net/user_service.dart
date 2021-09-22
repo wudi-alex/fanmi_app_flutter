@@ -1,6 +1,8 @@
+import 'package:fanmi/entity/block_entity.dart';
 import 'package:fanmi/entity/board_item_entity.dart';
 import 'package:fanmi/entity/card_preview_entity.dart';
 import 'package:fanmi/entity/contact_entity.dart';
+import 'package:fanmi/generated/json/block_entity_helper.dart';
 import 'package:fanmi/generated/json/board_item_entity_helper.dart';
 import 'package:fanmi/generated/json/card_preview_entity_helper.dart';
 import 'package:fanmi/generated/json/contact_entity_helper.dart';
@@ -10,7 +12,6 @@ import 'package:fanmi/utils/storage_manager.dart';
 import 'http_client.dart';
 
 class UserService {
-
   static Future getUserInfo() async {
     print(StorageManager.regId);
     String deviceInfo = await PlatformUtils.getDeviceInfo();
@@ -18,7 +19,7 @@ class UserService {
       "uid": StorageManager.uid,
       "platform": Platform.operatingSystem,
       "device": deviceInfo,
-      "reg_id":StorageManager.regId,
+      "reg_id": StorageManager.regId,
     });
     return resp;
   }
@@ -73,5 +74,36 @@ class UserService {
     var resp = await http
         .post('/user/delete_user_account', data: {"uid": StorageManager.uid});
     return resp;
+  }
+
+  static Future addBlock(
+      {required int blockedUid, required Map blockDict}) async {
+    var resp = await http.post('/user/add_block', data: {
+      "uid": StorageManager.uid,
+      "blocked_uid": blockedUid,
+      "blocked_dict": blockDict
+    });
+    return resp;
+  }
+
+  static Future cancelBlock({
+    required int blockedUid,
+  }) async {
+    var resp = await http.post('/user/cancel_block', data: {
+      "uid": StorageManager.uid,
+      "blocked_uid": blockedUid,
+    });
+    return resp;
+  }
+
+  static Future getBlockList({required int page}) async {
+    var resp = await http.post('/user/get_block_list', data: {
+      "uid": StorageManager.uid,
+      "page": page,
+    });
+    return resp.data
+        .map<BlockEntity>(
+            (item) => blockEntityFromJson(BlockEntity(), item) as BlockEntity)
+        .toList();
   }
 }
