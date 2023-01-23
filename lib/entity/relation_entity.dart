@@ -1,0 +1,44 @@
+import 'package:fanmi/generated/json/base/json_convert_content.dart';
+import 'package:fanmi/generated/json/base/json_field.dart';
+
+class RelationEntity with JsonConvert<RelationEntity> {
+	@JSONField(name: "add_card_id")
+	int? addCardId;
+	@JSONField(name: "add_card_type")
+	int? addCardType;
+	@JSONField(name: "birth_date")
+	String? birthDate;
+	String? city;
+	int? gender;
+	int? id;
+	@JSONField(name: "is_applicant")
+	int? isApplicant;
+	@JSONField(name: "last_login_time")
+	String? lastLoginTime;
+	int? status;
+	@JSONField(name: "t_avatar")
+	String? tAvatar;
+	@JSONField(name: "t_name")
+	String? tName;
+	@JSONField(name: "t_qq")
+	String? tQq;
+	@JSONField(name: "t_wx")
+	String? tWx;
+	@JSONField(name: "target_card_id")
+	int? targetCardId;
+	@JSONField(name: "target_card_type")
+	int? targetCardType;
+	@JSONField(name: "target_uid")
+	int? targetUid;
+	@JSONField(name: "u_avatar")
+	String? uAvatar;
+	@JSONField(name: "u_name")
+	String? uName;
+	@JSONField(name: "u_qq")
+	String? uQq;
+	@JSONField(name: "u_wx")
+	String? uWx;
+	int? uid;
+	@JSONField(name: "user_status")
+	int? userStatus;
+}

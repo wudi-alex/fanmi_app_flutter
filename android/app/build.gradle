@@ -23,7 +23,12 @@ if (flutterVersionName == null) {
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.huawei.agconnect'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 30
@@ -34,18 +39,61 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.fanminet.fanmi_app_v2"
-        minSdkVersion 16
+        applicationId "com.fanminet.fanmi"
+        minSdkVersion 19
         targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        multiDexEnabled true
+
+        ndk {
+            //选择要添加的对应 cpu 类型的 .so 库。
+            abiFilters 'armeabi', 'armeabi-v7a', 'x86', 'x86_64', 'mips', 'mips64', 'arm64-v8a'
+        }
+
+        manifestPlaceholders = [
+                TENCENT_APPID : "1111833337",
+                TENCENT_APP_ID : "1111833337",
+
+                JSHARE_PKGNAME : "com.fanminet.fanmi",
+                JPUSH_PKGNAME : "com.fanminet.fanmi",
+                JPUSH_APPKEY : "7a2d057f7592707ca6d56543", // NOTE: JPush 上注册的包名对应的 Appkey.
+                JPUSH_CHANNEL : "developer-default",
+                FACEBOOK_APPID : "facebook开发者应用的appID",
+                //暂时填写默认值即可.
+                MEIZU_APPKEY : "4dd6740e44e24db39686d7d5e948385e",
+                MEIZU_APPID : "144002",
+                XIAOMI_APPID : "MI-2882303761520040822",
+                XIAOMI_APPKEY : "MI-5572004045822",
+                OPPO_APPKEY : "OP-eefae768d3cf4e05a0ae7fdbe748d9d5",
+                OPPO_APPID : "OP-30629209",
+                OPPO_APPSECRET : "OP-89bd06b267d54c05b0c934241432c694",
+                VIVO_APPKEY : "0d3724deba3ff48fad079266892c4d46",
+                VIVO_APPID : "105509681"
+        ]
+    }
+
+    signingConfigs{
+        release{
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
+            proguardFiles 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug{
+            minifyEnabled false
+            signingConfig signingConfigs.release
         }
     }
 }
@@ -56,4 +104,21 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:multidex:1.0.3'
+    api 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
+
+    implementation 'cn.jiguang.sdk:jcore:2.7.2'  // 此处以JCore 2.7.2 版本为例。
+    implementation 'cn.jiguang.sdk:jpush:4.2.8'  // 此处以JPush 4.0.0 版本为例
+    // 接入华为厂商
+    implementation 'com.huawei.hms:push:5.3.0.301'
+    //引入极光-华为插件，如果采用此配置，无需拷贝jpush-android-plugin-huawei-v4.x.x.jar文件，也无需配置cn.jpush.android.service.PluginHuaweiPlatformsService组件
+    implementation 'cn.jiguang.sdk.plugin:huawei:4.2.8'
+    // 接入魅族厂商
+    implementation 'cn.jiguang.sdk.plugin:meizu:4.2.8'
+    // 接入 VIVO 厂商
+    implementation 'cn.jiguang.sdk.plugin:vivo:4.2.8'
+    // 接入 OPPO 厂商
+    implementation 'cn.jiguang.sdk.plugin:oppo:4.2.8'
+    // 接入小米厂商
+    implementation 'cn.jiguang.sdk.plugin:xiaomi:4.2.8'
 }
