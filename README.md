@@ -2,12 +2,16 @@
 
 ## Introduction
 
-Fanmi is an APP designed for efficient social interaction.
-The main function is that users can create different types of social cards, and at the same time, they can establish contacts through cards, exchange contact information, and realize efficient social connecting.
+Fanmi is an APP designed for efficient social interaction.  
+The main function is that users can create different types of social cards, and at the same time, they can establish contacts through cards, exchange contact information, and realize efficient social connecting.  
 This is the open source code of Fanmi client, which uses flutter framework and integrates with Tencent Cloud IM SDK.    
-凡觅是一个以效率社交为目的设计的APP。
-主要功能是用户可以创建不同类型的社交卡片，同时可以通过卡片建立联系，交换联系方式，实现效率社交。
-这是凡觅客户端开源代码，使用flutter框架，同时集成腾讯云IM等SDK。
+Fanmi used to be launched in the Apple Store, meaning that its functional integrity is fully guaranteed.
+But because the versions of Fultter frameworks and plugins change frequently, current code needs to be modified to run successfully according to the version you're using.
+凡觅是一个以效率社交为目的设计的APP。  
+主要功能是用户可以创建不同类型的社交卡片，同时可以通过卡片建立联系，交换联系方式，实现效率社交。  
+这是凡觅客户端开源代码，使用flutter框架，同时集成腾讯云IM等SDK。  
+凡觅上架过苹果商店，可充分保证其功能完整性。  
+但是由于Fultter框架和插件的版本更迭，现代码需根据使用的版本做适当改动方可运行。
 
 ## packages used
 
