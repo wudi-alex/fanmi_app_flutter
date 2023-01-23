@@ -1,5 +1,11 @@
 # fanmi_app_client
 
+## Overview
+<img src="assets/overview/1.png">  
+<img src="assets/overview/2.png">  
+<img src="assets/overview/3.png">  
+<img src="assets/overview/4.png">  
+
 ## Introduction
 
 Fanmi is an APP designed for efficient social interaction. 
@@ -15,7 +21,7 @@ current code needs to be modified to run successfully according to the version y
 凡觅上架过苹果商店，可充分保证其功能完整性。
 但是由于Fultter框架和插件的版本更迭，现代码需根据使用的版本做适当改动方可运行。
 
-## packages used
+## Packages used
 
 cupertino_icons: ^1.0.2
 ### 设备信息
