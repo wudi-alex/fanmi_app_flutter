@@ -62,7 +62,7 @@ class _FanmiAppState extends State<FanmiApp> {
       print('Failed to get platform version.');
     }
     jpush.setup(
-      appKey: "7a2d057f7592707ca6d56543", //你自己应用的 AppKey
+      appKey: "", //你自己应用的 AppKey
       channel: "theChannel",
       production: false,
       debug: true,
